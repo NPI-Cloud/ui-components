@@ -11,7 +11,10 @@ export enum BlockType {
 	Form = 'form',
 	Divider = 'divider',
 	Html = 'html',
+	Dynamic = 'dynamic',
 }
+
+export type TextVariant = 'heading' | 'paragraph' | 'list'
 
 export interface BaseBlockData {
 	id: string
@@ -30,6 +33,7 @@ export interface HeroBlockData extends BaseBlockData {
 
 export interface TextBlockData extends BaseBlockData {
 	type: BlockType.Text
+	textVariant: TextVariant
 	content: string
 }
 
@@ -92,6 +96,14 @@ export interface HtmlBlockData extends BaseBlockData {
 	html: string
 }
 
+export interface DynamicBlockData extends BaseBlockData {
+	type: BlockType.Dynamic
+	dynamicSource: string
+	dynamicFilter?: Record<string, unknown>
+	dynamicSort?: string
+	dynamicLimit?: number
+}
+
 export type AnyBlockData =
 	| HeroBlockData
 	| TextBlockData
@@ -105,3 +117,4 @@ export type AnyBlockData =
 	| FormBlockData
 	| DividerBlockData
 	| HtmlBlockData
+	| DynamicBlockData
