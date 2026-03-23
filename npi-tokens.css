@@ -1,0 +1,96 @@
+/* NPI UI Kit design tokens — Tailwind v4 @theme */
+
+@layer base {
+	:root {
+		/* NPI Brand colors */
+		--npi-blue: hsl(213 89% 40%);
+		--npi-blue-light: hsl(213 89% 60%);
+		--npi-blue-dark: hsl(213 89% 25%);
+		--npi-green: hsl(152 60% 40%);
+		--npi-green-light: hsl(152 60% 55%);
+		--npi-orange: hsl(28 95% 55%);
+		--npi-red: hsl(0 72% 50%);
+
+		/* NPI Neutrals */
+		--npi-gray-50: hsl(210 20% 98%);
+		--npi-gray-100: hsl(210 16% 93%);
+		--npi-gray-200: hsl(210 14% 85%);
+		--npi-gray-300: hsl(210 11% 71%);
+		--npi-gray-400: hsl(210 9% 56%);
+		--npi-gray-500: hsl(210 8% 45%);
+		--npi-gray-600: hsl(210 10% 35%);
+		--npi-gray-700: hsl(210 12% 25%);
+		--npi-gray-800: hsl(210 15% 16%);
+		--npi-gray-900: hsl(210 20% 9%);
+
+		/* NPI Typography scale */
+		--npi-font-family-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+		--npi-font-family-mono: 'JetBrains Mono', ui-monospace, monospace;
+		--npi-font-size-xs: 0.75rem;
+		--npi-font-size-sm: 0.875rem;
+		--npi-font-size-base: 1rem;
+		--npi-font-size-lg: 1.125rem;
+		--npi-font-size-xl: 1.25rem;
+		--npi-font-size-2xl: 1.5rem;
+		--npi-font-size-3xl: 1.875rem;
+		--npi-font-size-4xl: 2.25rem;
+		--npi-font-size-5xl: 3rem;
+
+		/* NPI Spacing */
+		--npi-spacing-xs: 0.25rem;
+		--npi-spacing-sm: 0.5rem;
+		--npi-spacing-md: 1rem;
+		--npi-spacing-lg: 1.5rem;
+		--npi-spacing-xl: 2rem;
+		--npi-spacing-2xl: 3rem;
+		--npi-spacing-3xl: 4rem;
+
+		/* NPI Radius */
+		--npi-radius-sm: 0.25rem;
+		--npi-radius-md: 0.375rem;
+		--npi-radius-lg: 0.5rem;
+		--npi-radius-xl: 0.75rem;
+		--npi-radius-2xl: 1rem;
+		--npi-radius-full: 9999px;
+
+		/* NPI Shadows */
+		--npi-shadow-sm: 0 1px 2px 0 hsl(0 0% 0% / 0.05);
+		--npi-shadow-md: 0 4px 6px -1px hsl(0 0% 0% / 0.1), 0 2px 4px -2px hsl(0 0% 0% / 0.1);
+		--npi-shadow-lg: 0 10px 15px -3px hsl(0 0% 0% / 0.1), 0 4px 6px -4px hsl(0 0% 0% / 0.1);
+	}
+}
+
+@theme {
+	/* NPI Brand colors */
+	--color-npi-blue: var(--npi-blue);
+	--color-npi-blue-light: var(--npi-blue-light);
+	--color-npi-blue-dark: var(--npi-blue-dark);
+	--color-npi-green: var(--npi-green);
+	--color-npi-green-light: var(--npi-green-light);
+	--color-npi-orange: var(--npi-orange);
+	--color-npi-red: var(--npi-red);
+
+	/* NPI Neutrals */
+	--color-npi-gray-50: var(--npi-gray-50);
+	--color-npi-gray-100: var(--npi-gray-100);
+	--color-npi-gray-200: var(--npi-gray-200);
+	--color-npi-gray-300: var(--npi-gray-300);
+	--color-npi-gray-400: var(--npi-gray-400);
+	--color-npi-gray-500: var(--npi-gray-500);
+	--color-npi-gray-600: var(--npi-gray-600);
+	--color-npi-gray-700: var(--npi-gray-700);
+	--color-npi-gray-800: var(--npi-gray-800);
+	--color-npi-gray-900: var(--npi-gray-900);
+
+	/* NPI Typography */
+	--font-family-npi-sans: var(--npi-font-family-sans);
+	--font-family-npi-mono: var(--npi-font-family-mono);
+
+	/* NPI Border radii */
+	--radius-npi-sm: var(--npi-radius-sm);
+	--radius-npi-md: var(--npi-radius-md);
+	--radius-npi-lg: var(--npi-radius-lg);
+	--radius-npi-xl: var(--npi-radius-xl);
+	--radius-npi-2xl: var(--npi-radius-2xl);
+	--radius-npi-full: var(--npi-radius-full);
+}

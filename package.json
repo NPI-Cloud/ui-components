@@ -1,0 +1,14 @@
+{
+	"name": "@app/ui-components",
+	"private": true,
+	"type": "module",
+	"main": "src/index.ts",
+
+	"dependencies": {
+		"react": "catalog:ui",
+		"tailwindcss": "catalog:ui-dev"
+	},
+	"devDependencies": {
+		"@types/react": "catalog:ui-dev"
+	}
+}
