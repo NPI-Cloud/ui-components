@@ -2,4 +2,5 @@ export { ContentImageBlock, type ContentImageBlockProps } from './ContentImageBl
 export { DynamicBlock, type DynamicBlockProps } from './DynamicBlock'
 export { HeroBlock, type HeroBlockProps } from './HeroBlock'
 export { ImageBlock, type ImageBlockProps } from './ImageBlock'
+export { NewsletterBlock, type NewsletterBlockProps } from './NewsletterBlock'
 export { TextBlock, type TextBlockProps } from './TextBlock'
