@@ -1,3 +1,5 @@
-export { DynamicBlock, type DynamicBlockProps } from './DynamicBlock.js'
-export { ImageBlock, type ImageBlockProps } from './ImageBlock.js'
-export { TextBlock, type TextBlockProps } from './TextBlock.js'
+export { ContentImageBlock, type ContentImageBlockProps } from './ContentImageBlock'
+export { DynamicBlock, type DynamicBlockProps } from './DynamicBlock'
+export { HeroBlock, type HeroBlockProps } from './HeroBlock'
+export { ImageBlock, type ImageBlockProps } from './ImageBlock'
+export { TextBlock, type TextBlockProps } from './TextBlock'

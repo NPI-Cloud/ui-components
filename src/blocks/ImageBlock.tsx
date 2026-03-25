@@ -1,7 +1,7 @@
 export interface ImageBlockProps {
-	imageUrl?: string
-	imageAlt?: string
-	imageCaption?: string
+	imageUrl?: string | null
+	imageAlt?: string | null
+	imageCaption?: string | null
 }
 
 export function ImageBlock({ imageUrl, imageAlt, imageCaption }: ImageBlockProps) {
