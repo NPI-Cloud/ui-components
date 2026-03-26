@@ -1,14 +1,14 @@
 export interface DynamicBlockProps {
-	dynamicSource?: string
-	dynamicFilter?: Record<string, unknown>
-	dynamicSort?: string
-	dynamicLimit?: number
+	dynamicSource?: string | null
+	dynamicFilter?: Record<string, unknown> | null
+	dynamicSort?: string | null
+	dynamicLimit?: number | null
 	/** Section heading displayed above the card grid */
-	heading?: string
+	heading?: string | null
 	/** CTA button label */
-	ctaLabel?: string
+	ctaLabel?: string | null
 	/** CTA button URL */
-	ctaUrl?: string
+	ctaUrl?: string | null
 }
 
 interface MockCard {
@@ -40,7 +40,7 @@ const mockCards: MockCard[] = [
 
 function CardThumbnail({ tag }: { tag?: string }) {
 	return (
-		<div className="relative aspect-[4/3] w-full overflow-hidden rounded-npi-lg bg-npi-blue">
+		<div className="relative aspect-4/3 w-full overflow-hidden rounded-npi-lg bg-npi-blue">
 			{/* Decorative background shapes */}
 			<svg className="absolute inset-0 h-full w-full" viewBox="0 0 400 300" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
 				{/* Large play-button triangle */}
