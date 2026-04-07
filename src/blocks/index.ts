@@ -1,5 +1,8 @@
+export { ColumnBlock } from './ColumnBlock'
 export { ContentImageBlock, type ContentImageBlockProps } from './ContentImageBlock'
 export { DynamicBlock, type DynamicBlockProps } from './DynamicBlock'
+export { FlexEndBlock } from './FlexEndBlock'
+export { FlexStartBlock, type FlexStartBlockProps } from './FlexStartBlock'
 export { HeroBlock, type HeroBlockProps } from './HeroBlock'
 export { ImageBlock, type ImageBlockProps } from './ImageBlock'
 export { NewsletterBlock, type NewsletterBlockProps } from './NewsletterBlock'
