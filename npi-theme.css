@@ -22,15 +22,10 @@
 
 	/* NPI Grays */
 	--color-npi-black: var(--npi-black);
-	--color-npi-gray-900: var(--npi-gray-900);
-	--color-npi-gray-800: var(--npi-gray-800);
 	--color-npi-gray-700: var(--npi-gray-700);
-	--color-npi-gray-600: var(--npi-gray-600);
-	--color-npi-gray-500: var(--npi-gray-500);
 	--color-npi-gray-400: var(--npi-gray-400);
 	--color-npi-gray-300: var(--npi-gray-300);
 	--color-npi-gray-200: var(--npi-gray-200);
-	--color-npi-gray-100: var(--npi-gray-100);
 	--color-npi-gray-50: var(--npi-gray-50);
 	--color-npi-white: var(--npi-white);
 
@@ -100,7 +95,25 @@
 	--radius-npi-m: var(--npi-radius-m);
 	--radius-npi-l: var(--npi-radius-l);
 	--radius-npi-xl: var(--npi-radius-xl);
-	--radius-npi-full: var(--npi-radius-full);
+
+	/* NPI Spacing — additive, does not override Tailwind defaults */
+	--spacing-npi-1: 4px;
+	--spacing-npi-2: 8px;
+	--spacing-npi-3: 12px;
+	--spacing-npi-4: 16px;
+	--spacing-npi-6: 24px;
+	--spacing-npi-8: 32px;
+	--spacing-npi-10: 40px;
+	--spacing-npi-12: 48px;
+	--spacing-npi-14: 56px;
+	--spacing-npi-16: 64px;
+	--spacing-npi-18: 72px;
+	--spacing-npi-20: 80px;
+	--spacing-npi-22: 88px;
+	--spacing-npi-25: 100px;
+	--spacing-npi-30: 120px;
+	--spacing-npi-40: 160px;
+	--spacing-npi-50: 200px;
 
 	/* NPI Shadows — namespaced, does not override Tailwind defaults */
 	--shadow-npi-s: var(--npi-shadow-s);

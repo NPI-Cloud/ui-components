@@ -21,17 +21,12 @@
 		--npi-bg-dark: #02216E;
 		--npi-bg-blue: #3566FC;
 
-		/* NPI Grays — Figma anchors: P427=#FAFAFA, P428=#E0E0E0, P429=#C6C6C6, P430=#ABABAB, P431=#525252 */
+		/* NPI Grays — Figma: Black, P431, P430, P429, P428, P427, White */
 		--npi-black: #000000;
-		--npi-gray-900: #1A1A1A;
-		--npi-gray-800: #363636;
 		--npi-gray-700: #525252;
-		--npi-gray-600: #707070;
-		--npi-gray-500: #8E8E8E;
 		--npi-gray-400: #ABABAB;
 		--npi-gray-300: #C6C6C6;
 		--npi-gray-200: #E0E0E0;
-		--npi-gray-100: #F0F0F0;
 		--npi-gray-50: #FAFAFA;
 		--npi-white: #FFFFFF;
 
@@ -101,7 +96,6 @@
 		--npi-radius-m: 24px;
 		--npi-radius-l: 32px;
 		--npi-radius-xl: 40px;
-		--npi-radius-full: 9999px;
 
 		/* NPI Shadows */
 		--npi-shadow-s: 0 2px 5px 0 #F0F0F0;
