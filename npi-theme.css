@@ -1,0 +1,111 @@
+/* NPI Design System — Tailwind v4 theme mappings (additive, no default overrides) */
+
+@theme {
+	/* NPI Primary */
+	--color-npi-blue: var(--npi-blue);
+	--color-npi-blue-hover: var(--npi-blue-hover);
+	--color-npi-blue-dark: var(--npi-blue-dark);
+	--color-npi-blue-light: var(--npi-blue-light);
+	--color-npi-blue-lighter: var(--npi-blue-lighter);
+
+	/* NPI Typography colors */
+	--color-npi-text-primary: var(--npi-text-primary);
+	--color-npi-text-secondary: var(--npi-text-secondary);
+	--color-npi-text-link: var(--npi-text-link);
+	--color-npi-text-link-hover: var(--npi-text-link-hover);
+
+	/* NPI Backgrounds */
+	--color-npi-bg-white: var(--npi-bg-white);
+	--color-npi-bg-light: var(--npi-bg-light);
+	--color-npi-bg-dark: var(--npi-bg-dark);
+	--color-npi-bg-blue: var(--npi-bg-blue);
+
+	/* NPI Grays */
+	--color-npi-black: var(--npi-black);
+	--color-npi-gray-900: var(--npi-gray-900);
+	--color-npi-gray-800: var(--npi-gray-800);
+	--color-npi-gray-700: var(--npi-gray-700);
+	--color-npi-gray-600: var(--npi-gray-600);
+	--color-npi-gray-500: var(--npi-gray-500);
+	--color-npi-gray-400: var(--npi-gray-400);
+	--color-npi-gray-300: var(--npi-gray-300);
+	--color-npi-gray-200: var(--npi-gray-200);
+	--color-npi-gray-100: var(--npi-gray-100);
+	--color-npi-gray-50: var(--npi-gray-50);
+	--color-npi-white: var(--npi-white);
+
+	/* NPI Secondary — reds & pinks */
+	--color-npi-red: var(--npi-red);
+	--color-npi-maroon: var(--npi-maroon);
+	--color-npi-coral: var(--npi-coral);
+	--color-npi-pink: var(--npi-pink);
+	--color-npi-light-pink: var(--npi-light-pink);
+
+	/* NPI Secondary — oranges */
+	--color-npi-orange: var(--npi-orange);
+	--color-npi-peach: var(--npi-peach);
+
+	/* NPI Secondary — browns & earths */
+	--color-npi-dark-brown: var(--npi-dark-brown);
+	--color-npi-rust-brown: var(--npi-rust-brown);
+	--color-npi-rust: var(--npi-rust);
+	--color-npi-caramel: var(--npi-caramel);
+	--color-npi-sand: var(--npi-sand);
+	--color-npi-beige: var(--npi-beige);
+	--color-npi-taupe: var(--npi-taupe);
+
+	/* NPI Secondary — yellows & golds */
+	--color-npi-dark-gold: var(--npi-dark-gold);
+	--color-npi-gold: var(--npi-gold);
+	--color-npi-yellow: var(--npi-yellow);
+	--color-npi-light-yellow: var(--npi-light-yellow);
+
+	/* NPI Secondary — greens */
+	--color-npi-green: var(--npi-green);
+	--color-npi-dark-sage: var(--npi-dark-sage);
+	--color-npi-sage-green: var(--npi-sage-green);
+	--color-npi-lime: var(--npi-lime);
+	--color-npi-sage: var(--npi-sage);
+
+	/* NPI Secondary — blues & teals */
+	--color-npi-deep-teal: var(--npi-deep-teal);
+	--color-npi-dark-teal: var(--npi-dark-teal);
+	--color-npi-steel-blue: var(--npi-steel-blue);
+	--color-npi-bright-sky: var(--npi-bright-sky);
+	--color-npi-teal: var(--npi-teal);
+	--color-npi-sky-blue: var(--npi-sky-blue);
+	--color-npi-gray-blue: var(--npi-gray-blue);
+	--color-npi-lavender: var(--npi-lavender);
+
+	/* NPI Secondary — purples */
+	--color-npi-purple: var(--npi-purple);
+	--color-npi-light-purple: var(--npi-light-purple);
+
+	/* NPI Secondary — neutrals */
+	--color-npi-warm-gray: var(--npi-warm-gray);
+
+	/* NPI Status */
+	--color-npi-status-error: var(--npi-status-error);
+	--color-npi-status-success: var(--npi-status-success);
+	--color-npi-status-warning: var(--npi-status-warning);
+
+	/* NPI Typography */
+	--font-family-npi-serif: var(--npi-font-family-serif);
+	--font-family-npi-sans: var(--npi-font-family-sans);
+	--font-family-npi-mono: var(--npi-font-family-mono);
+
+	/* NPI Border radii — namespaced, does not override Tailwind defaults */
+	--radius-npi-xxs: var(--npi-radius-xxs);
+	--radius-npi-xs: var(--npi-radius-xs);
+	--radius-npi-s: var(--npi-radius-s);
+	--radius-npi-m: var(--npi-radius-m);
+	--radius-npi-l: var(--npi-radius-l);
+	--radius-npi-xl: var(--npi-radius-xl);
+	--radius-npi-full: var(--npi-radius-full);
+
+	/* NPI Shadows — namespaced, does not override Tailwind defaults */
+	--shadow-npi-s: var(--npi-shadow-s);
+	--shadow-npi-s-hover: var(--npi-shadow-s-hover);
+	--shadow-npi-m: var(--npi-shadow-m);
+	--shadow-npi-m-hover: var(--npi-shadow-m-hover);
+}

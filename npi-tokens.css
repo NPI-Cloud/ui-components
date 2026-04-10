@@ -1,4 +1,4 @@
-/* NPI UI Kit design tokens — Tailwind v4 @theme */
+/* NPI Design System — CSS custom properties */
 
 @layer base {
 	:root {
@@ -35,18 +35,18 @@
 		--npi-gray-50: #FAFAFA;
 		--npi-white: #FFFFFF;
 
-		/* NPI Secondary — reds & pinks (5) */
+		/* NPI Secondary — reds & pinks */
 		--npi-red: #D32737;
 		--npi-maroon: #7D272D;
 		--npi-coral: #FF5867;
 		--npi-pink: #FC9BC1;
 		--npi-light-pink: #F7C1C5;
 
-		/* NPI Secondary — oranges (2) */
+		/* NPI Secondary — oranges */
 		--npi-orange: #FF6A42;
 		--npi-peach: #FDAE82;
 
-		/* NPI Secondary — browns & earths (7) */
+		/* NPI Secondary — browns & earths */
 		--npi-dark-brown: #6B3D31;
 		--npi-rust-brown: #924C30;
 		--npi-rust: #B15536;
@@ -55,20 +55,20 @@
 		--npi-beige: #CDA78E;
 		--npi-taupe: #AB826E;
 
-		/* NPI Secondary — yellows & golds (4) */
+		/* NPI Secondary — yellows & golds */
 		--npi-dark-gold: #998701;
 		--npi-gold: #F1B53D;
 		--npi-yellow: #F3D148;
 		--npi-light-yellow: #F8E5A3;
 
-		/* NPI Secondary — greens (5) */
+		/* NPI Secondary — greens */
 		--npi-green: #24A926;
 		--npi-dark-sage: #637258;
 		--npi-sage-green: #A7C190;
 		--npi-lime: #BCC365;
 		--npi-sage: #E3EBBC;
 
-		/* NPI Secondary — blues & teals (8) */
+		/* NPI Secondary — blues & teals */
 		--npi-deep-teal: #0D525A;
 		--npi-dark-teal: #3F5E5E;
 		--npi-steel-blue: #7088A9;
@@ -78,11 +78,11 @@
 		--npi-gray-blue: #B0C1C8;
 		--npi-lavender: #D9E1F2;
 
-		/* NPI Secondary — purples (2) */
+		/* NPI Secondary — purples */
 		--npi-purple: #7F55D3;
 		--npi-light-purple: #AD96E9;
 
-		/* NPI Secondary — neutrals (1) */
+		/* NPI Secondary — neutrals */
 		--npi-warm-gray: #D8D4D7;
 
 		/* NPI Status colors */
@@ -90,22 +90,9 @@
 		--npi-status-success: #24A926;
 		--npi-status-warning: #F3D148;
 
-		/* NPI Typography scale */
+		/* NPI Typography */
 		--npi-font-family-serif: 'Bitter', ui-serif, Georgia, serif;
 		--npi-font-family-sans: 'Noto Sans', ui-sans-serif, system-ui, sans-serif;
-		--npi-font-family-mono: 'JetBrains Mono', ui-monospace, monospace;
-		--npi-font-size-xs: 0.625rem;
-		--npi-font-size-sm: 0.75rem;
-		--npi-font-size-base: 0.875rem;
-		--npi-font-size-md: 0.875rem;
-		--npi-font-size-lg: 1rem;
-		--npi-font-size-xl: 1.375rem;
-		--npi-font-size-2xl: 1.25rem;
-		--npi-font-size-3xl: 1.5rem;
-		--npi-font-size-4xl: 1.75rem;
-		--npi-font-size-5xl: 2rem;
-		--npi-font-size-6xl: 2.5rem;
-		--npi-font-size-7xl: 3.5rem;
 
 		/* NPI Radius */
 		--npi-radius-xxs: 4px;
@@ -122,136 +109,4 @@
 		--npi-shadow-m: 0 20px 45px 0 #F0F0F0;
 		--npi-shadow-m-hover: 0 20px 45px 0 #F0F0F0;
 	}
-}
-
-@theme {
-	/* NPI Primary */
-	--color-npi-blue: var(--npi-blue);
-	--color-npi-blue-hover: var(--npi-blue-hover);
-	--color-npi-blue-dark: var(--npi-blue-dark);
-	--color-npi-blue-light: var(--npi-blue-light);
-	--color-npi-blue-lighter: var(--npi-blue-lighter);
-
-	/* NPI Typography colors */
-	--color-npi-text-primary: var(--npi-text-primary);
-	--color-npi-text-secondary: var(--npi-text-secondary);
-	--color-npi-text-link: var(--npi-text-link);
-	--color-npi-text-link-hover: var(--npi-text-link-hover);
-
-	/* NPI Backgrounds */
-	--color-npi-bg-white: var(--npi-bg-white);
-	--color-npi-bg-light: var(--npi-bg-light);
-	--color-npi-bg-dark: var(--npi-bg-dark);
-	--color-npi-bg-blue: var(--npi-bg-blue);
-
-	/* NPI Grays */
-	--color-npi-black: var(--npi-black);
-	--color-npi-gray-900: var(--npi-gray-900);
-	--color-npi-gray-800: var(--npi-gray-800);
-	--color-npi-gray-700: var(--npi-gray-700);
-	--color-npi-gray-600: var(--npi-gray-600);
-	--color-npi-gray-500: var(--npi-gray-500);
-	--color-npi-gray-400: var(--npi-gray-400);
-	--color-npi-gray-300: var(--npi-gray-300);
-	--color-npi-gray-200: var(--npi-gray-200);
-	--color-npi-gray-100: var(--npi-gray-100);
-	--color-npi-gray-50: var(--npi-gray-50);
-	--color-npi-white: var(--npi-white);
-
-	/* NPI Secondary — reds & pinks */
-	--color-npi-red: var(--npi-red);
-	--color-npi-maroon: var(--npi-maroon);
-	--color-npi-coral: var(--npi-coral);
-	--color-npi-pink: var(--npi-pink);
-	--color-npi-light-pink: var(--npi-light-pink);
-
-	/* NPI Secondary — oranges */
-	--color-npi-orange: var(--npi-orange);
-	--color-npi-peach: var(--npi-peach);
-
-	/* NPI Secondary — browns & earths */
-	--color-npi-dark-brown: var(--npi-dark-brown);
-	--color-npi-rust-brown: var(--npi-rust-brown);
-	--color-npi-rust: var(--npi-rust);
-	--color-npi-caramel: var(--npi-caramel);
-	--color-npi-sand: var(--npi-sand);
-	--color-npi-beige: var(--npi-beige);
-	--color-npi-taupe: var(--npi-taupe);
-
-	/* NPI Secondary — yellows & golds */
-	--color-npi-dark-gold: var(--npi-dark-gold);
-	--color-npi-gold: var(--npi-gold);
-	--color-npi-yellow: var(--npi-yellow);
-	--color-npi-light-yellow: var(--npi-light-yellow);
-
-	/* NPI Secondary — greens */
-	--color-npi-green: var(--npi-green);
-	--color-npi-dark-sage: var(--npi-dark-sage);
-	--color-npi-sage-green: var(--npi-sage-green);
-	--color-npi-lime: var(--npi-lime);
-	--color-npi-sage: var(--npi-sage);
-
-	/* NPI Secondary — blues & teals */
-	--color-npi-deep-teal: var(--npi-deep-teal);
-	--color-npi-dark-teal: var(--npi-dark-teal);
-	--color-npi-steel-blue: var(--npi-steel-blue);
-	--color-npi-bright-sky: var(--npi-bright-sky);
-	--color-npi-teal: var(--npi-teal);
-	--color-npi-sky-blue: var(--npi-sky-blue);
-	--color-npi-gray-blue: var(--npi-gray-blue);
-	--color-npi-lavender: var(--npi-lavender);
-
-	/* NPI Secondary — purples */
-	--color-npi-purple: var(--npi-purple);
-	--color-npi-light-purple: var(--npi-light-purple);
-
-	/* NPI Secondary — neutrals */
-	--color-npi-warm-gray: var(--npi-warm-gray);
-
-	/* NPI Status */
-	--color-npi-status-error: var(--npi-status-error);
-	--color-npi-status-success: var(--npi-status-success);
-	--color-npi-status-warning: var(--npi-status-warning);
-
-	/* NPI Shadows — overrides Tailwind defaults */
-	--shadow-*: initial;
-	--shadow-s: var(--npi-shadow-s);
-	--shadow-s-hover: var(--npi-shadow-s-hover);
-	--shadow-m: var(--npi-shadow-m);
-	--shadow-m-hover: var(--npi-shadow-m-hover);
-
-	/* NPI Spacing — overrides Tailwind defaults, only these values are valid */
-	--spacing-*: initial;
-	--spacing-1: 4px;
-	--spacing-2: 8px;
-	--spacing-3: 12px;
-	--spacing-4: 16px;
-	--spacing-6: 24px;
-	--spacing-8: 32px;
-	--spacing-10: 40px;
-	--spacing-12: 48px;
-	--spacing-14: 56px;
-	--spacing-16: 64px;
-	--spacing-18: 72px;
-	--spacing-20: 80px;
-	--spacing-22: 88px;
-	--spacing-25: 100px;
-	--spacing-30: 120px;
-	--spacing-40: 160px;
-	--spacing-50: 200px;
-
-	/* NPI Typography */
-	--font-family-npi-serif: var(--npi-font-family-serif);
-	--font-family-npi-sans: var(--npi-font-family-sans);
-	--font-family-npi-mono: var(--npi-font-family-mono);
-
-	/* NPI Border radii — overrides Tailwind defaults */
-	--radius-*: initial;
-	--radius-xxs: var(--npi-radius-xxs);
-	--radius-xs: var(--npi-radius-xs);
-	--radius-s: var(--npi-radius-s);
-	--radius-m: var(--npi-radius-m);
-	--radius-l: var(--npi-radius-l);
-	--radius-xl: var(--npi-radius-xl);
-	--radius-full: var(--npi-radius-full);
 }

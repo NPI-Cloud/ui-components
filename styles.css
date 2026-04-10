@@ -1,0 +1,3 @@
+/* NPI Design System — single import for consumers */
+@import './npi-tokens.css';
+@import './npi-theme.css';

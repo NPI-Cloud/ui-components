@@ -23,7 +23,7 @@ const sizeClasses: Record<NonNullable<ButtonProps['size']>, string> = {
 export function Button({ variant = 'primary', size = 'md', className, children, ...props }: ButtonProps) {
 	return (
 		<button
-			className={`inline-flex items-center justify-center rounded-xs font-npi-sans font-semibold transition-colors disabled:pointer-events-none disabled:opacity-50 ${
+			className={`inline-flex items-center justify-center rounded-npi-xs font-npi-sans font-semibold transition-colors disabled:pointer-events-none disabled:opacity-50 ${
 				variantClasses[variant]
 			} ${sizeClasses[size]} ${className ?? ''}`}
 			{...props}
