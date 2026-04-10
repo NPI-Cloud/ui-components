@@ -5,7 +5,11 @@
 	"main": "src/index.ts",
 
 	"dependencies": {
+		"@radix-ui/react-slot": "catalog:ui",
+		"class-variance-authority": "catalog:ui",
+		"clsx": "catalog:ui",
 		"react": "catalog:ui",
+		"tailwind-merge": "catalog:ui",
 		"tailwindcss": "catalog:ui-dev"
 	},
 	"devDependencies": {
