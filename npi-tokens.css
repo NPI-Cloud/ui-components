@@ -117,9 +117,10 @@
 		--npi-radius-full: 9999px;
 
 		/* NPI Shadows */
-		--npi-shadow-sm: 0 1px 2px 0 hsl(0 0% 0% / 0.05);
-		--npi-shadow-md: 0 4px 6px -1px hsl(0 0% 0% / 0.1), 0 2px 4px -2px hsl(0 0% 0% / 0.1);
-		--npi-shadow-lg: 0 10px 15px -3px hsl(0 0% 0% / 0.1), 0 4px 6px -4px hsl(0 0% 0% / 0.1);
+		--npi-shadow-s: 0 2px 5px 0 #F0F0F0;
+		--npi-shadow-s-hover: 0 2px 10px 0 #F0F0F0;
+		--npi-shadow-m: 0 20px 45px 0 #F0F0F0;
+		--npi-shadow-m-hover: 0 20px 45px 0 #F0F0F0;
 	}
 }
 
@@ -211,6 +212,13 @@
 	--color-npi-status-error: var(--npi-status-error);
 	--color-npi-status-success: var(--npi-status-success);
 	--color-npi-status-warning: var(--npi-status-warning);
+
+	/* NPI Shadows — overrides Tailwind defaults */
+	--shadow-*: initial;
+	--shadow-s: var(--npi-shadow-s);
+	--shadow-s-hover: var(--npi-shadow-s-hover);
+	--shadow-m: var(--npi-shadow-m);
+	--shadow-m-hover: var(--npi-shadow-m-hover);
 
 	/* NPI Spacing — overrides Tailwind defaults, only these values are valid */
 	--spacing-*: initial;
