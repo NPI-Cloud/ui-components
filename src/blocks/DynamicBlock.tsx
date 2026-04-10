@@ -40,7 +40,7 @@ const mockCards: MockCard[] = [
 
 function CardThumbnail({ tag }: { tag?: string }) {
 	return (
-		<div className="relative aspect-4/3 w-full overflow-hidden rounded-npi-lg bg-npi-blue">
+		<div className="relative aspect-4/3 w-full overflow-hidden rounded-xs bg-npi-blue">
 			{/* Decorative background shapes */}
 			<svg className="absolute inset-0 h-full w-full" viewBox="0 0 400 300" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
 				{/* Large play-button triangle */}
@@ -62,7 +62,7 @@ function CardThumbnail({ tag }: { tag?: string }) {
 				)}
 			</svg>
 			{tag && (
-				<span className="absolute left-3 top-3 rounded-npi-sm border border-npi-orange px-2 py-0.5 font-npi-sans text-[length:var(--npi-font-size-xs)] font-medium text-npi-orange">
+				<span className="absolute left-3 top-3 rounded-xxs border border-npi-orange px-2 py-0.5 font-npi-sans text-[length:var(--npi-font-size-xs)] font-medium text-npi-orange">
 					{tag}
 				</span>
 			)}
@@ -115,7 +115,7 @@ export function DynamicBlock({ dynamicSource, dynamicLimit, heading, ctaLabel, c
 				<div>
 					<a
 						href={ctaUrl ?? '#'}
-						className="inline-flex items-center gap-2 rounded-npi-lg bg-npi-blue px-6 py-3 font-npi-sans text-[length:var(--npi-font-size-base)] font-semibold text-white"
+						className="inline-flex items-center gap-2 rounded-xs bg-npi-blue px-6 py-3 font-npi-sans text-[length:var(--npi-font-size-base)] font-semibold text-white"
 					>
 						{ctaLabel}
 						<svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">

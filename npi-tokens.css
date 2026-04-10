@@ -108,11 +108,12 @@
 		--npi-font-size-7xl: 3.5rem;
 
 		/* NPI Radius */
-		--npi-radius-sm: 0.25rem;
-		--npi-radius-md: 0.375rem;
-		--npi-radius-lg: 0.5rem;
-		--npi-radius-xl: 0.75rem;
-		--npi-radius-2xl: 1rem;
+		--npi-radius-xxs: 4px;
+		--npi-radius-xs: 8px;
+		--npi-radius-s: 16px;
+		--npi-radius-m: 24px;
+		--npi-radius-l: 32px;
+		--npi-radius-xl: 40px;
 		--npi-radius-full: 9999px;
 
 		/* NPI Shadows */
@@ -236,11 +237,13 @@
 	--font-family-npi-sans: var(--npi-font-family-sans);
 	--font-family-npi-mono: var(--npi-font-family-mono);
 
-	/* NPI Border radii */
-	--radius-npi-sm: var(--npi-radius-sm);
-	--radius-npi-md: var(--npi-radius-md);
-	--radius-npi-lg: var(--npi-radius-lg);
-	--radius-npi-xl: var(--npi-radius-xl);
-	--radius-npi-2xl: var(--npi-radius-2xl);
-	--radius-npi-full: var(--npi-radius-full);
+	/* NPI Border radii — overrides Tailwind defaults */
+	--radius-*: initial;
+	--radius-xxs: var(--npi-radius-xxs);
+	--radius-xs: var(--npi-radius-xs);
+	--radius-s: var(--npi-radius-s);
+	--radius-m: var(--npi-radius-m);
+	--radius-l: var(--npi-radius-l);
+	--radius-xl: var(--npi-radius-xl);
+	--radius-full: var(--npi-radius-full);
 }

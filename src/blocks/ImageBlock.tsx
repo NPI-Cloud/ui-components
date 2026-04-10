@@ -12,11 +12,11 @@ export function ImageBlock({ imageUrl, imageAlt, imageCaption }: ImageBlockProps
 					<img
 						src={imageUrl}
 						alt={imageAlt ?? ''}
-						className="w-full rounded-npi-lg object-cover"
+						className="w-full rounded-xs object-cover"
 					/>
 				)
 				: (
-					<div className="flex h-48 w-full items-center justify-center rounded-npi-lg bg-npi-gray-100 text-npi-gray-400">
+					<div className="flex h-48 w-full items-center justify-center rounded-xs bg-npi-gray-100 text-npi-gray-400">
 						<svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
 							<path
 								strokeLinecap="round"

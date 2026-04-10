@@ -63,7 +63,7 @@ function DecorativeIllustration() {
 
 export function NewsletterBlock({ heading, ctaLabel, ctaUrl, imageUrl, imageAlt }: NewsletterBlockProps) {
 	return (
-		<div className="grid grid-cols-1 overflow-hidden rounded-npi-2xl bg-npi-gray-50 md:grid-cols-2">
+		<div className="grid grid-cols-1 overflow-hidden rounded-s bg-npi-gray-50 md:grid-cols-2">
 			<div className="flex flex-col justify-center p-8 md:p-12 lg:p-16">
 				{heading && (
 					<h2 className="font-npi-sans text-[length:var(--npi-font-size-4xl)] font-bold italic leading-tight text-npi-blue">
@@ -74,7 +74,7 @@ export function NewsletterBlock({ heading, ctaLabel, ctaUrl, imageUrl, imageAlt 
 					<div className="mt-8">
 						<a
 							href={ctaUrl ?? '#'}
-							className="inline-flex items-center gap-2 rounded-npi-lg bg-npi-blue px-8 py-4 font-npi-sans text-[length:var(--npi-font-size-base)] font-semibold text-white"
+							className="inline-flex items-center gap-2 rounded-xs bg-npi-blue px-8 py-4 font-npi-sans text-[length:var(--npi-font-size-base)] font-semibold text-white"
 						>
 							{ctaLabel}
 						</a>

@@ -42,11 +42,11 @@ export function ContentImageBlock({ heading, bodyContent, ctaLabel, ctaUrl, imag
 					<img
 						src={imageUrl}
 						alt={imageAlt ?? ''}
-						className="h-full w-full rounded-npi-xl object-cover"
+						className="h-full w-full rounded-s object-cover"
 					/>
 				)
 				: (
-					<div className="flex h-full min-h-50 w-full items-center justify-center rounded-npi-xl bg-npi-gray-100 text-npi-gray-400">
+					<div className="flex h-full min-h-50 w-full items-center justify-center rounded-s bg-npi-gray-100 text-npi-gray-400">
 						<svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
 							<path
 								strokeLinecap="round"
@@ -60,7 +60,7 @@ export function ContentImageBlock({ heading, bodyContent, ctaLabel, ctaUrl, imag
 	)
 
 	return (
-		<div className="grid grid-cols-1 overflow-hidden rounded-npi-xl bg-white md:grid-cols-[40%_60%]">
+		<div className="grid grid-cols-1 overflow-hidden rounded-s bg-white md:grid-cols-[40%_60%]">
 			{imagePosition === 'left'
 				? (
 					<>

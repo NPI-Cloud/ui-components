@@ -13,7 +13,7 @@ export function HeroBlock({ heading, subtitle, ctaLabel, ctaUrl, imageUrl, image
 
 	return (
 		<div
-			className={`grid min-h-75 grid-cols-1 overflow-hidden rounded-npi-xl md:grid-cols-[55%_45%] ${isDark ? 'bg-[#0a1a4a]' : 'bg-white'}`}
+			className={`grid min-h-75 grid-cols-1 overflow-hidden rounded-s md:grid-cols-[55%_45%] ${isDark ? 'bg-[#0a1a4a]' : 'bg-white'}`}
 		>
 			<div className="flex flex-col justify-center p-8 md:p-12">
 				{heading && (
@@ -34,7 +34,7 @@ export function HeroBlock({ heading, subtitle, ctaLabel, ctaUrl, imageUrl, image
 					<div className="mt-6">
 						<a
 							href={ctaUrl ?? '#'}
-							className="inline-flex items-center gap-2 rounded-npi-lg bg-npi-blue px-6 py-3 font-npi-sans text-(length:--npi-font-size-base) font-semibold text-white"
+							className="inline-flex items-center gap-2 rounded-xs bg-npi-blue px-6 py-3 font-npi-sans text-(length:--npi-font-size-base) font-semibold text-white"
 						>
 							{ctaLabel}
 							<span aria-hidden="true">&gt;</span>
@@ -48,11 +48,11 @@ export function HeroBlock({ heading, subtitle, ctaLabel, ctaUrl, imageUrl, image
 						<img
 							src={imageUrl}
 							alt={imageAlt ?? ''}
-							className="h-full w-full rounded-npi-xl object-cover"
+							className="h-full w-full rounded-s object-cover"
 						/>
 					)
 					: (
-						<div className="flex h-full min-h-50 w-full items-center justify-center rounded-npi-xl bg-npi-gray-100 text-npi-gray-400">
+						<div className="flex h-full min-h-50 w-full items-center justify-center rounded-s bg-npi-gray-100 text-npi-gray-400">
 							<svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
 								<path
 									strokeLinecap="round"
