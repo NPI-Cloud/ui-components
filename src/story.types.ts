@@ -1,0 +1,23 @@
+import type { ComponentProps, ComponentType } from 'react'
+
+export type ControlType = 'text' | 'select' | 'boolean' | 'number' | 'json'
+
+export interface ArgType {
+	control: ControlType
+	options?: string[]
+	min?: number
+	max?: number
+	defaultValue?: unknown
+	description?: string
+}
+
+export interface Meta<C extends ComponentType<any> = ComponentType<any>> {
+	title: string
+	component: C
+	argTypes?: Record<string, ArgType>
+}
+
+export interface Story<C extends ComponentType<any> = ComponentType<any>> {
+	name?: string
+	args: Partial<ComponentProps<C>>
+}

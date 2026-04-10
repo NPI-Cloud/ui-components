@@ -1,2 +1,1 @@
-// Shared visual components — to be implemented in future issues
-export {}
+export { Button, type ButtonProps, buttonVariants, buttonSizes } from './Button'
