@@ -11,6 +11,12 @@
 		--npi-orange: hsl(28 95% 55%);
 		--npi-red: hsl(0 72% 50%);
 
+		/* NPI Typography colors */
+		--npi-text-primary: #02216E;
+		--npi-text-secondary: #525252;
+		--npi-text-link: #3566FC;
+		--npi-text-link-hover: #2D5AE3;
+
 		/* NPI Neutrals */
 		--npi-gray-50: hsl(210 20% 98%);
 		--npi-gray-100: hsl(210 16% 93%);
@@ -24,17 +30,21 @@
 		--npi-gray-900: hsl(210 20% 9%);
 
 		/* NPI Typography scale */
-		--npi-font-family-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+		--npi-font-family-serif: 'Bitter', ui-serif, Georgia, serif;
+		--npi-font-family-sans: 'Noto Sans', ui-sans-serif, system-ui, sans-serif;
 		--npi-font-family-mono: 'JetBrains Mono', ui-monospace, monospace;
-		--npi-font-size-xs: 0.75rem;
-		--npi-font-size-sm: 0.875rem;
-		--npi-font-size-base: 1rem;
-		--npi-font-size-lg: 1.125rem;
-		--npi-font-size-xl: 1.25rem;
-		--npi-font-size-2xl: 1.5rem;
-		--npi-font-size-3xl: 1.875rem;
-		--npi-font-size-4xl: 2.25rem;
-		--npi-font-size-5xl: 3rem;
+		--npi-font-size-xs: 0.625rem;
+		--npi-font-size-sm: 0.75rem;
+		--npi-font-size-base: 0.875rem;
+		--npi-font-size-md: 0.875rem;
+		--npi-font-size-lg: 1rem;
+		--npi-font-size-xl: 1.375rem;
+		--npi-font-size-2xl: 1.25rem;
+		--npi-font-size-3xl: 1.5rem;
+		--npi-font-size-4xl: 1.75rem;
+		--npi-font-size-5xl: 2rem;
+		--npi-font-size-6xl: 2.5rem;
+		--npi-font-size-7xl: 3.5rem;
 
 		/* NPI Spacing */
 		--npi-spacing-xs: 0.25rem;
@@ -70,6 +80,12 @@
 	--color-npi-orange: var(--npi-orange);
 	--color-npi-red: var(--npi-red);
 
+	/* NPI Typography colors */
+	--color-npi-text-primary: var(--npi-text-primary);
+	--color-npi-text-secondary: var(--npi-text-secondary);
+	--color-npi-text-link: var(--npi-text-link);
+	--color-npi-text-link-hover: var(--npi-text-link-hover);
+
 	/* NPI Neutrals */
 	--color-npi-gray-50: var(--npi-gray-50);
 	--color-npi-gray-100: var(--npi-gray-100);
@@ -83,6 +99,7 @@
 	--color-npi-gray-900: var(--npi-gray-900);
 
 	/* NPI Typography */
+	--font-family-npi-serif: var(--npi-font-family-serif);
 	--font-family-npi-sans: var(--npi-font-family-sans);
 	--font-family-npi-mono: var(--npi-font-family-mono);
 

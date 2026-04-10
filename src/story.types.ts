@@ -4,7 +4,7 @@ export type ControlType = 'text' | 'select' | 'boolean' | 'number' | 'json'
 
 export interface ArgType {
 	control: ControlType
-	options?: string[]
+	options?: (string | number)[]
 	min?: number
 	max?: number
 	defaultValue?: unknown
