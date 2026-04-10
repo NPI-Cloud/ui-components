@@ -92,7 +92,6 @@
 	/* NPI Typography */
 	--font-family-npi-serif: var(--npi-font-family-serif);
 	--font-family-npi-sans: var(--npi-font-family-sans);
-	--font-family-npi-mono: var(--npi-font-family-mono);
 
 	/* NPI Border radii — namespaced, does not override Tailwind defaults */
 	--radius-npi-xxs: var(--npi-radius-xxs);
