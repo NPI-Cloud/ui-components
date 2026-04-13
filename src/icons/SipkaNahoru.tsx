@@ -1,6 +1,12 @@
 import type { SVGProps } from 'react'
 
-export const SipkaNahoru = (props: SVGProps<SVGSVGElement>) => (
+export const SipkaNahoruM = (props: SVGProps<SVGSVGElement>) => (
+	<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" {...props}>
+		<path fillRule="evenodd" clipRule="evenodd" d="M19.7431 10.9722C19.3736 11.3826 18.7413 11.4157 18.3308 11.0462L13 6.24608L13 20C13 20.5523 12.5523 21 12 21C11.4477 21 11 20.5523 11 20L11 6.24608L5.66913 11.0462C5.25871 11.4157 4.62641 11.3826 4.25686 10.9722C3.8873 10.5618 3.92043 9.92945 4.33085 9.5599L11.3308 3.25687C11.7112 2.91438 12.2888 2.91438 12.6691 3.25687L19.6691 9.5599C20.0796 9.92945 20.1127 10.5618 19.7431 10.9722Z" fill="currentColor"/>
+	</svg>
+)
+
+export const SipkaNahoruS = (props: SVGProps<SVGSVGElement>) => (
 	<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" {...props}>
 		<path fillRule="evenodd" clipRule="evenodd" d="M19.7431 10.9722C19.3736 11.3826 18.7413 11.4157 18.3308 11.0462L13 6.24608L13 20C13 20.5523 12.5523 21 12 21C11.4477 21 11 20.5523 11 20L11 6.24608L5.66913 11.0462C5.25871 11.4157 4.62641 11.3826 4.25686 10.9722C3.8873 10.5618 3.92043 9.92945 4.33085 9.5599L11.3308 3.25687C11.7112 2.91438 12.2888 2.91438 12.6691 3.25687L19.6691 9.5599C20.0796 9.92945 20.1127 10.5618 19.7431 10.9722Z" fill="currentColor"/>
 	</svg>

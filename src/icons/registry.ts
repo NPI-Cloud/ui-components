@@ -1,203 +1,303 @@
 import type { ComponentType, SVGProps } from 'react'
-import { Apple } from './Apple'
-import { ApplePodcasts } from './ApplePodcasts'
-import { ArrowDolu } from './ArrowDolu'
-import { ArrowNahoru } from './ArrowNahoru'
-import { ArrowVlevo } from './ArrowVlevo'
-import { ArrowVpravo } from './ArrowVpravo'
-import { Cas } from './Cas'
-import { Check } from './Check'
-import { Dlazdice } from './Dlazdice'
-import { Domecek } from './Domecek'
-import { Dopis } from './Dopis'
-import { ExterniLink } from './ExterniLink'
-import { Facebook } from './Facebook'
-import { Filtr } from './Filtr'
-import { Fotoaparat } from './Fotoaparat'
-import { Galery } from './Galery'
-import { Hvezda } from './Hvezda'
-import { Info } from './Info'
-import { Instagram } from './Instagram'
-import { Kalendar } from './Kalendar'
-import { Karta } from './Karta'
-import { KolacovyGraf } from './KolacovyGraf'
-import { Komentar } from './Komentar'
-import { Konfigurace } from './Konfigurace'
-import { Kopirovat } from './Kopirovat'
-import { Kos } from './Kos'
-import { Kosik } from './Kosik'
-import { Layout } from './Layout'
-import { LinkedIn } from './LinkedIn'
-import { Lokace } from './Lokace'
-import { Lupa } from './Lupa'
-import { Mapa } from './Mapa'
-import { MenuVpravo } from './MenuVpravo'
-import { Minus } from './Minus'
-import { Nacitani } from './Nacitani'
-import { NahratDokument } from './NahratDokument'
-import { Nastaveni } from './Nastaveni'
-import { Navazani } from './Navazani'
-import { Obnovit } from './Obnovit'
-import { Obrazek } from './Obrazek'
-import { OdhlasitSe } from './OdhlasitSe'
-import { Odkaz } from './Odkaz'
-import { PalecDolu } from './PalecDolu'
-import { PalecNahoru } from './PalecNahoru'
-import { Pauza } from './Pauza'
-import { Plus } from './Plus'
-import { Podcast } from './Podcast'
-import { Polozky } from './Polozky'
-import { Poslat } from './Poslat'
-import { Posouvani } from './Posouvani'
-import { Prehrat } from './Prehrat'
-import { Preskocit } from './Preskocit'
-import { Pripojit } from './Pripojit'
-import { Profil } from './Profil'
-import { Prumer } from './Prumer'
-import { Radit } from './Radit'
-import { Schovat } from './Schovat'
-import { Schuzka } from './Schuzka'
-import { Seznam } from './Seznam'
-import { SipkaDolu } from './SipkaDolu'
-import { SipkaNahoru } from './SipkaNahoru'
-import { SipkaVlevo } from './SipkaVlevo'
-import { SipkaVpravo } from './SipkaVpravo'
-import { SloupcovyGraf } from './SloupcovyGraf'
-import { Slozka } from './Slozka'
-import { Soubor } from './Soubor'
-import { Spotify } from './Spotify'
-import { Srdce } from './Srdce'
-import { Stahnout } from './Stahnout'
-import { Stitek } from './Stitek'
-import { Taska } from './Taska'
-import { Telefon } from './Telefon'
-import { Time } from './Time'
-import { Tisk } from './Tisk'
-import { Tuzka } from './Tuzka'
-import { Tym } from './Tym'
-import { Ukazat } from './Ukazat'
-import { Upozorneni } from './Upozorneni'
-import { ViceHorizontalne } from './ViceHorizontalne'
-import { ViceVertikalne } from './ViceVertikalne'
-import { Video } from './Video'
-import { Vzdelani } from './Vzdelani'
-import { Wifi } from './Wifi'
-import { X } from './X'
-import { YouTube } from './YouTube'
-import { Zakazane } from './Zakazane'
-import { Zalozka } from './Zalozka'
-import { ZalozkaFill } from './ZalozkaFill'
-import { Zamecek } from './Zamecek'
-import { Zavinac } from './Zavinac'
-import { Zavrit } from './Zavrit'
-import { ZavritHranate } from './ZavritHranate'
-import { ZmenaVelikosti } from './ZmenaVelikosti'
-import { Zpet } from './Zpet'
-import { Zpetne } from './Zpetne'
-import { Zvonek } from './Zvonek'
-import { ZvukVypnuto } from './ZvukVypnuto'
-import { ZvukZapnuto } from './ZvukZapnuto'
+import { AppleM, AppleS } from './Apple'
+import { ApplePodcastsM, ApplePodcastsS } from './ApplePodcasts'
+import { ArrowDoluM, ArrowDoluS } from './ArrowDolu'
+import { ArrowNahoruM, ArrowNahoruS } from './ArrowNahoru'
+import { ArrowVlevoM, ArrowVlevoS } from './ArrowVlevo'
+import { ArrowVpravoM, ArrowVpravoS } from './ArrowVpravo'
+import { CasM, CasS } from './Cas'
+import { CheckM, CheckS } from './Check'
+import { DlazdiceM, DlazdiceS } from './Dlazdice'
+import { DomecekM, DomecekS } from './Domecek'
+import { DopisM, DopisS } from './Dopis'
+import { ExterniLinkM, ExterniLinkS } from './ExterniLink'
+import { FacebookM, FacebookS } from './Facebook'
+import { FiltrM, FiltrS } from './Filtr'
+import { FotoaparatM, FotoaparatS } from './Fotoaparat'
+import { GaleryM, GaleryS } from './Galery'
+import { HvezdaM, HvezdaS } from './Hvezda'
+import { InfoM, InfoS } from './Info'
+import { InstagramM, InstagramS } from './Instagram'
+import { KalendarM, KalendarS } from './Kalendar'
+import { KartaM, KartaS } from './Karta'
+import { KolacovyGrafM, KolacovyGrafS } from './KolacovyGraf'
+import { KomentarM, KomentarS } from './Komentar'
+import { KonfiguraceM, KonfiguraceS } from './Konfigurace'
+import { KopirovatM, KopirovatS } from './Kopirovat'
+import { KosM, KosS } from './Kos'
+import { KosikM, KosikS } from './Kosik'
+import { LayoutM, LayoutS } from './Layout'
+import { LinkedInM, LinkedInS } from './LinkedIn'
+import { LokaceM, LokaceS } from './Lokace'
+import { LupaM, LupaS } from './Lupa'
+import { MapaM, MapaS } from './Mapa'
+import { MenuVpravoM, MenuVpravoS } from './MenuVpravo'
+import { MinusM, MinusS } from './Minus'
+import { NacitaniM, NacitaniS } from './Nacitani'
+import { NahratDokumentM, NahratDokumentS } from './NahratDokument'
+import { NastaveniM, NastaveniS } from './Nastaveni'
+import { NavazaniM, NavazaniS } from './Navazani'
+import { ObnovitM, ObnovitS } from './Obnovit'
+import { ObrazekM, ObrazekS } from './Obrazek'
+import { OdhlasitSeM, OdhlasitSeS } from './OdhlasitSe'
+import { OdkazM, OdkazS } from './Odkaz'
+import { PalecDoluM, PalecDoluS } from './PalecDolu'
+import { PalecNahoruM, PalecNahoruS } from './PalecNahoru'
+import { PauzaM, PauzaS } from './Pauza'
+import { PlusM, PlusS } from './Plus'
+import { PodcastM, PodcastS } from './Podcast'
+import { PolozkyM, PolozkyS } from './Polozky'
+import { PoslatM, PoslatS } from './Poslat'
+import { PosouvaniM, PosouvaniS } from './Posouvani'
+import { PrehratM, PrehratS } from './Prehrat'
+import { PreskocitM, PreskocitS } from './Preskocit'
+import { PripojitM, PripojitS } from './Pripojit'
+import { ProfilM, ProfilS } from './Profil'
+import { PrumerM, PrumerS } from './Prumer'
+import { RaditM, RaditS } from './Radit'
+import { SchovatM, SchovatS } from './Schovat'
+import { SchuzkaM, SchuzkaS } from './Schuzka'
+import { SeznamM, SeznamS } from './Seznam'
+import { SipkaDoluM, SipkaDoluS } from './SipkaDolu'
+import { SipkaNahoruM, SipkaNahoruS } from './SipkaNahoru'
+import { SipkaVlevoM, SipkaVlevoS } from './SipkaVlevo'
+import { SipkaVpravoM, SipkaVpravoS } from './SipkaVpravo'
+import { SloupcovyGrafM, SloupcovyGrafS } from './SloupcovyGraf'
+import { SlozkaM, SlozkaS } from './Slozka'
+import { SouborM, SouborS } from './Soubor'
+import { SpotifyM, SpotifyS } from './Spotify'
+import { SrdceM, SrdceS } from './Srdce'
+import { StahnoutM, StahnoutS } from './Stahnout'
+import { StitekM, StitekS } from './Stitek'
+import { TaskaM, TaskaS } from './Taska'
+import { TelefonM, TelefonS } from './Telefon'
+import { TimeM, TimeS } from './Time'
+import { TiskM, TiskS } from './Tisk'
+import { TuzkaM, TuzkaS } from './Tuzka'
+import { TymM, TymS } from './Tym'
+import { UkazatM, UkazatS } from './Ukazat'
+import { UpozorneniM, UpozorneniS } from './Upozorneni'
+import { ViceHorizontalneM, ViceHorizontalneS } from './ViceHorizontalne'
+import { ViceVertikalneM, ViceVertikalneS } from './ViceVertikalne'
+import { VideoM, VideoS } from './Video'
+import { VzdelaniM, VzdelaniS } from './Vzdelani'
+import { WifiM, WifiS } from './Wifi'
+import { XM, XS } from './X'
+import { YouTubeM, YouTubeS } from './YouTube'
+import { ZakazaneM, ZakazaneS } from './Zakazane'
+import { ZalozkaM, ZalozkaS } from './Zalozka'
+import { ZalozkaFillM, ZalozkaFillS } from './ZalozkaFill'
+import { ZamecekM, ZamecekS } from './Zamecek'
+import { ZavinacM, ZavinacS } from './Zavinac'
+import { ZavritM, ZavritS } from './Zavrit'
+import { ZavritHranateM, ZavritHranateS } from './ZavritHranate'
+import { ZmenaVelikostiM, ZmenaVelikostiS } from './ZmenaVelikosti'
+import { ZpetM, ZpetS } from './Zpet'
+import { ZpetneM, ZpetneS } from './Zpetne'
+import { ZvonekM, ZvonekS } from './Zvonek'
+import { ZvukVypnutoM, ZvukVypnutoS } from './ZvukVypnuto'
+import { ZvukZapnutoM, ZvukZapnutoS } from './ZvukZapnuto'
 
-export const iconRegistry: Record<string, ComponentType<SVGProps<SVGSVGElement>>> = {
-	apple: Apple,
-	applePodcasts: ApplePodcasts,
-	arrowDolu: ArrowDolu,
-	arrowNahoru: ArrowNahoru,
-	arrowVlevo: ArrowVlevo,
-	arrowVpravo: ArrowVpravo,
-	cas: Cas,
-	check: Check,
-	dlazdice: Dlazdice,
-	domecek: Domecek,
-	dopis: Dopis,
-	externiLink: ExterniLink,
-	facebook: Facebook,
-	filtr: Filtr,
-	fotoaparat: Fotoaparat,
-	galery: Galery,
-	hvezda: Hvezda,
-	info: Info,
-	instagram: Instagram,
-	kalendar: Kalendar,
-	karta: Karta,
-	kolacovyGraf: KolacovyGraf,
-	komentar: Komentar,
-	konfigurace: Konfigurace,
-	kopirovat: Kopirovat,
-	kos: Kos,
-	kosik: Kosik,
-	layout: Layout,
-	linkedIn: LinkedIn,
-	lokace: Lokace,
-	lupa: Lupa,
-	mapa: Mapa,
-	menuVpravo: MenuVpravo,
-	minus: Minus,
-	nacitani: Nacitani,
-	nahratDokument: NahratDokument,
-	nastaveni: Nastaveni,
-	navazani: Navazani,
-	obnovit: Obnovit,
-	obrazek: Obrazek,
-	odhlasitSe: OdhlasitSe,
-	odkaz: Odkaz,
-	palecDolu: PalecDolu,
-	palecNahoru: PalecNahoru,
-	pauza: Pauza,
-	plus: Plus,
-	podcast: Podcast,
-	polozky: Polozky,
-	poslat: Poslat,
-	posouvani: Posouvani,
-	prehrat: Prehrat,
-	preskocit: Preskocit,
-	pripojit: Pripojit,
-	profil: Profil,
-	prumer: Prumer,
-	radit: Radit,
-	schovat: Schovat,
-	schuzka: Schuzka,
-	seznam: Seznam,
-	sipkaDolu: SipkaDolu,
-	sipkaNahoru: SipkaNahoru,
-	sipkaVlevo: SipkaVlevo,
-	sipkaVpravo: SipkaVpravo,
-	sloupcovyGraf: SloupcovyGraf,
-	slozka: Slozka,
-	soubor: Soubor,
-	spotify: Spotify,
-	srdce: Srdce,
-	stahnout: Stahnout,
-	stitek: Stitek,
-	taska: Taska,
-	telefon: Telefon,
-	time: Time,
-	tisk: Tisk,
-	tuzka: Tuzka,
-	tym: Tym,
-	ukazat: Ukazat,
-	upozorneni: Upozorneni,
-	viceHorizontalne: ViceHorizontalne,
-	viceVertikalne: ViceVertikalne,
-	video: Video,
-	vzdelani: Vzdelani,
-	wifi: Wifi,
-	x: X,
-	youTube: YouTube,
-	zakazane: Zakazane,
-	zalozka: Zalozka,
-	zalozkaFill: ZalozkaFill,
-	zamecek: Zamecek,
-	zavinac: Zavinac,
-	zavrit: Zavrit,
-	zavritHranate: ZavritHranate,
-	zmenaVelikosti: ZmenaVelikosti,
-	zpet: Zpet,
-	zpetne: Zpetne,
-	zvonek: Zvonek,
-	zvukVypnuto: ZvukVypnuto,
-	zvukZapnuto: ZvukZapnuto,
-}
+type SvgComponent = ComponentType<SVGProps<SVGSVGElement>>
 
-export const iconNames = Object.keys(iconRegistry) as IconName[]
-export type IconName = keyof typeof iconRegistry
+export const iconRegistryM = {
+	apple: AppleM,
+	applePodcasts: ApplePodcastsM,
+	arrowDolu: ArrowDoluM,
+	arrowNahoru: ArrowNahoruM,
+	arrowVlevo: ArrowVlevoM,
+	arrowVpravo: ArrowVpravoM,
+	cas: CasM,
+	check: CheckM,
+	dlazdice: DlazdiceM,
+	domecek: DomecekM,
+	dopis: DopisM,
+	externiLink: ExterniLinkM,
+	facebook: FacebookM,
+	filtr: FiltrM,
+	fotoaparat: FotoaparatM,
+	galery: GaleryM,
+	hvezda: HvezdaM,
+	info: InfoM,
+	instagram: InstagramM,
+	kalendar: KalendarM,
+	karta: KartaM,
+	kolacovyGraf: KolacovyGrafM,
+	komentar: KomentarM,
+	konfigurace: KonfiguraceM,
+	kopirovat: KopirovatM,
+	kos: KosM,
+	kosik: KosikM,
+	layout: LayoutM,
+	linkedIn: LinkedInM,
+	lokace: LokaceM,
+	lupa: LupaM,
+	mapa: MapaM,
+	menuVpravo: MenuVpravoM,
+	minus: MinusM,
+	nacitani: NacitaniM,
+	nahratDokument: NahratDokumentM,
+	nastaveni: NastaveniM,
+	navazani: NavazaniM,
+	obnovit: ObnovitM,
+	obrazek: ObrazekM,
+	odhlasitSe: OdhlasitSeM,
+	odkaz: OdkazM,
+	palecDolu: PalecDoluM,
+	palecNahoru: PalecNahoruM,
+	pauza: PauzaM,
+	plus: PlusM,
+	podcast: PodcastM,
+	polozky: PolozkyM,
+	poslat: PoslatM,
+	posouvani: PosouvaniM,
+	prehrat: PrehratM,
+	preskocit: PreskocitM,
+	pripojit: PripojitM,
+	profil: ProfilM,
+	prumer: PrumerM,
+	radit: RaditM,
+	schovat: SchovatM,
+	schuzka: SchuzkaM,
+	seznam: SeznamM,
+	sipkaDolu: SipkaDoluM,
+	sipkaNahoru: SipkaNahoruM,
+	sipkaVlevo: SipkaVlevoM,
+	sipkaVpravo: SipkaVpravoM,
+	sloupcovyGraf: SloupcovyGrafM,
+	slozka: SlozkaM,
+	soubor: SouborM,
+	spotify: SpotifyM,
+	srdce: SrdceM,
+	stahnout: StahnoutM,
+	stitek: StitekM,
+	taska: TaskaM,
+	telefon: TelefonM,
+	time: TimeM,
+	tisk: TiskM,
+	tuzka: TuzkaM,
+	tym: TymM,
+	ukazat: UkazatM,
+	upozorneni: UpozorneniM,
+	viceHorizontalne: ViceHorizontalneM,
+	viceVertikalne: ViceVertikalneM,
+	video: VideoM,
+	vzdelani: VzdelaniM,
+	wifi: WifiM,
+	x: XM,
+	youTube: YouTubeM,
+	zakazane: ZakazaneM,
+	zalozka: ZalozkaM,
+	zalozkaFill: ZalozkaFillM,
+	zamecek: ZamecekM,
+	zavinac: ZavinacM,
+	zavrit: ZavritM,
+	zavritHranate: ZavritHranateM,
+	zmenaVelikosti: ZmenaVelikostiM,
+	zpet: ZpetM,
+	zpetne: ZpetneM,
+	zvonek: ZvonekM,
+	zvukVypnuto: ZvukVypnutoM,
+	zvukZapnuto: ZvukZapnutoM,
+} satisfies Record<string, SvgComponent>
+
+export const iconRegistryS = {
+	apple: AppleS,
+	applePodcasts: ApplePodcastsS,
+	arrowDolu: ArrowDoluS,
+	arrowNahoru: ArrowNahoruS,
+	arrowVlevo: ArrowVlevoS,
+	arrowVpravo: ArrowVpravoS,
+	cas: CasS,
+	check: CheckS,
+	dlazdice: DlazdiceS,
+	domecek: DomecekS,
+	dopis: DopisS,
+	externiLink: ExterniLinkS,
+	facebook: FacebookS,
+	filtr: FiltrS,
+	fotoaparat: FotoaparatS,
+	galery: GaleryS,
+	hvezda: HvezdaS,
+	info: InfoS,
+	instagram: InstagramS,
+	kalendar: KalendarS,
+	karta: KartaS,
+	kolacovyGraf: KolacovyGrafS,
+	komentar: KomentarS,
+	konfigurace: KonfiguraceS,
+	kopirovat: KopirovatS,
+	kos: KosS,
+	kosik: KosikS,
+	layout: LayoutS,
+	linkedIn: LinkedInS,
+	lokace: LokaceS,
+	lupa: LupaS,
+	mapa: MapaS,
+	menuVpravo: MenuVpravoS,
+	minus: MinusS,
+	nacitani: NacitaniS,
+	nahratDokument: NahratDokumentS,
+	nastaveni: NastaveniS,
+	navazani: NavazaniS,
+	obnovit: ObnovitS,
+	obrazek: ObrazekS,
+	odhlasitSe: OdhlasitSeS,
+	odkaz: OdkazS,
+	palecDolu: PalecDoluS,
+	palecNahoru: PalecNahoruS,
+	pauza: PauzaS,
+	plus: PlusS,
+	podcast: PodcastS,
+	polozky: PolozkyS,
+	poslat: PoslatS,
+	posouvani: PosouvaniS,
+	prehrat: PrehratS,
+	preskocit: PreskocitS,
+	pripojit: PripojitS,
+	profil: ProfilS,
+	prumer: PrumerS,
+	radit: RaditS,
+	schovat: SchovatS,
+	schuzka: SchuzkaS,
+	seznam: SeznamS,
+	sipkaDolu: SipkaDoluS,
+	sipkaNahoru: SipkaNahoruS,
+	sipkaVlevo: SipkaVlevoS,
+	sipkaVpravo: SipkaVpravoS,
+	sloupcovyGraf: SloupcovyGrafS,
+	slozka: SlozkaS,
+	soubor: SouborS,
+	spotify: SpotifyS,
+	srdce: SrdceS,
+	stahnout: StahnoutS,
+	stitek: StitekS,
+	taska: TaskaS,
+	telefon: TelefonS,
+	time: TimeS,
+	tisk: TiskS,
+	tuzka: TuzkaS,
+	tym: TymS,
+	ukazat: UkazatS,
+	upozorneni: UpozorneniS,
+	viceHorizontalne: ViceHorizontalneS,
+	viceVertikalne: ViceVertikalneS,
+	video: VideoS,
+	vzdelani: VzdelaniS,
+	wifi: WifiS,
+	x: XS,
+	youTube: YouTubeS,
+	zakazane: ZakazaneS,
+	zalozka: ZalozkaS,
+	zalozkaFill: ZalozkaFillS,
+	zamecek: ZamecekS,
+	zavinac: ZavinacS,
+	zavrit: ZavritS,
+	zavritHranate: ZavritHranateS,
+	zmenaVelikosti: ZmenaVelikostiS,
+	zpet: ZpetS,
+	zpetne: ZpetneS,
+	zvonek: ZvonekS,
+	zvukVypnuto: ZvukVypnutoS,
+	zvukZapnuto: ZvukZapnutoS,
+} satisfies Record<string, SvgComponent>
