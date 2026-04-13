@@ -20,9 +20,9 @@ const ButtonRoot = uic("button", {
 			secondary:
 				"rounded-npi-xxs px-npi-8 py-npi-3 min-w-npi-40 text-[1rem] leading-[1.6] border border-npi-blue text-npi-blue bg-transparent hover:border-npi-blue-hover hover:text-npi-blue-hover active:border-npi-blue-hover active:text-npi-blue-hover disabled:text-npi-gray-700 disabled:border-npi-gray-700",
 			tertiary:
-				"text-[1rem] leading-[1.6] bg-transparent text-npi-blue hover:text-npi-blue-hover active:text-npi-blue-hover focus-visible:outline-none focus-visible:shadow-[0_3px_0_0_#ACCDFF] disabled:text-npi-gray-700",
+				"text-[1rem] leading-[1.6] p-npi-2 bg-transparent text-npi-blue hover:text-npi-blue-hover active:text-npi-blue-hover focus-visible:outline-none focus-visible:shadow-[0_3px_0_0_#ACCDFF] disabled:text-npi-gray-700",
 			"tertiary-s":
-				"text-[0.875rem] leading-[1.3] font-normal bg-transparent text-npi-blue hover:text-npi-blue-hover active:text-npi-blue-hover focus-visible:outline-none focus-visible:shadow-[0_3px_0_0_#ACCDFF] disabled:text-npi-gray-700",
+				"text-[0.875rem] leading-[1.3] p-npi-1 font-normal bg-transparent text-npi-blue hover:text-npi-blue-hover active:text-npi-blue-hover focus-visible:outline-none focus-visible:shadow-[0_3px_0_0_#ACCDFF] disabled:text-npi-gray-700",
 			icon: "size-12 rounded-full p-0 border border-npi-blue text-npi-blue bg-transparent hover:border-npi-blue-hover hover:text-npi-blue-hover active:border-npi-blue-hover active:text-npi-blue-hover disabled:text-npi-gray-700 disabled:border-npi-gray-700",
 		},
 		inverted: {
@@ -80,7 +80,11 @@ export type ButtonProps = Omit<
 };
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-	({ label, iconBefore, iconAfter, className, ...props }, ref) => {
+	({ label, iconBefore, iconAfter, className, variant, ...props }, ref) => {
+		const isSmall = variant === "tertiary-s";
+		const iconSize = isSmall ? ("s" as const) : ("m" as const);
+		const iconClass = isSmall ? "size-4" : ICON_SIZE;
+
 		const paddingOverride =
 			iconBefore && iconAfter
 				? "px-npi-1"
@@ -93,12 +97,17 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 		return (
 			<ButtonRoot
 				ref={ref}
+				variant={variant}
 				className={`${paddingOverride} ${className ?? ""}`}
 				{...props}
 			>
-				{iconBefore && <Icon name={iconBefore} className={ICON_SIZE} />}
+				{iconBefore && (
+					<Icon name={iconBefore} size={iconSize} className={iconClass} />
+				)}
 				{label && <span>{label}</span>}
-				{iconAfter && <Icon name={iconAfter} className={ICON_SIZE} />}
+				{iconAfter && (
+					<Icon name={iconAfter} size={iconSize} className={iconClass} />
+				)}
 			</ButtonRoot>
 		);
 	},
