@@ -1,59 +1,106 @@
-import { uic } from '../utils/uic'
+import { forwardRef } from "react";
+import { Icon, type IconName } from "../icons";
+import { uic } from "../utils/uic";
 
-export const buttonVariants = ['primary', 'secondary', 'tertiary', 'tertiary-s', 'icon'] as const
+export const buttonVariants = [
+	"primary",
+	"secondary",
+	"tertiary",
+	"tertiary-s",
+	"icon",
+] as const;
 
-export const Button = uic('button', {
+const ButtonRoot = uic("button", {
 	baseClass:
-		'inline-flex items-center justify-center gap-npi-2 cursor-pointer font-npi-sans font-bold transition-colors focus-visible:outline-[3px] focus-visible:outline-offset-0 focus-visible:outline-[#ACCDFF] disabled:pointer-events-none',
+		"inline-flex items-center justify-center gap-npi-2 cursor-pointer font-npi-sans font-bold transition-colors focus-visible:outline-[3px] focus-visible:outline-offset-0 focus-visible:outline-[#ACCDFF] disabled:pointer-events-none",
 	variants: {
 		variant: {
 			primary:
-				'rounded-npi-xxs px-npi-2 py-npi-3 min-w-npi-40 text-[1rem] leading-[1.6] bg-npi-blue text-npi-white hover:bg-npi-blue-hover active:bg-npi-blue-hover disabled:bg-npi-gray-700',
+				"rounded-npi-xxs px-npi-8 py-npi-3 min-w-npi-40 text-[1rem] leading-[1.6] bg-npi-blue text-npi-white hover:bg-npi-blue-hover active:bg-npi-blue-hover disabled:bg-npi-gray-700",
 			secondary:
-				'rounded-npi-xxs px-npi-2 py-npi-3 min-w-npi-40 text-[1rem] leading-[1.6] border border-npi-blue text-npi-blue bg-transparent hover:border-npi-blue-hover hover:text-npi-blue-hover active:border-npi-blue-hover active:text-npi-blue-hover disabled:text-npi-gray-700 disabled:border-npi-gray-700',
+				"rounded-npi-xxs px-npi-8 py-npi-3 min-w-npi-40 text-[1rem] leading-[1.6] border border-npi-blue text-npi-blue bg-transparent hover:border-npi-blue-hover hover:text-npi-blue-hover active:border-npi-blue-hover active:text-npi-blue-hover disabled:text-npi-gray-700 disabled:border-npi-gray-700",
 			tertiary:
-				'text-[1rem] leading-[1.6] bg-transparent text-npi-blue hover:text-npi-blue-hover active:text-npi-blue-hover focus-visible:outline-none focus-visible:shadow-[0_3px_0_0_#ACCDFF] disabled:text-npi-gray-700',
-			'tertiary-s':
-				'text-[0.875rem] leading-[1.3] font-normal bg-transparent text-npi-blue hover:text-npi-blue-hover active:text-npi-blue-hover focus-visible:outline-none focus-visible:shadow-[0_3px_0_0_#ACCDFF] disabled:text-npi-gray-700',
-			icon:
-				'size-12 rounded-full p-0 border border-npi-blue text-npi-blue bg-transparent hover:border-npi-blue-hover hover:text-npi-blue-hover active:border-npi-blue-hover active:text-npi-blue-hover disabled:text-npi-gray-700 disabled:border-npi-gray-700',
+				"text-[1rem] leading-[1.6] bg-transparent text-npi-blue hover:text-npi-blue-hover active:text-npi-blue-hover focus-visible:outline-none focus-visible:shadow-[0_3px_0_0_#ACCDFF] disabled:text-npi-gray-700",
+			"tertiary-s":
+				"text-[0.875rem] leading-[1.3] font-normal bg-transparent text-npi-blue hover:text-npi-blue-hover active:text-npi-blue-hover focus-visible:outline-none focus-visible:shadow-[0_3px_0_0_#ACCDFF] disabled:text-npi-gray-700",
+			icon: "size-12 rounded-full p-0 border border-npi-blue text-npi-blue bg-transparent hover:border-npi-blue-hover hover:text-npi-blue-hover active:border-npi-blue-hover active:text-npi-blue-hover disabled:text-npi-gray-700 disabled:border-npi-gray-700",
 		},
 		inverted: {
-			true: '',
+			true: "",
 		},
 	},
 	defaultVariants: {
-		variant: 'primary',
+		variant: "primary",
 	},
 	compoundVariants: [
 		{
-			variant: 'primary',
+			variant: "primary",
 			inverted: true,
-			className: 'bg-npi-white text-npi-blue hover:bg-npi-gray-50 active:bg-npi-gray-50',
+			className:
+				"bg-npi-white text-npi-blue hover:bg-npi-gray-50 active:bg-npi-gray-50",
 		},
 		{
-			variant: 'secondary',
+			variant: "secondary",
 			inverted: true,
-			className: 'border-npi-white text-npi-white hover:border-npi-gray-200 hover:text-npi-gray-200',
+			className:
+				"border-npi-white text-npi-white hover:border-npi-gray-200 hover:text-npi-gray-200",
 		},
 		{
-			variant: 'tertiary',
+			variant: "tertiary",
 			inverted: true,
-			className: 'text-npi-white hover:text-npi-gray-200 active:text-npi-gray-200',
+			className:
+				"text-npi-white hover:text-npi-gray-200 active:text-npi-gray-200",
 		},
 		{
-			variant: 'tertiary-s',
+			variant: "tertiary-s",
 			inverted: true,
-			className: 'text-npi-white hover:text-npi-gray-200 active:text-npi-gray-200',
+			className:
+				"text-npi-white hover:text-npi-gray-200 active:text-npi-gray-200",
 		},
 		{
-			variant: 'icon',
+			variant: "icon",
 			inverted: true,
-			className: 'border-npi-white text-npi-white hover:border-npi-gray-200 hover:text-npi-gray-200',
+			className:
+				"border-npi-white text-npi-white hover:border-npi-gray-200 hover:text-npi-gray-200",
 		},
-		{ inverted: true, className: 'focus-visible:outline-npi-white' },
+		{ inverted: true, className: "focus-visible:outline-npi-white" },
 	],
-	displayName: 'Button',
-})
+	displayName: "Button",
+});
 
-export type ButtonProps = React.ComponentProps<typeof Button>
+const ICON_SIZE = "size-6";
+
+export type ButtonProps = Omit<
+	React.ComponentProps<typeof ButtonRoot>,
+	"children"
+> & {
+	label?: string;
+	iconBefore?: IconName;
+	iconAfter?: IconName;
+};
+
+export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
+	({ label, iconBefore, iconAfter, className, ...props }, ref) => {
+		const paddingOverride =
+			iconBefore && iconAfter
+				? "px-npi-1"
+				: iconBefore
+					? "pl-npi-1"
+					: iconAfter
+						? "pr-npi-1"
+						: "";
+
+		return (
+			<ButtonRoot
+				ref={ref}
+				className={`${paddingOverride} ${className ?? ""}`}
+				{...props}
+			>
+				{iconBefore && <Icon name={iconBefore} className={ICON_SIZE} />}
+				{label && <span>{label}</span>}
+				{iconAfter && <Icon name={iconAfter} className={ICON_SIZE} />}
+			</ButtonRoot>
+		);
+	},
+);
+Button.displayName = "Button";
