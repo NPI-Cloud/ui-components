@@ -1,5 +1,6 @@
 export * from './blocks/index'
 export * from './components/index'
+export * from './icons/index'
 export * from './story.types'
 export * from './types'
 export { type ConfigVariants, uic, uiconfig } from './utils/uic'

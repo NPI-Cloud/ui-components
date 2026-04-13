@@ -1,0 +1,7 @@
+import type { SVGProps } from 'react'
+
+export const SipkaVpravo = (props: SVGProps<SVGSVGElement>) => (
+	<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" {...props}>
+		<path fillRule="evenodd" clipRule="evenodd" d="M13.0278 19.7431C12.6174 19.3736 12.5843 18.7413 12.9538 18.3308L17.7539 13L4 13C3.44771 13 3 12.5523 3 12C3 11.4477 3.44771 11 4 11L17.7539 11L12.9538 5.66913C12.5843 5.25871 12.6174 4.62641 13.0278 4.25686C13.4383 3.8873 14.0705 3.92042 14.4401 4.33085L20.7431 11.3308C21.0856 11.7112 21.0856 12.2888 20.7431 12.6691L14.4401 19.6691C14.0705 20.0796 13.4382 20.1127 13.0278 19.7431Z" fill="currentColor"/>
+	</svg>
+)
