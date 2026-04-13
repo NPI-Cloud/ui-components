@@ -1,5 +1,3 @@
 export { Button, type ButtonProps, buttonVariants } from './Button'
-export { DownloadButton, type DownloadButtonProps } from './DownloadButton'
 export { Heading, type HeadingLevel, headingLevels, type HeadingProps, type HeadingSpec, headingSpecs } from './Heading'
-export { IllustrationButton, type IllustrationButtonProps } from './IllustrationButton'
 export { Text, type TextProps, type TextSize, type TextSpec, textSpecs, textVariants, type TextWeight, textWeights } from './Text'
