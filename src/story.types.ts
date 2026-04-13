@@ -21,4 +21,5 @@ export interface Meta<C extends ComponentType<any> = ComponentType<any>> {
 export interface Story<C extends ComponentType<any> = ComponentType<any>> {
 	name?: string
 	args: Partial<ComponentProps<C>>
+	order?: number
 }
