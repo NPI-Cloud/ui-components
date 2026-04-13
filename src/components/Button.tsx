@@ -16,9 +16,9 @@ const ButtonRoot = uic("button", {
 	variants: {
 		variant: {
 			primary:
-				"rounded-npi-xxs px-npi-8 py-npi-3 w-full @md:w-auto min-w-npi-40 text-[1rem] leading-[1.6] bg-npi-blue text-npi-white hover:bg-npi-blue-hover active:bg-npi-blue-hover disabled:bg-npi-gray-700",
+				"rounded-npi-xxs px-npi-8 py-npi-3 w-full md:w-auto min-w-npi-40 text-[1rem] leading-[1.6] bg-npi-blue text-npi-white hover:bg-npi-blue-hover active:bg-npi-blue-hover disabled:bg-npi-gray-700",
 			secondary:
-				"rounded-npi-xxs px-npi-8 py-npi-3 w-full @md:w-auto min-w-npi-40 text-[1rem] leading-[1.6] border border-npi-blue text-npi-blue bg-transparent hover:border-npi-blue-hover hover:text-npi-blue-hover active:border-npi-blue-hover active:text-npi-blue-hover disabled:text-npi-gray-700 disabled:border-npi-gray-700",
+				"rounded-npi-xxs px-npi-8 py-npi-3 w-full md:w-auto min-w-npi-40 text-[1rem] leading-[1.6] border border-npi-blue text-npi-blue bg-transparent hover:border-npi-blue-hover hover:text-npi-blue-hover active:border-npi-blue-hover active:text-npi-blue-hover disabled:text-npi-gray-700 disabled:border-npi-gray-700",
 			tertiary:
 				"text-[1rem] leading-[1.6] p-npi-2 bg-transparent text-npi-blue hover:text-npi-blue-hover active:text-npi-blue-hover focus-visible:outline-none focus-visible:shadow-[0_3px_0_0_#ACCDFF] disabled:text-npi-gray-700",
 			"tertiary-s":
@@ -88,7 +88,12 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 		if (isIcon) {
 			const name = iconBefore ?? iconAfter;
 			return (
-				<ButtonRoot ref={ref} variant={variant} className={className} {...props}>
+				<ButtonRoot
+					ref={ref}
+					variant={variant}
+					className={className}
+					{...props}
+				>
 					{name && <Icon name={name} className={ICON_SIZE} />}
 				</ButtonRoot>
 			);
