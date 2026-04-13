@@ -1,27 +1,58 @@
 import { uic } from '../utils/uic'
 
-export const buttonVariants = ['primary', 'secondary', 'outline'] as const
-export const buttonSizes = ['sm', 'md', 'lg'] as const
+export const buttonVariants = ['primary', 'secondary', 'tertiary', 'tertiary-s', 'icon'] as const
 
 export const Button = uic('button', {
 	baseClass:
-		'inline-flex items-center justify-center rounded-npi-xs font-npi-sans font-semibold transition-colors disabled:pointer-events-none disabled:opacity-50',
+		'inline-flex items-center justify-center gap-npi-2 cursor-pointer font-npi-sans font-bold transition-colors focus-visible:outline-[3px] focus-visible:outline-offset-0 focus-visible:outline-[#ACCDFF] disabled:pointer-events-none',
 	variants: {
 		variant: {
-			primary: 'bg-npi-blue text-white hover:bg-npi-blue-dark',
-			secondary: 'bg-npi-gray-100 text-npi-gray-900 hover:bg-npi-gray-200',
-			outline: 'border border-npi-gray-300 bg-transparent text-npi-gray-700 hover:bg-npi-gray-50',
+			primary:
+				'rounded-npi-xxs px-npi-2 py-npi-3 min-w-npi-40 text-[1rem] leading-[1.6] bg-npi-blue text-npi-white hover:bg-npi-blue-hover active:bg-npi-blue-hover disabled:bg-npi-gray-700',
+			secondary:
+				'rounded-npi-xxs px-npi-2 py-npi-3 min-w-npi-40 text-[1rem] leading-[1.6] border border-npi-blue text-npi-blue bg-transparent hover:border-npi-blue-hover hover:text-npi-blue-hover active:border-npi-blue-hover active:text-npi-blue-hover disabled:text-npi-gray-700 disabled:border-npi-gray-700',
+			tertiary:
+				'text-[1rem] leading-[1.6] bg-transparent text-npi-blue hover:text-npi-blue-hover active:text-npi-blue-hover focus-visible:outline-none focus-visible:shadow-[0_3px_0_0_#ACCDFF] disabled:text-npi-gray-700',
+			'tertiary-s':
+				'text-[0.875rem] leading-[1.3] font-normal bg-transparent text-npi-blue hover:text-npi-blue-hover active:text-npi-blue-hover focus-visible:outline-none focus-visible:shadow-[0_3px_0_0_#ACCDFF] disabled:text-npi-gray-700',
+			icon:
+				'size-12 rounded-full p-0 border border-npi-blue text-npi-blue bg-transparent hover:border-npi-blue-hover hover:text-npi-blue-hover active:border-npi-blue-hover active:text-npi-blue-hover disabled:text-npi-gray-700 disabled:border-npi-gray-700',
 		},
-		size: {
-			sm: 'px-3 py-1.5 text-[length:var(--npi-font-size-sm)]',
-			md: 'px-5 py-2.5 text-[length:var(--npi-font-size-base)]',
-			lg: 'px-7 py-3.5 text-[length:var(--npi-font-size-lg)]',
+		inverted: {
+			true: '',
 		},
 	},
 	defaultVariants: {
 		variant: 'primary',
-		size: 'md',
 	},
+	compoundVariants: [
+		{
+			variant: 'primary',
+			inverted: true,
+			className: 'bg-npi-white text-npi-blue hover:bg-npi-gray-50 active:bg-npi-gray-50',
+		},
+		{
+			variant: 'secondary',
+			inverted: true,
+			className: 'border-npi-white text-npi-white hover:border-npi-gray-200 hover:text-npi-gray-200',
+		},
+		{
+			variant: 'tertiary',
+			inverted: true,
+			className: 'text-npi-white hover:text-npi-gray-200 active:text-npi-gray-200',
+		},
+		{
+			variant: 'tertiary-s',
+			inverted: true,
+			className: 'text-npi-white hover:text-npi-gray-200 active:text-npi-gray-200',
+		},
+		{
+			variant: 'icon',
+			inverted: true,
+			className: 'border-npi-white text-npi-white hover:border-npi-gray-200 hover:text-npi-gray-200',
+		},
+		{ inverted: true, className: 'focus-visible:outline-npi-white' },
+	],
 	displayName: 'Button',
 })
 

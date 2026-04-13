@@ -15,6 +15,7 @@ export interface Meta<C extends ComponentType<any> = ComponentType<any>> {
 	title: string
 	component: C
 	argTypes?: Record<string, ArgType>
+	order?: number
 }
 
 export interface Story<C extends ComponentType<any> = ComponentType<any>> {
