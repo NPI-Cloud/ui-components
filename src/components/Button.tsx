@@ -23,7 +23,7 @@ const ButtonRoot = uic("button", {
 				"text-[1rem] leading-[1.6] p-npi-2 bg-transparent text-npi-blue hover:text-npi-blue-hover active:text-npi-blue-hover focus-visible:outline-none focus-visible:shadow-[0_3px_0_0_#ACCDFF] disabled:text-npi-gray-700",
 			"tertiary-s":
 				"text-[0.875rem] leading-[1.3] p-npi-1 font-normal bg-transparent text-npi-blue hover:text-npi-blue-hover active:text-npi-blue-hover focus-visible:outline-none focus-visible:shadow-[0_3px_0_0_#ACCDFF] disabled:text-npi-gray-700",
-			icon: "size-12 rounded-full p-0 border border-npi-blue text-npi-blue bg-transparent hover:border-npi-blue-hover hover:text-npi-blue-hover active:border-npi-blue-hover active:text-npi-blue-hover disabled:text-npi-gray-700 disabled:border-npi-gray-700",
+			icon: "size-10 rounded-full p-0 border border-npi-gray-300 text-npi-blue bg-transparent hover:border-npi-blue-hover hover:text-npi-blue-hover active:border-npi-blue-hover active:text-npi-blue-hover disabled:border-npi-gray-300 disabled:text-npi-gray-700",
 		},
 		inverted: {
 			true: "",
@@ -61,9 +61,8 @@ const ButtonRoot = uic("button", {
 			variant: "icon",
 			inverted: true,
 			className:
-				"border-npi-white text-npi-white hover:border-npi-gray-200 hover:text-npi-gray-200",
+				"bg-npi-white border-npi-white text-npi-blue hover:bg-npi-white hover:text-npi-blue hover:border-npi-white active:bg-npi-white disabled:text-npi-gray-700",
 		},
-		{ inverted: true, className: "focus-visible:outline-npi-white" },
 	],
 	displayName: "Button",
 });
@@ -81,9 +80,19 @@ export type ButtonProps = Omit<
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 	({ label, iconBefore, iconAfter, className, variant, ...props }, ref) => {
+		const isIcon = variant === "icon";
 		const isSmall = variant === "tertiary-s";
 		const iconSize = isSmall ? ("s" as const) : ("m" as const);
 		const iconClass = isSmall ? "size-4" : ICON_SIZE;
+
+		if (isIcon) {
+			const name = iconBefore ?? iconAfter;
+			return (
+				<ButtonRoot ref={ref} variant={variant} className={className} {...props}>
+					{name && <Icon name={name} className={ICON_SIZE} />}
+				</ButtonRoot>
+			);
+		}
 
 		const paddingOverride =
 			iconBefore && iconAfter
