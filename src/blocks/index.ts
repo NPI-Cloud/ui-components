@@ -3,7 +3,7 @@ export { ContentImageBlock, type ContentImageBlockProps } from './ContentImageBl
 export { DynamicBlock, type DynamicBlockProps } from './DynamicBlock'
 export { FlexEndBlock } from './FlexEndBlock'
 export { FlexStartBlock, type FlexStartBlockProps } from './FlexStartBlock'
-export { HeroBlock, type HeroBlockProps } from './HeroBlock'
+export { HeroBlock, type HeroBlockProps, type HeroSize, heroSizes } from './HeroBlock'
 export { ImageBlock, type ImageBlockProps } from './ImageBlock'
 export { NewsletterBlock, type NewsletterBlockProps } from './NewsletterBlock'
 export { TextBlock, type TextBlockProps } from './TextBlock'

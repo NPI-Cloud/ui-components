@@ -1,68 +1,95 @@
+import { clsx } from 'clsx'
+import { Heading } from '../components/Heading'
+import { Text } from '../components/Text'
+
+export const heroSizes = ['homepage-1-1', 'homepage-7-5', 'subpage-2-1', 'subpage-1-1'] as const
+export type HeroSize = (typeof heroSizes)[number]
+
 export interface HeroBlockProps {
+	/** Main heading (H1) */
 	heading?: string | null
+	/** Description/perex paragraph under the heading */
 	subtitle?: string | null
+	/** Primary CTA label */
 	ctaLabel?: string | null
+	/** Primary CTA URL */
 	ctaUrl?: string | null
+	/** Optional secondary CTA label */
+	secondaryCtaLabel?: string | null
+	/** Optional secondary CTA URL */
+	secondaryCtaUrl?: string | null
+	/** Visual image URL shown on the right (stacks below on mobile) */
 	imageUrl?: string | null
 	imageAlt?: string | null
-	variant?: 'light' | 'dark'
+	/** Layout variant — controls content/visual width split and visual aspect ratio */
+	size?: HeroSize
 }
 
-export function HeroBlock({ heading, subtitle, ctaLabel, ctaUrl, imageUrl, imageAlt, variant = 'light' }: HeroBlockProps) {
-	const isDark = variant === 'dark'
+const baseCta =
+	'inline-flex items-center justify-center rounded-npi-xxs px-npi-8 py-npi-3 min-w-npi-40 w-full md:w-auto font-npi-sans font-bold text-[1rem] leading-[1.6] transition-colors focus-visible:outline-[3px] focus-visible:outline-offset-0 focus-visible:outline-[#ACCDFF]'
+const primaryCtaClass = `${baseCta} bg-npi-blue text-npi-white hover:bg-npi-blue-hover`
+const secondaryCtaClass = `${baseCta} bg-transparent border border-npi-blue text-npi-blue hover:border-npi-blue-hover hover:text-npi-blue-hover`
+
+const sizeConfig: Record<HeroSize, { gridCols: string; visualAspect: string }> = {
+	// 50/50 split, 4:3 visual — homepage default
+	'homepage-1-1': { gridCols: 'md:grid-cols-2', visualAspect: 'aspect-[4/3]' },
+	// ~59/41 split, 4:3 visual — wider content for homepage with longer copy
+	'homepage-7-5': { gridCols: 'md:grid-cols-[59fr_41fr]', visualAspect: 'aspect-[4/3]' },
+	// ~68/32 split, 4:3 visual — content-heavy subpage hero
+	'subpage-2-1': { gridCols: 'md:grid-cols-[68fr_32fr]', visualAspect: 'aspect-[4/3]' },
+	// 50/50 split, 16:9 visual — compact subpage hero
+	'subpage-1-1': { gridCols: 'md:grid-cols-2', visualAspect: 'aspect-[16/9]' },
+}
+
+export function HeroBlock({
+	heading,
+	subtitle,
+	ctaLabel,
+	ctaUrl,
+	secondaryCtaLabel,
+	secondaryCtaUrl,
+	imageUrl,
+	imageAlt,
+	size = 'homepage-1-1',
+}: HeroBlockProps) {
+	const hasCta = ctaLabel || secondaryCtaLabel
+	const config = sizeConfig[size]
 
 	return (
-		<div
-			className={`grid min-h-75 grid-cols-1 overflow-hidden rounded-s md:grid-cols-[55%_45%] ${isDark ? 'bg-[#0a1a4a]' : 'bg-white'}`}
-		>
-			<div className="flex flex-col justify-center p-8 md:p-12">
-				{heading && (
-					<h2
-						className={`font-npi-sans text-(length:--npi-font-size-4xl) font-bold leading-tight ${isDark ? 'text-white' : 'text-npi-gray-900'}`}
-					>
-						{heading}
-					</h2>
-				)}
-				{subtitle && (
-					<p
-						className={`mt-4 font-npi-sans text-(length:--npi-font-size-lg) leading-relaxed ${isDark ? 'text-npi-gray-300' : 'text-npi-gray-700'}`}
-					>
-						{subtitle}
-					</p>
-				)}
-				{ctaLabel && (
-					<div className="mt-6">
-						<a
-							href={ctaUrl ?? '#'}
-							className="inline-flex items-center gap-2 rounded-xs bg-npi-blue px-6 py-3 font-npi-sans text-(length:--npi-font-size-base) font-semibold text-white"
-						>
-							{ctaLabel}
-							<span aria-hidden="true">&gt;</span>
-						</a>
+		<section className={clsx('grid grid-cols-1 items-center gap-npi-8 md:gap-npi-10', config.gridCols)}>
+			<div className="flex flex-col items-start gap-npi-6">
+				{heading && <Heading level={1}>{heading}</Heading>}
+				{subtitle && <Text variant="l">{subtitle}</Text>}
+				{hasCta && (
+					<div className="flex w-full flex-col gap-npi-4 md:w-auto md:flex-row">
+						{ctaLabel && (
+							<a href={ctaUrl ?? '#'} className={primaryCtaClass}>
+								{ctaLabel}
+							</a>
+						)}
+						{secondaryCtaLabel && (
+							<a href={secondaryCtaUrl ?? '#'} className={secondaryCtaClass}>
+								{secondaryCtaLabel}
+							</a>
+						)}
 					</div>
 				)}
 			</div>
-			<div className="flex items-center justify-center p-4 md:p-8">
+			<div className={clsx('relative w-full overflow-hidden', config.visualAspect)}>
 				{imageUrl
 					? (
 						<img
 							src={imageUrl}
 							alt={imageAlt ?? ''}
-							className="h-full w-full rounded-s object-cover"
+							className="absolute inset-0 h-full w-full object-contain"
 						/>
 					)
 					: (
-						<div className="flex h-full min-h-50 w-full items-center justify-center rounded-s bg-npi-gray-100 text-npi-gray-400">
-							<svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-								<path
-									strokeLinecap="round"
-									strokeLinejoin="round"
-									d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0 0 22.5 18.75V5.25A2.25 2.25 0 0 0 20.25 3H3.75A2.25 2.25 0 0 0 1.5 5.25v13.5A2.25 2.25 0 0 0 3.75 21Z"
-								/>
-							</svg>
+						<div className="absolute inset-0 flex items-center justify-center bg-npi-blue-lighter">
+							<Text variant="l" className="text-npi-text-primary">Visual</Text>
 						</div>
 					)}
 			</div>
-		</div>
+		</section>
 	)
 }
