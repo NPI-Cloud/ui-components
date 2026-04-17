@@ -123,4 +123,7 @@
 
 	/* NPI Layout — max content width. Enables `max-w-npi-layout` and `@npi-layout:` container variants */
 	--container-npi-layout: 1064px;
+
+	/* NPI Breakpoints — viewport widths. Enables `npi-tablet:`, etc. responsive variants */
+	--breakpoint-npi-tablet: 720px;
 }
