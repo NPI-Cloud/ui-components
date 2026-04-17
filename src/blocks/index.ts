@@ -1,4 +1,4 @@
-export { BlockColumns, blockColumnsRatios, type BlockColumnsMode, type BlockColumnsProps, type BlockColumnsRatio } from './BlockColumns'
+export { BlockColumns, type BlockColumnsMode, type BlockColumnsProps, type BlockColumnsRatio, blockColumnsRatios } from './BlockColumns'
 export { ColumnBlock } from './ColumnBlock'
 export { ContentImageBlock, type ContentImageBlockProps } from './ContentImageBlock'
 export { DynamicBlock, type DynamicBlockProps } from './DynamicBlock'

@@ -58,19 +58,16 @@ const toneRootClass: Record<BannerTone, string> = {
 //  - base (< @md / 448px): "S" — vertical stack, compact padding, h5 title
 //  - @md (≥ 448px):        "M" — horizontal, mid padding, h5 title
 //  - @4xl (≥ 896px):       "L" — horizontal, large padding/radius, h3 title
-const rootClass =
-	'@container flex w-full flex-col overflow-hidden gap-npi-8 px-npi-6 pt-npi-10 pb-npi-6 rounded-npi-m '
+const rootClass = '@container flex w-full flex-col overflow-hidden gap-npi-8 px-npi-6 pt-npi-10 pb-npi-6 rounded-npi-m '
 	+ '@md:flex-row @md:items-center @md:gap-npi-8 @md:p-npi-12 '
 	+ '@4xl:gap-npi-14 @4xl:px-npi-16 @4xl:py-npi-12 @4xl:rounded-npi-l'
 
-const visualClass =
-	'relative flex items-end justify-end overflow-hidden rounded-npi-xxs bg-npi-blue-lighter p-npi-2 '
+const visualClass = 'relative flex items-end justify-end overflow-hidden rounded-npi-xxs bg-npi-blue-lighter p-npi-2 '
 	+ 'w-full aspect-[4/3] '
 	+ '@md:w-npi-30 @md:h-[180px] @md:aspect-auto @md:shrink-0 '
 	+ '@4xl:w-[340px] @4xl:h-[255px]'
 
-const actionsClass =
-	'flex w-full flex-col gap-npi-4 [&>*]:w-full '
+const actionsClass = 'flex w-full flex-col gap-npi-4 [&>*]:w-full '
 	+ '@md:w-auto @md:flex-row @md:flex-wrap @md:gap-npi-3 @md:[&>*]:w-auto'
 
 // Banner heading scales with container width: H5 at narrow/mid, H3 at wide.
