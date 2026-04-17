@@ -1,92 +1,92 @@
-import { forwardRef } from "react";
-import { Icon, type IconName } from "../icons";
-import { uic } from "../utils/uic";
+import { forwardRef } from 'react'
+import { Icon, type IconName } from '../icons'
+import { uic } from '../utils/uic'
 
 export const buttonVariants = [
-	"primary",
-	"secondary",
-	"tertiary",
-	"tertiary-s",
-	"icon",
-] as const;
+	'primary',
+	'secondary',
+	'tertiary',
+	'tertiary-s',
+	'icon',
+] as const
 
-const ButtonRoot = uic("button", {
+const ButtonRoot = uic('button', {
 	baseClass:
-		"inline-flex items-center justify-center gap-npi-2 cursor-pointer font-npi-sans font-bold transition-colors focus-visible:outline-[3px] focus-visible:outline-offset-0 focus-visible:outline-[#ACCDFF] disabled:pointer-events-none",
+		'inline-flex items-center justify-center gap-npi-2 cursor-pointer font-npi-sans font-bold transition-colors focus-visible:outline-[3px] focus-visible:outline-offset-0 focus-visible:outline-[#ACCDFF] disabled:pointer-events-none',
 	variants: {
 		variant: {
 			primary:
-				"rounded-npi-xxs px-npi-8 py-npi-3 w-full md:w-auto min-w-npi-40 text-[1rem] leading-[1.6] bg-npi-blue text-npi-white hover:bg-npi-blue-hover active:bg-npi-blue-hover disabled:bg-npi-gray-700",
+				'rounded-npi-xxs px-npi-8 py-npi-3 w-full md:w-auto min-w-npi-40 text-[1rem] leading-[1.6] bg-npi-blue text-npi-white hover:bg-npi-blue-hover active:bg-npi-blue-hover disabled:bg-npi-gray-700',
 			secondary:
-				"rounded-npi-xxs px-npi-8 py-npi-3 w-full md:w-auto min-w-npi-40 text-[1rem] leading-[1.6] border border-npi-blue text-npi-blue bg-transparent hover:border-npi-blue-hover hover:text-npi-blue-hover active:border-npi-blue-hover active:text-npi-blue-hover disabled:text-npi-gray-700 disabled:border-npi-gray-700",
+				'rounded-npi-xxs px-npi-8 py-npi-3 w-full md:w-auto min-w-npi-40 text-[1rem] leading-[1.6] border border-npi-blue text-npi-blue bg-transparent hover:border-npi-blue-hover hover:text-npi-blue-hover active:border-npi-blue-hover active:text-npi-blue-hover disabled:text-npi-gray-700 disabled:border-npi-gray-700',
 			tertiary:
-				"text-[1rem] leading-[1.6] p-npi-2 bg-transparent text-npi-blue hover:text-npi-blue-hover active:text-npi-blue-hover focus-visible:outline-none focus-visible:shadow-[0_3px_0_0_#ACCDFF] disabled:text-npi-gray-700",
-			"tertiary-s":
-				"text-[0.875rem] leading-[1.3] p-npi-1 font-normal bg-transparent text-npi-blue hover:text-npi-blue-hover active:text-npi-blue-hover focus-visible:outline-none focus-visible:shadow-[0_3px_0_0_#ACCDFF] disabled:text-npi-gray-700",
-			icon: "size-10 rounded-full p-0 border border-npi-gray-300 text-npi-blue bg-transparent hover:border-npi-blue-hover hover:text-npi-blue-hover active:border-npi-blue-hover active:text-npi-blue-hover disabled:border-npi-gray-300 disabled:text-npi-gray-700",
+				'text-[1rem] leading-[1.6] p-npi-2 bg-transparent text-npi-blue hover:text-npi-blue-hover active:text-npi-blue-hover focus-visible:outline-none focus-visible:shadow-[0_3px_0_0_#ACCDFF] disabled:text-npi-gray-700',
+			'tertiary-s':
+				'text-[0.875rem] leading-[1.3] p-npi-1 font-normal bg-transparent text-npi-blue hover:text-npi-blue-hover active:text-npi-blue-hover focus-visible:outline-none focus-visible:shadow-[0_3px_0_0_#ACCDFF] disabled:text-npi-gray-700',
+			icon:
+				'size-10 rounded-full p-0 border border-npi-gray-300 text-npi-blue bg-transparent hover:border-npi-blue-hover hover:text-npi-blue-hover active:border-npi-blue-hover active:text-npi-blue-hover disabled:border-npi-gray-300 disabled:text-npi-gray-700',
 		},
 		inverted: {
-			true: "",
+			true: '',
 		},
 	},
 	defaultVariants: {
-		variant: "primary",
+		variant: 'primary',
 	},
 	compoundVariants: [
 		{
-			variant: "primary",
+			variant: 'primary',
 			inverted: true,
-			className:
-				"bg-npi-white text-npi-blue hover:bg-npi-gray-50 active:bg-npi-gray-50 disabled:bg-npi-gray-700 disabled:text-npi-white",
+			className: 'bg-npi-white text-npi-blue hover:bg-npi-gray-50 active:bg-npi-gray-50 disabled:bg-npi-gray-700 disabled:text-npi-white',
 		},
 		{
-			variant: "secondary",
+			variant: 'secondary',
 			inverted: true,
 			className:
-				"border-npi-white text-npi-white hover:border-npi-gray-200 hover:text-npi-gray-200 disabled:text-npi-gray-300 disabled:border-npi-gray-300",
+				'border-npi-white text-npi-white hover:border-npi-gray-200 hover:text-npi-gray-200 disabled:text-npi-gray-300 disabled:border-npi-gray-300',
 		},
 		{
-			variant: "tertiary",
+			variant: 'tertiary',
 			inverted: true,
-			className:
-				"text-npi-white hover:text-npi-gray-200 active:text-npi-gray-200 disabled:text-npi-gray-300",
+			className: 'text-npi-white hover:text-npi-gray-200 active:text-npi-gray-200 disabled:text-npi-gray-300',
 		},
 		{
-			variant: "tertiary-s",
+			variant: 'tertiary-s',
 			inverted: true,
-			className:
-				"text-npi-white hover:text-npi-gray-200 active:text-npi-gray-200 disabled:text-npi-gray-300",
+			className: 'text-npi-white hover:text-npi-gray-200 active:text-npi-gray-200 disabled:text-npi-gray-300',
 		},
 		{
-			variant: "icon",
+			variant: 'icon',
 			inverted: true,
 			className:
-				"bg-npi-white border-npi-white text-npi-blue hover:bg-npi-white hover:text-npi-blue hover:border-npi-white active:bg-npi-white disabled:text-npi-gray-700",
+				'bg-npi-white border-npi-white text-npi-blue hover:bg-npi-white hover:text-npi-blue hover:border-npi-white active:bg-npi-white disabled:text-npi-gray-700',
 		},
 	],
-	displayName: "Button",
-});
+	displayName: 'Button',
+})
 
-const ICON_SIZE = "size-6";
+const ICON_SIZE = 'size-6'
 
-export type ButtonProps = Omit<
-	React.ComponentProps<typeof ButtonRoot>,
-	"children"
-> & {
-	label?: string;
-	iconBefore?: IconName;
-	iconAfter?: IconName;
-};
+export type ButtonProps =
+	& Omit<
+		React.ComponentProps<typeof ButtonRoot>,
+		'children'
+	>
+	& {
+		label?: string
+		iconBefore?: IconName
+		iconAfter?: IconName
+	}
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 	({ label, iconBefore, iconAfter, className, variant, ...props }, ref) => {
-		const isIcon = variant === "icon";
-		const isSmall = variant === "tertiary-s";
-		const iconSize = isSmall ? ("s" as const) : ("m" as const);
-		const iconClass = isSmall ? "size-4" : ICON_SIZE;
+		const isIcon = variant === 'icon'
+		const isSmall = variant === 'tertiary-s'
+		const iconSize = isSmall ? ('s' as const) : ('m' as const)
+		const iconClass = isSmall ? 'size-4' : ICON_SIZE
 
 		if (isIcon) {
-			const name = iconBefore ?? iconAfter;
+			const name = iconBefore ?? iconAfter
 			return (
 				<ButtonRoot
 					ref={ref}
@@ -96,34 +96,29 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 				>
 					{name && <Icon name={name} className={ICON_SIZE} />}
 				</ButtonRoot>
-			);
+			)
 		}
 
-		const paddingOverride =
-			iconBefore && iconAfter
-				? "px-npi-1"
-				: iconBefore
-					? "pl-npi-1"
-					: iconAfter
-						? "pr-npi-1"
-						: "";
+		const paddingOverride = iconBefore && iconAfter
+			? 'px-npi-1'
+			: iconBefore
+			? 'pl-npi-1'
+			: iconAfter
+			? 'pr-npi-1'
+			: ''
 
 		return (
 			<ButtonRoot
 				ref={ref}
 				variant={variant}
-				className={`${paddingOverride} ${className ?? ""}`}
+				className={`${paddingOverride} ${className ?? ''}`}
 				{...props}
 			>
-				{iconBefore && (
-					<Icon name={iconBefore} size={iconSize} className={iconClass} />
-				)}
+				{iconBefore && <Icon name={iconBefore} size={iconSize} className={iconClass} />}
 				{label && <span>{label}</span>}
-				{iconAfter && (
-					<Icon name={iconAfter} size={iconSize} className={iconClass} />
-				)}
+				{iconAfter && <Icon name={iconAfter} size={iconSize} className={iconClass} />}
 			</ButtonRoot>
-		);
+		)
 	},
-);
-Button.displayName = "Button";
+)
+Button.displayName = 'Button'
