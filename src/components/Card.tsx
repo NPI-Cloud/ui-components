@@ -5,9 +5,6 @@ import { Icon, type IconName } from '../icons'
 import { Heading } from './Heading'
 import { Text } from './Text'
 
-export const cardSizes = ['S', 'M', 'L'] as const
-export type CardSize = (typeof cardSizes)[number]
-
 export const cardAspects = ['16/9', '1/1', '4/3', '3/2', '3/4'] as const
 export type CardAspect = (typeof cardAspects)[number]
 
@@ -31,8 +28,6 @@ const indicatorIconMap: Record<CardIndicator, IconName> = {
 export interface CardProps extends Omit<React.HTMLAttributes<HTMLElement>, 'title'> {
 	/** Main heading */
 	title: string
-	/** Size variant: S (vertical), M/L (horizontal with visual on the left) */
-	size?: CardSize
 	/** Small caps label shown above the title */
 	label?: string
 	/** Meta info shown below the title, separated by bullets */
@@ -41,7 +36,7 @@ export interface CardProps extends Omit<React.HTMLAttributes<HTMLElement>, 'titl
 	description?: string
 	/** Content for the visual area (image, video, etc.) */
 	visual?: React.ReactNode
-	/** Aspect ratio of the visual area. Only applies to size 'S' (M/L use fixed dimensions) */
+	/** Aspect ratio of the visual area. Only applies when card is in narrow/vertical layout */
 	aspect?: CardAspect
 	/** Hide the visual area entirely */
 	hideVisual?: boolean
@@ -55,30 +50,14 @@ export interface CardProps extends Omit<React.HTMLAttributes<HTMLElement>, 'titl
 	children?: React.ReactNode
 }
 
-const rootClass = 'flex w-full overflow-hidden rounded-npi-s bg-npi-white transition-shadow'
+// @container makes the Card responsive to its own width.
+// @md (≥28rem / 448px) → horizontal layout (M)
+// @4xl (≥56rem / 896px) → wider visual (L)
+const rootClass = '@container flex w-full flex-col overflow-hidden rounded-npi-s bg-npi-white transition-shadow @md:flex-row'
 const rootShadowClass = 'shadow-npi-m hover:shadow-npi-m-hover'
-
-const sizeDirectionClass: Record<CardSize, string> = {
-	S: 'flex-col',
-	M: 'flex-row',
-	L: 'flex-row',
-}
-
-const contentClass: Record<CardSize, string> = {
-	S: 'flex flex-col items-start gap-npi-4 px-npi-6 pt-npi-6 pb-npi-8 w-full',
-	M: 'flex flex-col items-start gap-npi-4 p-npi-8 flex-1',
-	L: 'flex flex-col items-start gap-npi-4 p-npi-8 flex-1',
-}
-
-const visualSizeClass: Record<CardSize, (aspect: CardAspect) => string> = {
-	S: aspect => clsx('w-full', aspectClassMap[aspect]),
-	M: () => 'w-npi-50 aspect-[3/4] shrink-0',
-	L: () => 'w-[400px] aspect-[16/9] shrink-0',
-}
 
 export const Card = forwardRef<HTMLElement, CardProps>(({
 	title,
-	size = 'S',
 	label,
 	meta,
 	description,
@@ -92,7 +71,6 @@ export const Card = forwardRef<HTMLElement, CardProps>(({
 	className,
 	...props
 }, ref) => {
-	const titleLevel = size === 'L' ? 4 : 5
 	const Root = href ? 'a' : 'article'
 
 	return (
@@ -101,7 +79,6 @@ export const Card = forwardRef<HTMLElement, CardProps>(({
 			className={twMerge(
 				clsx(
 					rootClass,
-					sizeDirectionClass[size],
 					!inverted && rootShadowClass,
 					href && 'cursor-pointer no-underline',
 					className,
@@ -114,7 +91,13 @@ export const Card = forwardRef<HTMLElement, CardProps>(({
 				<div
 					className={clsx(
 						'relative flex items-end justify-end bg-npi-blue-dark p-npi-2',
-						visualSizeClass[size](aspect),
+						// Narrow (S): full-width with caller-provided aspect
+						'w-full',
+						aspectClassMap[aspect],
+						// @md (M): fixed 200×267 visual on the left
+						'@md:w-npi-50 @md:shrink-0 @md:aspect-[3/4]',
+						// @4xl (L): wider 400px / 16:9 visual
+						'@4xl:w-[400px] @4xl:aspect-[16/9]',
 					)}
 				>
 					{visual}
@@ -125,9 +108,9 @@ export const Card = forwardRef<HTMLElement, CardProps>(({
 					)}
 				</div>
 			)}
-			<div className={contentClass[size]}>
+			<div className="flex w-full flex-col items-start gap-npi-4 px-npi-6 pt-npi-6 pb-npi-8 @md:flex-1 @md:p-npi-8">
 				{label && <Text variant="label">{label}</Text>}
-				<Heading level={titleLevel} className="text-npi-blue">
+				<Heading level={5} className="text-npi-blue">
 					{title}
 				</Heading>
 				{meta && meta.length > 0 && (
