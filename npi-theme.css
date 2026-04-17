@@ -120,4 +120,7 @@
 	--shadow-npi-s-hover: var(--npi-shadow-s-hover);
 	--shadow-npi-m: var(--npi-shadow-m);
 	--shadow-npi-m-hover: var(--npi-shadow-m-hover);
+
+	/* NPI Layout — max content width. Enables `max-w-npi-layout` and `@npi-layout:` container variants */
+	--container-npi-layout: 1064px;
 }
