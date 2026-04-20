@@ -1,10 +1,31 @@
-import { clsx } from 'clsx'
 import { forwardRef } from 'react'
-import { twMerge } from 'tailwind-merge'
 import { Icon, type IconName } from '../icons'
+import { uic } from '../utils/uic'
 
 export const tagSizes = ['M', 'S'] as const
 export type TagSize = (typeof tagSizes)[number]
+
+const TagRoot = uic('button', {
+	baseClass: [
+		'inline-flex items-center gap-npi-2 rounded-npi-xxs font-npi-sans cursor-pointer transition-colors',
+		'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-npi-blue-light',
+	],
+	variants: {
+		size: {
+			M: 'px-npi-3 py-[6px] text-[0.875rem] leading-[1.3] border',
+			S: 'px-[10px] py-npi-1 text-[0.75rem] leading-[1.3] font-semibold border-2',
+		},
+		inverted: {
+			true:
+				'bg-transparent border-npi-white text-npi-white hover:border-npi-blue-light hover:text-npi-blue-light active:border-npi-blue-light active:text-npi-blue-light',
+			false:
+				'bg-npi-white border-npi-blue text-npi-blue hover:border-npi-blue-hover hover:text-npi-blue-hover active:border-npi-blue-hover active:text-npi-blue-hover',
+		},
+	},
+	defaultVariants: { size: 'M', inverted: false },
+	defaultProps: { type: 'button' },
+	displayName: 'TagRoot',
+})
 
 export interface TagProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'children'> {
 	/** Visible label */
@@ -21,36 +42,14 @@ export interface TagProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonElem
 	onRemove?: () => void
 }
 
-const rootBase =
-	'inline-flex items-center gap-npi-2 rounded-npi-xxs font-npi-sans cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-npi-blue-light'
-
-const sizeClass: Record<TagSize, string> = {
-	// px-12 py-[6px] / text-m / 1px border
-	M: 'px-npi-3 py-[6px] text-[0.875rem] leading-[1.3] border',
-	// px-[10px] py-1 / text-s semibold / 2px border
-	S: 'px-[10px] py-npi-1 text-[0.75rem] leading-[1.3] font-semibold border-2',
-}
-
-const toneClass = {
-	default:
-		'bg-npi-white border-npi-blue text-npi-blue hover:border-npi-blue-hover hover:text-npi-blue-hover active:border-npi-blue-hover active:text-npi-blue-hover',
-	inverted:
-		'bg-transparent border-npi-white text-npi-white hover:border-npi-blue-light hover:text-npi-blue-light active:border-npi-blue-light active:text-npi-blue-light',
-}
-
 export const Tag = forwardRef<HTMLButtonElement, TagProps>(
-	({ label, size = 'M', iconBefore, iconAfter, inverted = false, onRemove, className, type = 'button', ...props }, ref) => {
+	({ label, size = 'M', iconBefore, iconAfter, inverted = false, onRemove, className, ...props }, ref) => {
 		const showIconBefore = iconBefore != null && size === 'M'
 		const showRemove = onRemove != null && size === 'M'
 		const showIconAfter = iconAfter != null && size === 'M' && !showRemove
 
 		return (
-			<button
-				ref={ref}
-				type={type}
-				className={twMerge(clsx(rootBase, sizeClass[size], inverted ? toneClass.inverted : toneClass.default, className))}
-				{...props}
-			>
+			<TagRoot ref={ref} size={size} inverted={inverted} className={className} {...props}>
 				{showIconBefore && <Icon name={iconBefore} size="s" className="size-4 shrink-0" />}
 				<span>{label}</span>
 				{showIconAfter && <Icon name={iconAfter} size="s" className="size-4 shrink-0" />}
@@ -75,7 +74,7 @@ export const Tag = forwardRef<HTMLButtonElement, TagProps>(
 						<Icon name="zavrit" size="s" className="size-4 shrink-0" />
 					</span>
 				)}
-			</button>
+			</TagRoot>
 		)
 	},
 )
