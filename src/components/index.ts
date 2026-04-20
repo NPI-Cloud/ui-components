@@ -1,5 +1,6 @@
 export { Badge, type BadgeProps, type BadgeTone, badgeTones } from './Badge'
 export { Banner, type BannerAction, type BannerIndicator, bannerIndicators, type BannerProps, type BannerTone, bannerTones } from './Banner'
+export { Breadcrumbs, type BreadcrumbsItem, type BreadcrumbsProps } from './Breadcrumbs'
 export { Button, type ButtonProps, buttonVariants } from './Button'
 export { Card, type CardAspect, cardAspects, type CardIndicator, cardIndicators, type CardProps } from './Card'
 export { Checkbox, type CheckboxProps, type CheckboxSize, checkboxSizes } from './Checkbox'
