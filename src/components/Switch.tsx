@@ -10,7 +10,8 @@ export interface SwitchProps extends Omit<React.InputHTMLAttributes<HTMLInputEle
 	labelPosition?: 'before' | 'after'
 }
 
-const trackClass = 'peer h-6 w-[42px] shrink-0 appearance-none cursor-pointer rounded-full border border-npi-gray-400 bg-npi-bg-white transition-colors '
+const trackClass =
+	'peer h-6 w-[42px] shrink-0 appearance-none cursor-pointer rounded-full border border-npi-gray-400 bg-npi-bg-white transition-colors '
 	+ 'checked:border-npi-blue checked:bg-npi-blue '
 	+ 'checked:hover:border-npi-blue-hover checked:hover:bg-npi-blue-hover '
 	+ 'checked:active:border-npi-blue-hover checked:active:bg-npi-blue-hover '
