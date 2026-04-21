@@ -1,3 +1,13 @@
+export {
+	Accordion,
+	AccordionItem,
+	type AccordionItemProps,
+	type AccordionProps,
+	type AccordionSize,
+	accordionSizes,
+	type AccordionVariant,
+	accordionVariants,
+} from './Accordion'
 export { Badge, type BadgeProps, type BadgeTone, badgeTones } from './Badge'
 export { Banner, type BannerAction, type BannerIndicator, bannerIndicators, type BannerProps, type BannerTone, bannerTones } from './Banner'
 export { Breadcrumbs, type BreadcrumbsItem, type BreadcrumbsProps } from './Breadcrumbs'
