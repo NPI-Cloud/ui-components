@@ -5,10 +5,13 @@
 	"main": "src/index.ts",
 
 	"dependencies": {
+		"@radix-ui/react-accordion": "catalog:ui",
+		"@radix-ui/react-navigation-menu": "catalog:ui",
 		"@radix-ui/react-slot": "catalog:ui",
 		"class-variance-authority": "catalog:ui",
 		"clsx": "catalog:ui",
 		"react": "catalog:ui",
+		"react-dom": "catalog:ui",
 		"tailwind-merge": "catalog:ui",
 		"tailwindcss": "catalog:ui-dev"
 	},

@@ -126,4 +126,17 @@
 
 	/* NPI Breakpoints — viewport widths. Enables `npi-tablet:`, etc. responsive variants */
 	--breakpoint-npi-tablet: 720px;
+
+	/* NPI Animations — Radix Accordion open/close using the content-height CSS var */
+	--animate-npi-accordion-down: npi-accordion-down 200ms ease-out;
+	--animate-npi-accordion-up: npi-accordion-up 200ms ease-out;
+
+	@keyframes npi-accordion-down {
+		from { height: 0; }
+		to { height: var(--radix-accordion-content-height); }
+	}
+	@keyframes npi-accordion-up {
+		from { height: var(--radix-accordion-content-height); }
+		to { height: 0; }
+	}
 }

@@ -1,5 +1,6 @@
+import * as RadixAccordion from '@radix-ui/react-accordion'
 import { clsx } from 'clsx'
-import { createContext, forwardRef, type MouseEvent, useContext } from 'react'
+import { createContext, forwardRef, useContext } from 'react'
 import { twMerge } from 'tailwind-merge'
 import { Icon } from '../icons'
 
@@ -48,7 +49,9 @@ export const Accordion = forwardRef<HTMLDivElement, AccordionProps>(
 )
 Accordion.displayName = 'Accordion'
 
-export interface AccordionItemProps extends Omit<React.HTMLAttributes<HTMLDetailsElement>, 'title' | 'onToggle'> {
+const ITEM_VALUE = 'item'
+
+export interface AccordionItemProps {
 	/** Header content — string or any JSX (supports multi-line, medallion blocks, etc.) */
 	title: React.ReactNode
 	/** Secondary text shown under the title (Noto Sans 16px). Use for subtitle, role, or description patterns. */
@@ -63,9 +66,13 @@ export interface AccordionItemProps extends Omit<React.HTMLAttributes<HTMLDetail
 	disabled?: boolean
 	/** Fires when the user attempts to toggle — receives the next open state */
 	onToggle?: (open: boolean) => void
+	/** Extra classes on the item wrapper */
+	className?: string
+	/** Body content */
+	children?: React.ReactNode
 }
 
-export const AccordionItem = forwardRef<HTMLDetailsElement, AccordionItemProps>(
+export const AccordionItem = forwardRef<HTMLDivElement, AccordionItemProps>(
 	(
 		{
 			title,
@@ -77,78 +84,79 @@ export const AccordionItem = forwardRef<HTMLDetailsElement, AccordionItemProps>(
 			onToggle,
 			className,
 			children,
-			...props
 		},
 		ref,
 	) => {
 		const { variant, size } = useContext(AccordionContext)
 		const hasLeading = Boolean(leading)
 
-		const handleSummaryClick = (event: MouseEvent<HTMLElement>) => {
-			if (disabled) {
-				event.preventDefault()
-				return
+		const rootValueProps = open !== undefined
+			? { value: open ? ITEM_VALUE : '', onValueChange: (v: string) => onToggle?.(v === ITEM_VALUE) }
+			: {
+				defaultValue: defaultOpen ? ITEM_VALUE : undefined,
+				onValueChange: (v: string) => onToggle?.(v === ITEM_VALUE),
 			}
-			if (open !== undefined) event.preventDefault()
-			onToggle?.(
-				!(event.currentTarget.parentElement as HTMLDetailsElement).open,
-			)
-		}
 
 		return (
-			<details
+			<RadixAccordion.Root
 				ref={ref}
-				open={open ?? defaultOpen}
+				type="single"
+				collapsible
+				{...rootValueProps}
 				className={twMerge(
 					clsx(
 						variant === 'plain' && 'border-t border-npi-gray-200 last:border-b',
 						className,
 					),
 				)}
-				{...props}
 			>
-				<summary
-					onClick={handleSummaryClick}
-					aria-disabled={disabled || undefined}
-					className={clsx(
-						'flex list-none items-center gap-npi-6 py-npi-6 outline-none',
-						'[&::-webkit-details-marker]:hidden',
-						'focus-visible:outline-4 focus-visible:outline-offset-0 focus-visible:outline-npi-blue-light',
-						'transition-colors',
-						disabled
-							? 'cursor-not-allowed text-npi-gray-700'
-							: 'cursor-pointer text-npi-blue hover:text-npi-blue-hover active:text-npi-blue-hover',
-					)}
-				>
-					{hasLeading && <span className="flex shrink-0 items-center">{leading}</span>}
-					<span className="flex min-w-0 flex-1 flex-col gap-npi-1">
-						<span
+				<RadixAccordion.Item value={ITEM_VALUE} disabled={disabled}>
+					<RadixAccordion.Header className="flex">
+						<RadixAccordion.Trigger
 							className={clsx(
-								'font-npi-serif leading-[1.2]',
-								size === 'm' ? 'text-[1.25rem] font-medium' : 'text-[1rem] font-bold',
+								'group flex flex-1 select-none items-center gap-npi-6 py-npi-6 outline-none',
+								'focus-visible:outline-4 focus-visible:outline-offset-0 focus-visible:outline-npi-blue-light',
+								'transition-colors',
+								disabled
+									? 'cursor-not-allowed text-npi-gray-700'
+									: 'cursor-pointer text-npi-blue hover:text-npi-blue-hover active:text-npi-blue-hover',
 							)}
 						>
-							{title}
-						</span>
-						{description && (
-							<span
-								className={clsx(
-									'font-npi-sans font-normal text-npi-text-primary',
-									size === 'm' ? 'text-[1rem] leading-[1.5]' : 'text-[0.875rem] leading-[1.3]',
+							{hasLeading && <span className="flex shrink-0 items-center">{leading}</span>}
+							<span className="flex min-w-0 flex-1 flex-col gap-npi-1 text-start">
+								<span
+									className={clsx(
+										'font-npi-serif leading-[1.2]',
+										size === 'm' ? 'text-[1.25rem] font-medium' : 'text-[1rem] font-bold',
+									)}
+								>
+									{title}
+								</span>
+								{description && (
+									<span
+										className={clsx(
+											'font-npi-sans font-normal text-npi-text-primary',
+											size === 'm' ? 'text-[1rem] leading-[1.5]' : 'text-[0.875rem] leading-[1.3]',
+										)}
+									>
+										{description}
+									</span>
 								)}
-							>
-								{description}
 							</span>
+							<Icon
+								name="arrowDolu"
+								className="size-6 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-180"
+								aria-hidden="true"
+							/>
+						</RadixAccordion.Trigger>
+					</RadixAccordion.Header>
+					<RadixAccordion.Content
+						className={clsx(
+							'overflow-hidden',
+							'data-[state=open]:animate-npi-accordion-down',
+							'data-[state=closed]:animate-npi-accordion-up',
 						)}
-					</span>
-					<Icon
-						name="arrowDolu"
-						className="size-6 shrink-0 transition-transform duration-200 [details[open]>summary>&]:rotate-180"
-						aria-hidden="true"
-					/>
-				</summary>
-				<div className="grid grid-rows-[0fr] transition-[grid-template-rows] duration-200 ease-out [details[open]>&]:grid-rows-[1fr]">
-					<div className="min-h-0 overflow-hidden">
+					>
 						<div className="flex gap-npi-6 pb-npi-6">
 							{hasLeading && (
 								<span aria-hidden className="invisible shrink-0">
@@ -160,9 +168,9 @@ export const AccordionItem = forwardRef<HTMLDetailsElement, AccordionItemProps>(
 							</div>
 							<span aria-hidden className="invisible size-6 shrink-0" />
 						</div>
-					</div>
-				</div>
-			</details>
+					</RadixAccordion.Content>
+				</RadixAccordion.Item>
+			</RadixAccordion.Root>
 		)
 	},
 )
