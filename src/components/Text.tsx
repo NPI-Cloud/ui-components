@@ -26,22 +26,21 @@ export const textSpecs: Record<TextSize, TextSpec> = {
 	label: { size: '0.8125rem', lineHeight: 1.3, font: 'serif', defaultWeight: 700, uppercase: true, tracking: '0.18em' },
 }
 
+// Hardcoded so Tailwind v4's source scanner can see the literal arbitrary values and generate CSS for them.
+// Must stay in sync with `textSpecs` above.
+const variantClasses: Record<TextSize, string> = {
+	xl: 'text-[1.25rem] md:text-[1.375rem] leading-[1.3]',
+	l: 'text-[1rem] leading-[1.6]',
+	m: 'text-[0.875rem] leading-[1.3]',
+	s: 'text-[0.75rem] leading-[1.3]',
+	xs: 'text-[0.625rem] leading-[1.3]',
+	label: 'text-[0.8125rem] leading-[1.3] font-npi-serif font-bold uppercase tracking-[0.18em]',
+}
+
 export const Text = uic('p', {
 	baseClass: 'font-npi-sans',
 	variants: {
-		variant: Object.fromEntries(
-			textVariants.map(v => {
-				const s = textSpecs[v]
-				const sizeClass = s.mobileSize ? `text-[${s.mobileSize}] md:text-[${s.size}]` : `text-[${s.size}]`
-				const extra = [
-					s.font === 'serif' ? 'font-npi-serif' : '',
-					s.uppercase ? 'uppercase' : '',
-					s.tracking ? `tracking-[${s.tracking}]` : '',
-					s.defaultWeight === 700 ? 'font-bold' : '',
-				].filter(Boolean).join(' ')
-				return [v, `${sizeClass} leading-[${s.lineHeight}] ${extra}`.trim()]
-			}),
-		) as Record<TextSize, string>,
+		variant: variantClasses,
 		weight: {
 			regular: 'font-normal',
 			bold: 'font-bold',

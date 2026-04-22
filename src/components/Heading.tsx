@@ -28,15 +28,21 @@ export interface HeadingProps extends React.HTMLAttributes<HTMLHeadingElement> {
 	inverted?: boolean
 }
 
+// Hardcoded so Tailwind v4's source scanner can see the literal arbitrary values and generate CSS for them.
+// Must stay in sync with `headingSpecs` above.
+const levelClasses: Record<HeadingLevel, string> = {
+	1: 'text-[2.25rem] md:text-[3.5rem] leading-[1.2] font-normal',
+	2: 'text-[2rem] md:text-[2.5rem] leading-[1.2] font-normal',
+	3: 'text-[1.75rem] md:text-[2rem] leading-[1.2] font-normal',
+	4: 'text-[1.5rem] md:text-[1.75rem] leading-[1.2] font-normal',
+	5: 'text-[1.375rem] md:text-[1.5rem] leading-[1.2] font-medium',
+	6: 'text-[1.25rem] md:text-[1.25rem] leading-[1.2] font-medium',
+	7: 'text-[1.125rem] md:text-[1rem] leading-[1.2] font-bold',
+}
+
 const headingCva = cva('font-npi-serif', {
 	variants: {
-		level: Object.fromEntries(
-			headingLevels.map(l => {
-				const s = headingSpecs[l]
-				const w = s.weight === 400 ? 'font-normal' : s.weight === 500 ? 'font-medium' : 'font-bold'
-				return [l, `text-[${s.mobile}] md:text-[${s.desktop}] leading-[${s.lineHeight}] ${w}`]
-			}),
-		) as Record<HeadingLevel, string>,
+		level: levelClasses,
 		inverted: {
 			true: 'text-white',
 			false: 'text-npi-text-primary',
