@@ -84,9 +84,9 @@
 	--color-npi-status-success: var(--npi-status-success);
 	--color-npi-status-warning: var(--npi-status-warning);
 
-	/* NPI Typography */
-	--font-family-npi-serif: var(--npi-font-family-serif);
-	--font-family-npi-sans: var(--npi-font-family-sans);
+	/* NPI Typography — Tailwind v4 uses the `--font-*` namespace for font-family utilities */
+	--font-npi-serif: var(--npi-font-family-serif);
+	--font-npi-sans: var(--npi-font-family-sans);
 
 	/* NPI Border radii — namespaced, does not override Tailwind defaults */
 	--radius-npi-xxs: var(--npi-radius-xxs);
