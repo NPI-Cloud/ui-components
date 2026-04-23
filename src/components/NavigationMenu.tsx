@@ -42,18 +42,47 @@ const InsideItemsContext = createContext(false)
  */
 const WidePortalContext = createContext<HTMLElement | null>(null)
 
+/**
+ * Signals to nested `NavigationMenuItem`s / `NavigationSubnav`s that they live inside a
+ * `NavigationMenuDrawer`. Items render as accordion rows with inline expansion; subnavs render
+ * inline (no portal, no panel styling, no wide/narrow width).
+ */
+const InsideDrawerContext = createContext(false)
+
+type MobileState = { open: boolean; toggle: () => void; close: () => void }
+const MobileContext = createContext<MobileState>({ open: false, toggle: () => {}, close: () => {} })
+
 export interface NavigationMenuProps extends HTMLAttributes<HTMLElement> {}
 
 export const NavigationMenu = forwardRef<HTMLElement, NavigationMenuProps>(
-	({ className, children, ...props }, ref) => (
-		<header
-			ref={ref}
-			className={twMerge(clsx('relative flex flex-col font-npi-sans bg-npi-white', className))}
-			{...props}
-		>
-			{children}
-		</header>
-	),
+	({ className, children, ...props }, ref) => {
+		const [open, setOpen] = useState(false)
+		const mobile: MobileState = {
+			open,
+			toggle: () => setOpen(v => !v),
+			close: () => setOpen(false),
+		}
+		return (
+			<MobileContext.Provider value={mobile}>
+				<header
+					ref={ref}
+					data-mobile-open={open ? '' : undefined}
+					className={twMerge(
+						clsx(
+							'relative flex flex-col font-npi-sans bg-npi-white',
+							// When the mobile drawer is open (below 1064px), take over the viewport so the drawer
+							// can fill the space below the bar — desktop keeps the regular in-flow header.
+							'max-npi-desktop:data-[mobile-open]:fixed max-npi-desktop:data-[mobile-open]:inset-0 max-npi-desktop:data-[mobile-open]:z-50 max-npi-desktop:data-[mobile-open]:h-dvh',
+							className,
+						),
+					)}
+					{...props}
+				>
+					{children}
+				</header>
+			</MobileContext.Provider>
+		)
+	},
 )
 NavigationMenu.displayName = 'NavigationMenu'
 
@@ -80,7 +109,7 @@ export const NavigationMenuSiteSwitcher = forwardRef<HTMLDivElement, NavigationM
 			<div
 				ref={ref}
 				className={twMerge(
-					clsx('bg-npi-bg-dark py-npi-3 text-[0.875rem] leading-[1.3] text-npi-white', className),
+					clsx('bg-npi-bg-dark py-npi-3 text-[0.875rem] leading-[1.3] text-npi-white max-npi-desktop:hidden', className),
 				)}
 				{...props}
 			>
@@ -224,6 +253,78 @@ export const NavigationMenuActions = forwardRef<HTMLDivElement, NavigationMenuAc
 )
 NavigationMenuActions.displayName = 'NavigationMenuActions'
 
+export interface NavigationMenuMobileToggleProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children' | 'type'> {
+	/** Accessible label for the closed (hamburger) state. Defaults to "Otevřít menu". */
+	openLabel?: string
+	/** Accessible label for the open (X) state. Defaults to "Zavřít menu". */
+	closeLabel?: string
+}
+
+/**
+ * Hamburger/close button shown only below 1064px. Toggles the `NavigationMenuDrawer` open
+ * state. Place it inside `NavigationMenuBar` next to the brand — the drawer opens in-place.
+ */
+export const NavigationMenuMobileToggle = forwardRef<HTMLButtonElement, NavigationMenuMobileToggleProps>(
+	({ openLabel = 'Otevřít menu', closeLabel = 'Zavřít menu', className, onClick, ...props }, ref) => {
+		const { open, toggle } = useContext(MobileContext)
+		return (
+			<button
+				ref={ref}
+				type="button"
+				aria-expanded={open}
+				aria-label={open ? closeLabel : openLabel}
+				onClick={event => {
+					toggle()
+					onClick?.(event)
+				}}
+				className={twMerge(
+					clsx(
+						'inline-flex size-npi-8 shrink-0 cursor-pointer items-center justify-center rounded-npi-xxs text-npi-blue',
+						'focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-npi-blue-light',
+						'npi-desktop:hidden',
+						className,
+					),
+				)}
+				{...props}
+			>
+				<Icon name={open ? 'zavrit' : 'seznam'} className="size-6" aria-hidden="true" />
+			</button>
+		)
+	},
+)
+NavigationMenuMobileToggle.displayName = 'NavigationMenuMobileToggle'
+
+export interface NavigationMenuDrawerProps extends HTMLAttributes<HTMLDivElement> {}
+
+/**
+ * Mobile drawer panel. Renders only below 1064px and only when the `NavigationMenuMobileToggle`
+ * is toggled open. Children render as a vertical stack with dividers — pass `NavigationMenuSearch`,
+ * `Button`, and `NavigationMenuItem`s (parents with `NavigationSubnav` become accordion sections).
+ */
+export const NavigationMenuDrawer = forwardRef<HTMLDivElement, NavigationMenuDrawerProps>(
+	({ className, children, ...props }, ref) => {
+		const { open } = useContext(MobileContext)
+		if (!open) return null
+		return (
+			<InsideDrawerContext.Provider value={true}>
+				<div
+					ref={ref}
+					className={twMerge(
+						clsx(
+							'flex w-full flex-1 flex-col gap-npi-6 overflow-y-auto bg-npi-white px-npi-6 pt-npi-2 pb-npi-8 npi-desktop:hidden',
+							className,
+						),
+					)}
+					{...props}
+				>
+					{children}
+				</div>
+			</InsideDrawerContext.Provider>
+		)
+	},
+)
+NavigationMenuDrawer.displayName = 'NavigationMenuDrawer'
+
 export type NavigationMenuItemsProps = React.ComponentPropsWithoutRef<typeof RadixNavMenu.Root>
 
 export const NavigationMenuItems = forwardRef<
@@ -237,7 +338,7 @@ export const NavigationMenuItems = forwardRef<
 			ref={ref}
 			aria-label="Hlavní navigace"
 			className={twMerge(
-				clsx('relative mx-auto flex w-full max-w-npi-layout justify-center px-npi-6', className),
+				clsx('relative mx-auto flex w-full max-w-npi-layout justify-center px-npi-6 max-npi-desktop:hidden', className),
 			)}
 			{...props}
 		>
@@ -282,6 +383,7 @@ export type NavigationMenuItemProps =
 
 export const NavigationMenuItem = forwardRef<HTMLElement, NavigationMenuItemProps>((props, ref) => {
 	const insideItems = useContext(InsideItemsContext)
+	const insideDrawer = useContext(InsideDrawerContext)
 	const {
 		label,
 		icon,
@@ -295,9 +397,49 @@ export const NavigationMenuItem = forwardRef<HTMLElement, NavigationMenuItemProp
 		...rest
 	} = props as NavigationMenuItemProps & { as?: 'a' | 'button' }
 
-	const hasSubnav = children != null && insideItems
+	const hasSubnav = children != null && (insideItems || insideDrawer)
 	const trailing = trailingProp ?? (hasSubnav ? 'chevron' : 'none')
 	const isIconOnly = !label && icon != null
+
+	// Inside NavigationMenuDrawer: render accordion row (with children) or plain divider-separated row.
+	if (insideDrawer) {
+		const drawerRowClass = 'flex w-full items-center justify-between py-npi-2 font-bold text-[1rem] leading-[1.5] text-npi-blue hover:text-npi-blue-dark focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-npi-blue-light rounded-npi-xxs cursor-pointer'
+		const liClass = 'flex w-full flex-col border-b border-npi-gray-200'
+
+		if (hasSubnav) {
+			return (
+				<li className={liClass}>
+					<details className="group flex w-full flex-col">
+						<summary
+							className={twMerge(clsx(drawerRowClass, 'list-none [&::-webkit-details-marker]:hidden', className))}
+						>
+							<span className="whitespace-nowrap">{label}</span>
+							<Icon
+								name="arrowDolu"
+								className="size-6 shrink-0 transition-transform group-open:-rotate-180"
+								aria-hidden="true"
+							/>
+						</summary>
+						<div className="flex flex-col gap-npi-3 pb-npi-3 pl-npi-6">{children}</div>
+					</details>
+				</li>
+			)
+		}
+
+		const anchorProps = rest as AnchorHTMLAttributes<HTMLAnchorElement>
+		return (
+			<li className={liClass}>
+				<a
+					ref={ref as React.Ref<HTMLAnchorElement>}
+					className={twMerge(clsx(drawerRowClass, className))}
+					aria-current={state === 'select' ? 'page' : undefined}
+					{...anchorProps}
+				>
+					<span className="whitespace-nowrap">{label}</span>
+				</a>
+			</li>
+		)
+	}
 
 	const baseClass = twMerge(
 		clsx(
@@ -447,7 +589,18 @@ export interface NavigationSubnavProps extends HTMLAttributes<HTMLDivElement> {
 export const NavigationSubnav = forwardRef<HTMLDivElement, NavigationSubnavProps>(
 	({ variant = 'wide', className, children, ...props }, ref) => {
 		const insideItems = useContext(InsideItemsContext)
+		const insideDrawer = useContext(InsideDrawerContext)
 		const widePortalEl = useContext(WidePortalContext)
+
+		// Inside the mobile drawer: render children inline with no panel styling. Wide/narrow variant is
+		// irrelevant — columns flatten to a single vertical stack.
+		if (insideDrawer) {
+			return (
+				<div ref={ref} className={twMerge(clsx('flex w-full flex-col', className))} {...props}>
+					{children}
+				</div>
+			)
+		}
 
 		const panel = (
 			<div
@@ -480,15 +633,25 @@ NavigationSubnav.displayName = 'NavigationSubnav'
 export interface NavigationSubnavColumnsProps extends HTMLAttributes<HTMLDivElement> {}
 
 export const NavigationSubnavColumns = forwardRef<HTMLDivElement, NavigationSubnavColumnsProps>(
-	({ className, children, ...props }, ref) => (
-		<div
-			ref={ref}
-			className={twMerge(clsx('grid grid-cols-[repeat(auto-fit,minmax(0,1fr))] gap-npi-10', className))}
-			{...props}
-		>
-			{children}
-		</div>
-	),
+	({ className, children, ...props }, ref) => {
+		const insideDrawer = useContext(InsideDrawerContext)
+		return (
+			<div
+				ref={ref}
+				className={twMerge(
+					clsx(
+						insideDrawer
+							? 'flex flex-col gap-npi-3'
+							: 'grid grid-cols-[repeat(auto-fit,minmax(0,1fr))] gap-npi-10',
+						className,
+					),
+				)}
+				{...props}
+			>
+				{children}
+			</div>
+		)
+	},
 )
 NavigationSubnavColumns.displayName = 'NavigationSubnavColumns'
 
