@@ -423,6 +423,28 @@ export const NavigationMenuItem = forwardRef<HTMLElement, NavigationMenuItemProp
 	if (insideDrawer) {
 		const anchorProps = rest as AnchorHTMLAttributes<HTMLAnchorElement>
 
+		// Account-style row (icon + label, no children): borderless, tight, left-aligned.
+		// Use for the profile / cart buttons at the bottom of the drawer.
+		if (icon && label && !insideGroup && !hasSubnav) {
+			return (
+				<a
+					ref={ref as React.Ref<HTMLAnchorElement>}
+					className={twMerge(
+						clsx(
+							'inline-flex items-center gap-npi-2 py-npi-2 font-bold text-[1rem] leading-[1.5] text-npi-blue hover:text-npi-blue-dark',
+							'focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-npi-blue-light rounded-npi-xxs',
+							className,
+						),
+					)}
+					aria-current={state === 'select' ? 'page' : undefined}
+					{...anchorProps}
+				>
+					<Icon name={icon} className="size-6 shrink-0" aria-hidden="true" />
+					<span className="whitespace-nowrap">{label}</span>
+				</a>
+			)
+		}
+
 		if (insideGroup) {
 			return (
 				<li className="flex w-full">
