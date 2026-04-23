@@ -115,7 +115,7 @@ export const NavigationMenuSiteSwitcher = forwardRef<HTMLDivElement, NavigationM
 					ref={ref}
 					className={twMerge(
 						clsx(
-							'-mx-npi-6 -mb-npi-8 bg-npi-bg-dark px-npi-6 py-npi-6 text-npi-white',
+							'-mx-npi-6 -mb-npi-8 bg-npi-bg-dark px-npi-6 py-npi-6 text-[0.875rem] leading-[1.3] text-npi-white',
 							className,
 						),
 					)}
@@ -130,7 +130,7 @@ export const NavigationMenuSiteSwitcher = forwardRef<HTMLDivElement, NavigationM
 										href={site.href}
 										aria-current={isCurrent ? 'page' : undefined}
 										className={clsx(
-											'inline-flex items-center font-bold text-[1rem] leading-[1.5] transition-colors focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-npi-blue-light rounded-npi-xxs',
+											'inline-flex items-center transition-colors focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-npi-blue-light rounded-npi-xxs',
 											isCurrent
 												? 'text-npi-white underline underline-offset-4'
 												: 'text-npi-white/80 hover:text-npi-white',
