@@ -49,6 +49,13 @@ const WidePortalContext = createContext<HTMLElement | null>(null)
  */
 const InsideDrawerContext = createContext(false)
 
+/**
+ * Signals to nested `NavigationMenuItem`s that they live inside an expanded drawer group
+ * (a `NavigationSubnav` child rendered under a drawer accordion). Items render as lighter
+ * 14px regular links with no divider borders.
+ */
+const InsideDrawerGroupContext = createContext(false)
+
 type MobileState = { open: boolean; toggle: () => void; close: () => void }
 const MobileContext = createContext<MobileState>({ open: false, toggle: () => {}, close: () => {} })
 
@@ -67,15 +74,7 @@ export const NavigationMenu = forwardRef<HTMLElement, NavigationMenuProps>(
 				<header
 					ref={ref}
 					data-mobile-open={open ? '' : undefined}
-					className={twMerge(
-						clsx(
-							'relative flex flex-col font-npi-sans bg-npi-white',
-							// When the mobile drawer is open (below 1064px), take over the viewport so the drawer
-							// can fill the space below the bar — desktop keeps the regular in-flow header.
-							'max-npi-desktop:data-[mobile-open]:fixed max-npi-desktop:data-[mobile-open]:inset-0 max-npi-desktop:data-[mobile-open]:z-50 max-npi-desktop:data-[mobile-open]:h-dvh',
-							className,
-						),
-					)}
+					className={twMerge(clsx('relative flex flex-col font-npi-sans bg-npi-white', className))}
 					{...props}
 				>
 					{children}
@@ -311,7 +310,7 @@ export const NavigationMenuDrawer = forwardRef<HTMLDivElement, NavigationMenuDra
 					ref={ref}
 					className={twMerge(
 						clsx(
-							'flex w-full flex-1 flex-col gap-npi-6 overflow-y-auto bg-npi-white px-npi-6 pt-npi-2 pb-npi-8 npi-desktop:hidden',
+							'flex w-full flex-col gap-npi-6 bg-npi-white px-npi-6 pt-npi-2 pb-npi-8 npi-desktop:hidden',
 							className,
 						),
 					)}
@@ -384,6 +383,7 @@ export type NavigationMenuItemProps =
 export const NavigationMenuItem = forwardRef<HTMLElement, NavigationMenuItemProps>((props, ref) => {
 	const insideItems = useContext(InsideItemsContext)
 	const insideDrawer = useContext(InsideDrawerContext)
+	const insideGroup = useContext(InsideDrawerGroupContext)
 	const {
 		label,
 		icon,
@@ -402,7 +402,31 @@ export const NavigationMenuItem = forwardRef<HTMLElement, NavigationMenuItemProp
 	const isIconOnly = !label && icon != null
 
 	// Inside NavigationMenuDrawer: render accordion row (with children) or plain divider-separated row.
+	// Inside an expanded drawer group: render as a lighter 14px regular link, no divider.
 	if (insideDrawer) {
+		const anchorProps = rest as AnchorHTMLAttributes<HTMLAnchorElement>
+
+		if (insideGroup) {
+			return (
+				<li className="flex w-full">
+					<a
+						ref={ref as React.Ref<HTMLAnchorElement>}
+						className={twMerge(
+							clsx(
+								'w-full font-normal text-[0.875rem] leading-[20px] text-npi-blue hover:text-npi-blue-dark',
+								'focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-npi-blue-light rounded-npi-xxs',
+								className,
+							),
+						)}
+						aria-current={state === 'select' ? 'page' : undefined}
+						{...anchorProps}
+					>
+						<span className="whitespace-nowrap">{label}</span>
+					</a>
+				</li>
+			)
+		}
+
 		const drawerRowClass = 'flex w-full items-center justify-between py-npi-2 font-bold text-[1rem] leading-[1.5] text-npi-blue hover:text-npi-blue-dark focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-npi-blue-light rounded-npi-xxs cursor-pointer'
 		const liClass = 'flex w-full flex-col border-b border-npi-gray-200'
 
@@ -420,13 +444,12 @@ export const NavigationMenuItem = forwardRef<HTMLElement, NavigationMenuItemProp
 								aria-hidden="true"
 							/>
 						</summary>
-						<div className="flex flex-col gap-npi-3 pb-npi-3 pl-npi-6">{children}</div>
+						<div className="flex flex-col gap-npi-4 pb-npi-2 pl-npi-6">{children}</div>
 					</details>
 				</li>
 			)
 		}
 
-		const anchorProps = rest as AnchorHTMLAttributes<HTMLAnchorElement>
 		return (
 			<li className={liClass}>
 				<a
@@ -593,12 +616,15 @@ export const NavigationSubnav = forwardRef<HTMLDivElement, NavigationSubnavProps
 		const widePortalEl = useContext(WidePortalContext)
 
 		// Inside the mobile drawer: render children inline with no panel styling. Wide/narrow variant is
-		// irrelevant — columns flatten to a single vertical stack.
+		// irrelevant — columns flatten to a single vertical stack. Signal `InsideDrawerGroup` so nested
+		// items render as lighter 14px regular links with no dividers (per Figma spec).
 		if (insideDrawer) {
 			return (
-				<div ref={ref} className={twMerge(clsx('flex w-full flex-col', className))} {...props}>
-					{children}
-				</div>
+				<InsideDrawerGroupContext.Provider value={true}>
+					<div ref={ref} className={twMerge(clsx('flex w-full flex-col gap-npi-4', className))} {...props}>
+						{children}
+					</div>
+				</InsideDrawerGroupContext.Provider>
 			)
 		}
 
@@ -641,7 +667,7 @@ export const NavigationSubnavColumns = forwardRef<HTMLDivElement, NavigationSubn
 				className={twMerge(
 					clsx(
 						insideDrawer
-							? 'flex flex-col gap-npi-3'
+							? 'flex flex-col gap-npi-4'
 							: 'grid grid-cols-[repeat(auto-fit,minmax(0,1fr))] gap-npi-10',
 						className,
 					),
