@@ -180,7 +180,7 @@ export const NavigationMenuBrand = forwardRef<HTMLAnchorElement, NavigationMenuB
 		>
 			<img src={logoSrc} alt={title ? '' : logoAlt ?? ''} className="size-npi-12 shrink-0" />
 			{title && (
-				<Heading level={7} className="whitespace-nowrap font-semibold">
+				<Heading level={7} className="whitespace-nowrap text-[1rem] font-semibold">
 					{title}
 				</Heading>
 			)}
@@ -204,7 +204,7 @@ export const NavigationMenuSearch = forwardRef<HTMLInputElement, NavigationMenuS
 			role="search"
 			className={twMerge(
 				clsx(
-					'flex w-[328px] max-w-full shrink items-center justify-between gap-npi-2 rounded-full border border-npi-gray-200 bg-npi-white py-npi-1 pl-npi-6 pr-npi-1',
+					'flex w-[328px] max-w-full shrink items-center justify-between gap-npi-2 rounded-full border border-npi-gray-200 bg-npi-white py-npi-1 pl-npi-6 pr-npi-1 max-npi-desktop:w-full',
 					'focus-within:border-npi-blue',
 					className,
 				),
@@ -442,7 +442,8 @@ export const NavigationMenuItem = forwardRef<HTMLElement, NavigationMenuItemProp
 			)
 		}
 
-		const drawerRowClass = 'flex w-full items-center justify-between py-npi-3 font-bold text-[1rem] leading-[1.5] text-npi-blue hover:text-npi-blue-dark focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-npi-blue-light rounded-npi-xxs cursor-pointer'
+		const drawerRowClass =
+			'flex w-full items-center justify-between py-npi-3 font-bold text-[1rem] leading-[1.5] text-npi-blue hover:text-npi-blue-dark focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-npi-blue-light rounded-npi-xxs cursor-pointer'
 		const liClass = 'flex w-full flex-col border-b border-npi-gray-200'
 
 		if (hasSubnav) {
@@ -558,8 +559,10 @@ export const NavigationMenuItem = forwardRef<HTMLElement, NavigationMenuItemProp
 								{content}
 							</a>
 						</RadixNavMenu.Trigger>
-						{/* Content has no visual styling — the Subnav child places itself (narrow: anchored here; wide: portals to nav root).
-						    top offset accounts for the List's bottom `py-npi-4` so narrow panels align with wide ones (which anchor to the List's bottom). */}
+						{
+							/* Content has no visual styling — the Subnav child places itself (narrow: anchored here; wide: portals to nav root).
+						    top offset accounts for the List's bottom `py-npi-4` so narrow panels align with wide ones (which anchor to the List's bottom). */
+						}
 						<RadixNavMenu.Content className="absolute left-0 top-[calc(100%+var(--spacing-npi-4))] z-20">
 							{children}
 						</RadixNavMenu.Content>
