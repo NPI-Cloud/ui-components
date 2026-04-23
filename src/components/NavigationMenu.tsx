@@ -3,9 +3,11 @@ import { clsx } from 'clsx'
 import {
 	type AnchorHTMLAttributes,
 	type ButtonHTMLAttributes,
+	Children,
 	createContext,
 	forwardRef,
 	type HTMLAttributes,
+	isValidElement,
 	type ReactNode,
 	useContext,
 	useState,
@@ -679,17 +681,37 @@ export interface NavigationSubnavColumnsProps extends HTMLAttributes<HTMLDivElem
 export const NavigationSubnavColumns = forwardRef<HTMLDivElement, NavigationSubnavColumnsProps>(
 	({ className, children, ...props }, ref) => {
 		const insideDrawer = useContext(InsideDrawerContext)
+
+		if (insideDrawer) {
+			// Split children: Promo cards vs. everything else (link columns). At tablet+ when a Promo
+			// exists, render as 2 cols — all link columns stacked in col 1, Promo in col 2.
+			const kids = Children.toArray(children)
+			const promos = kids.filter(c => isValidElement(c) && c.type === NavigationPromo)
+			const items = kids.filter(c => !(isValidElement(c) && c.type === NavigationPromo))
+			const hasPromo = promos.length > 0
+
+			return (
+				<div
+					ref={ref}
+					className={twMerge(
+						clsx(
+							'flex flex-col gap-npi-4',
+							hasPromo && 'npi-tablet:grid npi-tablet:grid-cols-2 npi-tablet:gap-npi-8',
+							className,
+						),
+					)}
+					{...props}
+				>
+					<div className="flex flex-col gap-npi-4">{items}</div>
+					{hasPromo && <div className="flex flex-col">{promos}</div>}
+				</div>
+			)
+		}
+
 		return (
 			<div
 				ref={ref}
-				className={twMerge(
-					clsx(
-						insideDrawer
-							? 'flex flex-col gap-npi-4'
-							: 'grid grid-cols-[repeat(auto-fit,minmax(0,1fr))] gap-npi-10',
-						className,
-					),
-				)}
+				className={twMerge(clsx('grid grid-cols-[repeat(auto-fit,minmax(0,1fr))] gap-npi-10', className))}
 				{...props}
 			>
 				{children}
