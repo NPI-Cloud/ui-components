@@ -426,6 +426,7 @@ export const NavigationMenuItem = forwardRef<HTMLElement, NavigationMenuItemProp
 		// Account-style row (icon + label, no children): borderless, tight, left-aligned.
 		// Use for the profile / cart buttons at the bottom of the drawer.
 		if (icon && label && !insideGroup && !hasSubnav) {
+			const showBadge = trailing === 'badge' && badgeCount != null
 			return (
 				<a
 					ref={ref as React.Ref<HTMLAnchorElement>}
@@ -439,7 +440,19 @@ export const NavigationMenuItem = forwardRef<HTMLElement, NavigationMenuItemProp
 					aria-current={state === 'select' ? 'page' : undefined}
 					{...anchorProps}
 				>
-					<Icon name={icon} className="size-6 shrink-0" aria-hidden="true" />
+					{showBadge
+						? (
+							<span className="relative inline-flex shrink-0">
+								<Icon name={icon} className="size-6" aria-hidden="true" />
+								<span
+									aria-label={`${badgeCount}`}
+									className="absolute -right-2 -top-2 grid size-5 place-items-center rounded-full bg-npi-blue text-center text-npi-white text-[12px] font-bold leading-none tabular-nums"
+								>
+									{badgeCount}
+								</span>
+							</span>
+						)
+						: <Icon name={icon} className="size-6 shrink-0" aria-hidden="true" />}
 					<span className="whitespace-nowrap">{label}</span>
 				</a>
 			)
