@@ -462,7 +462,7 @@ export const NavigationMenuItem = forwardRef<HTMLElement, NavigationMenuItemProp
 								aria-hidden="true"
 							/>
 						</summary>
-						<div className="flex flex-col gap-npi-4 pb-npi-2 pl-npi-6">{children}</div>
+						<div className="flex flex-col gap-npi-4 pb-npi-4 pl-npi-6">{children}</div>
 					</details>
 				</li>
 			)
@@ -703,7 +703,7 @@ export const NavigationSubnavColumns = forwardRef<HTMLDivElement, NavigationSubn
 					{...props}
 				>
 					<div className="flex flex-col gap-npi-4">{items}</div>
-					{hasPromo && <div className="flex flex-col">{promos}</div>}
+					{hasPromo && <div className="flex flex-col pb-npi-2 npi-tablet:pb-0">{promos}</div>}
 				</div>
 			)
 		}
