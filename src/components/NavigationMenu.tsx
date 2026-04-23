@@ -330,7 +330,22 @@ export const NavigationMenuItems = forwardRef<
 	React.ElementRef<typeof RadixNavMenu.Root>,
 	NavigationMenuItemsProps
 >(({ className, children, ...props }, ref) => {
+	const insideDrawer = useContext(InsideDrawerContext)
 	const [widePortalEl, setWidePortalEl] = useState<HTMLDivElement | null>(null)
+
+	// Inside the drawer: render items as a tight vertical list. No Radix Root (no popovers), no
+	// horizontal max-width, no gap between rows — each row's own py + border-b handles spacing so
+	// the label sits visually centered in its cell.
+	if (insideDrawer) {
+		return (
+			<ul
+				className={twMerge(clsx('flex w-full flex-col', className as string | undefined))}
+				aria-label="Hlavní navigace"
+			>
+				{children}
+			</ul>
+		)
+	}
 
 	return (
 		<RadixNavMenu.Root
@@ -427,7 +442,7 @@ export const NavigationMenuItem = forwardRef<HTMLElement, NavigationMenuItemProp
 			)
 		}
 
-		const drawerRowClass = 'flex w-full items-center justify-between py-npi-2 font-bold text-[1rem] leading-[1.5] text-npi-blue hover:text-npi-blue-dark focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-npi-blue-light rounded-npi-xxs cursor-pointer'
+		const drawerRowClass = 'flex w-full items-center justify-between py-npi-3 font-bold text-[1rem] leading-[1.5] text-npi-blue hover:text-npi-blue-dark focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-npi-blue-light rounded-npi-xxs cursor-pointer'
 		const liClass = 'flex w-full flex-col border-b border-npi-gray-200'
 
 		if (hasSubnav) {
@@ -701,17 +716,20 @@ export interface NavigationSubnavGroupProps extends HTMLAttributes<HTMLLIElement
 
 /** Groups a bold heading with its nested (indented, regular-weight) items. Used inside narrow Subnavs. */
 export const NavigationSubnavGroup = forwardRef<HTMLLIElement, NavigationSubnavGroupProps>(
-	({ heading, headingHref, className, children, ...props }, ref) => (
-		<li ref={ref} className={twMerge(clsx('flex flex-col gap-npi-3', className))} {...props}>
-			<a
-				href={headingHref}
-				className="font-bold text-[1rem] leading-[1.5] text-npi-blue hover:text-npi-blue-dark focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-npi-blue-light"
-			>
-				{heading}
-			</a>
-			<ul className="flex flex-col gap-npi-2 pl-npi-4">{children}</ul>
-		</li>
-	),
+	({ heading, headingHref, className, children, ...props }, ref) => {
+		const insideDrawer = useContext(InsideDrawerContext)
+		const headingClass = insideDrawer
+			? 'font-normal text-[0.875rem] leading-[20px] text-npi-blue hover:text-npi-blue-dark focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-npi-blue-light rounded-npi-xxs'
+			: 'font-bold text-[1rem] leading-[1.5] text-npi-blue hover:text-npi-blue-dark focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-npi-blue-light'
+		return (
+			<li ref={ref} className={twMerge(clsx('flex flex-col', insideDrawer ? 'gap-npi-2' : 'gap-npi-3', className))} {...props}>
+				<a href={headingHref} className={headingClass}>
+					{heading}
+				</a>
+				<ul className={clsx('flex flex-col pl-npi-4', insideDrawer ? 'gap-npi-2' : 'gap-npi-2')}>{children}</ul>
+			</li>
+		)
+	},
 )
 NavigationSubnavGroup.displayName = 'NavigationSubnavGroup'
 
@@ -719,23 +737,28 @@ NavigationSubnavGroup.displayName = 'NavigationSubnavGroup'
 export interface NavigationSubnavItemProps extends AnchorHTMLAttributes<HTMLAnchorElement> {}
 
 export const NavigationSubnavItem = forwardRef<HTMLAnchorElement, NavigationSubnavItemProps>(
-	({ className, children, ...props }, ref) => (
-		<li className="flex">
-			<a
-				ref={ref}
-				className={twMerge(
-					clsx(
-						'font-normal text-[1rem] leading-[1.5] text-npi-blue hover:text-npi-blue-dark',
-						'focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-npi-blue-light',
-						className,
-					),
-				)}
-				{...props}
-			>
-				{children}
-			</a>
-		</li>
-	),
+	({ className, children, ...props }, ref) => {
+		const insideDrawer = useContext(InsideDrawerContext)
+		return (
+			<li className="flex">
+				<a
+					ref={ref}
+					className={twMerge(
+						clsx(
+							insideDrawer
+								? 'font-normal text-[0.875rem] leading-[20px] text-npi-blue hover:text-npi-blue-dark'
+								: 'font-normal text-[1rem] leading-[1.5] text-npi-blue hover:text-npi-blue-dark',
+							'focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-npi-blue-light',
+							className,
+						),
+					)}
+					{...props}
+				>
+					{children}
+				</a>
+			</li>
+		)
+	},
 )
 NavigationSubnavItem.displayName = 'NavigationSubnavItem'
 
