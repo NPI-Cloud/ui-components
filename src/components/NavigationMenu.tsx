@@ -668,9 +668,9 @@ export const NavigationMenuItem = forwardRef<HTMLElement, NavigationMenuItemProp
 						</RadixNavMenu.Trigger>
 						{
 							/* Content has no visual styling — the Subnav child places itself (narrow: anchored here; wide: portals to nav root).
-						    top offset accounts for the List's bottom `py-npi-4` so narrow panels align with wide ones (which anchor to the List's bottom). */
+						    top offset matches the List's bottom `pb-npi-6` so narrow panels align with wide ones (which anchor to the List's bottom). */
 						}
-						<RadixNavMenu.Content className="absolute left-0 top-[calc(100%+var(--spacing-npi-4))] z-20">
+						<RadixNavMenu.Content className="absolute left-0 top-[calc(100%+var(--spacing-npi-6))] z-20">
 							{children}
 						</RadixNavMenu.Content>
 					</li>
