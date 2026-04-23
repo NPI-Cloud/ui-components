@@ -415,6 +415,50 @@ export const NavigationMenuItems = forwardRef<
 })
 NavigationMenuItems.displayName = 'NavigationMenuItems'
 
+interface DrawerAccordionProps {
+	label: string | undefined
+	rowClass: string
+	liClass: string
+	className?: string
+	children: ReactNode
+}
+
+/**
+ * Drawer-only accordion row. Uses the `grid-template-rows: 0fr → 1fr` technique so the submenu's
+ * intrinsic height animates smoothly; the chevron rotates in sync. Replaces the native `<details>`,
+ * which can't animate content height.
+ */
+function NavigationMenuDrawerAccordion({ label, rowClass, liClass, className, children }: DrawerAccordionProps) {
+	const [open, setOpen] = useState(false)
+	return (
+		<li className={liClass}>
+			<button
+				type="button"
+				aria-expanded={open}
+				onClick={() => setOpen(v => !v)}
+				className={twMerge(clsx(rowClass, className))}
+			>
+				<span className="whitespace-nowrap">{label}</span>
+				<Icon
+					name="arrowDolu"
+					className={clsx('size-6 shrink-0 transition-transform duration-300 ease-out', open && '-rotate-180')}
+					aria-hidden="true"
+				/>
+			</button>
+			<div
+				className={clsx(
+					'grid transition-[grid-template-rows] duration-300 ease-out',
+					open ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]',
+				)}
+			>
+				<div className="overflow-hidden">
+					<div className="flex flex-col gap-npi-4 pb-npi-4 pl-npi-6">{children}</div>
+				</div>
+			</div>
+		</li>
+	)
+}
+
 type NavigationMenuItemAnchor = AnchorHTMLAttributes<HTMLAnchorElement> & { as?: 'a' }
 type NavigationMenuItemButton = ButtonHTMLAttributes<HTMLButtonElement> & { as: 'button' }
 
@@ -525,21 +569,9 @@ export const NavigationMenuItem = forwardRef<HTMLElement, NavigationMenuItemProp
 
 		if (hasSubnav) {
 			return (
-				<li className={liClass}>
-					<details className="group flex w-full flex-col">
-						<summary
-							className={twMerge(clsx(drawerRowClass, 'list-none [&::-webkit-details-marker]:hidden', className))}
-						>
-							<span className="whitespace-nowrap">{label}</span>
-							<Icon
-								name="arrowDolu"
-								className="size-6 shrink-0 transition-transform group-open:-rotate-180"
-								aria-hidden="true"
-							/>
-						</summary>
-						<div className="flex flex-col gap-npi-4 pb-npi-4 pl-npi-6">{children}</div>
-					</details>
-				</li>
+				<NavigationMenuDrawerAccordion className={className} liClass={liClass} rowClass={drawerRowClass} label={label}>
+					{children}
+				</NavigationMenuDrawerAccordion>
 			)
 		}
 
