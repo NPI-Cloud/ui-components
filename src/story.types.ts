@@ -16,6 +16,8 @@ export interface Meta<C extends ComponentType<any> = ComponentType<any>> {
 	component: C
 	argTypes?: Record<string, ArgType>
 	order?: number
+	/** When true, the Playground renders the story without the default 24px padding and `max-w-npi-layout` wrapper — useful for edge-to-edge components like the full navigation. */
+	fullBleed?: boolean
 }
 
 export interface Story<C extends ComponentType<any> = ComponentType<any>> {
