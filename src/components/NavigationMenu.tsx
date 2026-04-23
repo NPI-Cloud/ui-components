@@ -589,13 +589,17 @@ export const NavigationMenuItem = forwardRef<HTMLElement, NavigationMenuItemProp
 		)
 	}
 
+	// Named profile / account-style rows (icon + label without a badge) use regular weight and an 8px
+	// gap — distinct from the bold, tight-gap label-only menu items. Matches Figma (`Jméno` spec).
+	const isIconWithLabel = !!icon && !!label && trailing !== 'badge'
 	const baseClass = twMerge(
 		clsx(
-			'group inline-flex h-npi-6 items-center gap-[2px] font-bold text-[1rem] leading-[1.5]',
+			'group inline-flex h-npi-6 items-center text-[1rem] leading-[1.5]',
 			'rounded-npi-xxs focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-npi-blue-light',
 			'bg-transparent cursor-pointer',
-			isIconOnly ? 'size-6 justify-center gap-0' : '',
-			indent === 1 ? 'pl-npi-4' : '',
+			isIconOnly && 'size-6 justify-center gap-0',
+			!isIconOnly && (isIconWithLabel ? 'gap-npi-2 font-normal' : 'gap-[2px] font-bold'),
+			indent === 1 && 'pl-npi-4',
 			state === 'select'
 				? 'text-npi-blue-dark'
 				: 'text-npi-blue hover:text-npi-blue-dark data-[state=open]:text-npi-blue-dark',
