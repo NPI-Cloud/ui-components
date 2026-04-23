@@ -243,7 +243,7 @@ export const NavigationMenuItems = forwardRef<
 		>
 			<InsideItemsContext.Provider value={true}>
 				<WidePortalContext.Provider value={widePortalEl}>
-					<RadixNavMenu.List className="flex items-center gap-npi-8 py-npi-4">
+					<RadixNavMenu.List className="flex items-center gap-npi-8 pt-npi-4 pb-npi-6">
 						{children}
 					</RadixNavMenu.List>
 					{/* Wide-subnav portal target: spans full Root width, centered below the List. */}
@@ -456,7 +456,6 @@ export const NavigationSubnav = forwardRef<HTMLDivElement, NavigationSubnavProps
 					clsx(
 						'pointer-events-auto rounded-npi-xs bg-npi-white shadow-npi-m',
 						variant === 'wide' ? 'w-[1064px] p-npi-10' : 'w-[320px] p-npi-8',
-						insideItems && 'mt-npi-1',
 						className,
 					),
 				)}
