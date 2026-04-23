@@ -650,7 +650,7 @@ export const NavigationMenuItem = forwardRef<HTMLElement, NavigationMenuItemProp
 
 	// Inside NavigationMenuItems: use Radix primitives so hover/focus/keyboard open the subnav.
 	if (insideItems) {
-		const { onMouseEnter, onFocus, ...anchorProps } = rest as AnchorHTMLAttributes<HTMLAnchorElement>
+		const anchorProps = rest as AnchorHTMLAttributes<HTMLAnchorElement>
 
 		if (hasSubnav) {
 			return (
@@ -661,8 +661,6 @@ export const NavigationMenuItem = forwardRef<HTMLElement, NavigationMenuItemProp
 								ref={ref as React.Ref<HTMLAnchorElement>}
 								className={baseClass}
 								aria-current={state === 'select' ? 'page' : undefined}
-								onMouseEnter={onMouseEnter}
-								onFocus={onFocus}
 								{...anchorProps}
 							>
 								{content}
@@ -858,7 +856,7 @@ export const NavigationSubnavGroup = forwardRef<HTMLLIElement, NavigationSubnavG
 				<a href={headingHref} className={headingClass}>
 					{heading}
 				</a>
-				<ul className={clsx('flex flex-col pl-npi-4', insideDrawer ? 'gap-npi-2' : 'gap-npi-2')}>{children}</ul>
+				<ul className="flex flex-col gap-npi-2 pl-npi-4">{children}</ul>
 			</li>
 		)
 	},
