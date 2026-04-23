@@ -445,7 +445,7 @@ export const NavigationMenuItem = forwardRef<HTMLElement, NavigationMenuItemProp
 		}
 
 		const drawerRowClass =
-			'flex w-full items-center justify-between py-npi-3 font-bold text-[1rem] leading-[1.5] text-npi-blue hover:text-npi-blue-dark focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-npi-blue-light rounded-npi-xxs cursor-pointer'
+			'flex w-full items-center justify-between py-npi-4 font-bold text-[1rem] leading-[1.5] text-npi-blue hover:text-npi-blue-dark focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-npi-blue-light rounded-npi-xxs cursor-pointer'
 		const liClass = 'flex w-full flex-col border-b border-npi-gray-200'
 
 		if (hasSubnav) {
@@ -462,7 +462,7 @@ export const NavigationMenuItem = forwardRef<HTMLElement, NavigationMenuItemProp
 								aria-hidden="true"
 							/>
 						</summary>
-						<div className="flex flex-col gap-npi-4 pb-npi-2 pl-npi-6">{children}</div>
+						<div className="flex flex-col gap-npi-4 pb-npi-4 pl-npi-6">{children}</div>
 					</details>
 				</li>
 			)
