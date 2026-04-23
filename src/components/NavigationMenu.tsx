@@ -400,7 +400,7 @@ export const NavigationMenuItems = forwardRef<
 		>
 			<InsideItemsContext.Provider value={true}>
 				<WidePortalContext.Provider value={widePortalEl}>
-					<RadixNavMenu.List className="flex items-center gap-npi-8 pt-npi-4 pb-npi-6">
+					<RadixNavMenu.List className="flex items-center gap-npi-8 pt-npi-2 pb-npi-6">
 						{children}
 					</RadixNavMenu.List>
 					{/* Wide-subnav portal target: spans full Root width, centered below the List. */}
@@ -657,18 +657,24 @@ export const NavigationMenuItem = forwardRef<HTMLElement, NavigationMenuItemProp
 		const anchorProps = rest as AnchorHTMLAttributes<HTMLAnchorElement>
 
 		if (hasSubnav) {
+			// Render the trigger as a <button>, not an <a>. On touch devices there's no hover, so the
+			// subnav can only be opened via click. An anchor's default navigation fires preventDefault'd
+			// clicks as well, which Radix's composeEventHandlers treats as "skip the open handler" —
+			// so tap would either navigate away or do nothing. A button has no navigation default.
+			const { href: _href, ...buttonProps } = anchorProps
 			return (
 				<RadixNavMenu.Item asChild>
 					<li className="relative flex">
 						<RadixNavMenu.Trigger asChild>
-							<a
-								ref={ref as React.Ref<HTMLAnchorElement>}
+							<button
+								ref={ref as React.Ref<HTMLButtonElement>}
+								type="button"
 								className={baseClass}
 								aria-current={state === 'select' ? 'page' : undefined}
-								{...anchorProps}
+								{...(buttonProps as ButtonHTMLAttributes<HTMLButtonElement>)}
 							>
 								{content}
-							</a>
+							</button>
 						</RadixNavMenu.Trigger>
 						{
 							/* Content has no visual styling — the Subnav child places itself (narrow: anchored here; wide: portals to nav root).
