@@ -551,11 +551,11 @@ export const NavigationSubnavItem = forwardRef<HTMLAnchorElement, NavigationSubn
 NavigationSubnavItem.displayName = 'NavigationSubnavItem'
 
 export interface NavigationPromoProps extends Omit<HTMLAttributes<HTMLAnchorElement>, 'title'> {
-	/** `icon` = small card with an icon medallion and a title. `cover` = large card with a photo background and title overlay. */
+	/** `icon` = horizontal card with an icon and a bold title. `cover` = label above a cover image. */
 	variant?: NavigationPromoVariant
-	/** Small label shown above the title (e.g. "Nejnovější podcast"). */
+	/** Small label shown above the title in the `icon` variant (e.g. "Nejnovější podcast"). Not used in `cover`. */
 	eyebrow?: string
-	/** Main title — bold, dark-navy. */
+	/** Primary text — bold navy for `icon`, regular label above the image for `cover`. */
 	title: ReactNode
 	/** Link target for the card. */
 	href?: string
@@ -563,12 +563,10 @@ export interface NavigationPromoProps extends Omit<HTMLAttributes<HTMLAnchorElem
 	icon?: IconName
 	/** Cover image URL (used by `cover` variant). */
 	coverSrc?: string
-	/** Optional caption below the cover (only `cover` variant). */
-	caption?: ReactNode
 }
 
 export const NavigationPromo = forwardRef<HTMLAnchorElement, NavigationPromoProps>(
-	({ variant = 'icon', eyebrow, title, icon = 'podcast', coverSrc, caption, href, className, ...props }, ref) => {
+	({ variant = 'icon', eyebrow, title, icon = 'podcast', coverSrc, href, className, ...props }, ref) => {
 		if (variant === 'icon') {
 			return (
 				<a
@@ -583,9 +581,7 @@ export const NavigationPromo = forwardRef<HTMLAnchorElement, NavigationPromoProp
 					)}
 					{...props}
 				>
-					<span className="inline-flex size-npi-10 shrink-0 items-center justify-center text-npi-blue">
-						<Icon name={icon} className="size-6" aria-hidden="true" />
-					</span>
+					<Icon name={icon} className="size-8 shrink-0 text-npi-blue" aria-hidden="true" />
 					<span className="flex min-w-0 flex-col gap-npi-1">
 						{eyebrow && (
 							<Text asChild variant="m" secondary>
@@ -606,31 +602,17 @@ export const NavigationPromo = forwardRef<HTMLAnchorElement, NavigationPromoProp
 				href={href}
 				className={twMerge(
 					clsx(
-						'flex flex-col gap-npi-2 rounded-npi-xs',
+						'flex flex-col gap-npi-2',
 						'focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-npi-blue-light',
 						className,
 					),
 				)}
 				{...props}
 			>
-				{eyebrow && (
-					<Text asChild variant="m" secondary>
-						<span>{eyebrow}</span>
-					</Text>
-				)}
-				<div className="relative overflow-hidden rounded-npi-xs bg-npi-blue">
-					{coverSrc && <img src={coverSrc} alt="" className="h-[180px] w-full object-cover" />}
-					<div className="absolute inset-0 flex items-center p-npi-6">
-						<Text asChild variant="xl" weight="bold" inverted>
-							<span>{title}</span>
-						</Text>
-					</div>
-				</div>
-				{caption && (
-					<Text asChild variant="m" secondary>
-						<span>{caption}</span>
-					</Text>
-				)}
+				<Text asChild variant="m" secondary>
+					<span>{title}</span>
+				</Text>
+				{coverSrc && <img src={coverSrc} alt="" className="aspect-video w-full rounded-npi-xs object-cover" />}
 			</a>
 		)
 	},
