@@ -15,6 +15,45 @@ export { Button, type ButtonProps, buttonVariants } from './Button'
 export { Card, type CardAspect, cardAspects, type CardIndicator, cardIndicators, type CardProps } from './Card'
 export { Checkbox, type CheckboxProps, type CheckboxSize, checkboxSizes } from './Checkbox'
 export { Heading, type HeadingLevel, headingLevels, type HeadingProps, type HeadingSpec, headingSpecs } from './Heading'
+export {
+	NavigationMenu,
+	NavigationMenuActions,
+	type NavigationMenuActionsProps,
+	NavigationMenuBar,
+	type NavigationMenuBarProps,
+	NavigationMenuBrand,
+	type NavigationMenuBrandProps,
+	NavigationMenuItem,
+	type NavigationMenuItemProps,
+	NavigationMenuItems,
+	type NavigationMenuItemsProps,
+	type NavigationMenuItemState,
+	navigationMenuItemStates,
+	type NavigationMenuItemTrailing,
+	navigationMenuItemTrailings,
+	type NavigationMenuProps,
+	NavigationMenuSearch,
+	type NavigationMenuSearchProps,
+	NavigationMenuSiteSwitcher,
+	type NavigationMenuSiteSwitcherProps,
+	type NavigationMenuSiteSwitcherSite,
+	NavigationPromo,
+	type NavigationPromoProps,
+	type NavigationPromoVariant,
+	navigationPromoVariants,
+	NavigationSubnav,
+	NavigationSubnavColumn,
+	type NavigationSubnavColumnProps,
+	NavigationSubnavColumns,
+	type NavigationSubnavColumnsProps,
+	NavigationSubnavGroup,
+	type NavigationSubnavGroupProps,
+	NavigationSubnavItem,
+	type NavigationSubnavItemProps,
+	type NavigationSubnavProps,
+	type NavigationSubnavVariant,
+	navigationSubnavVariants,
+} from './NavigationMenu'
 export { Radio, type RadioProps } from './Radio'
 export { StatusIndicator, type StatusIndicatorProps, type StatusIndicatorTone, statusIndicatorTones } from './StatusIndicator'
 export { Switch, type SwitchProps } from './Switch'
