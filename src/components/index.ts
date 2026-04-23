@@ -14,6 +14,26 @@ export { Breadcrumbs, type BreadcrumbsItem, type BreadcrumbsProps } from './Brea
 export { Button, type ButtonProps, buttonVariants } from './Button'
 export { Card, type CardAspect, cardAspects, type CardIndicator, cardIndicators, type CardProps } from './Card'
 export { Checkbox, type CheckboxProps, type CheckboxSize, checkboxSizes } from './Checkbox'
+export {
+	Footer,
+	FooterBottom,
+	type FooterBottomProps,
+	FooterColumn,
+	FooterColumnGroup,
+	type FooterColumnGroupProps,
+	type FooterColumnProps,
+	FooterColumns,
+	type FooterColumnsProps,
+	FooterLink,
+	type FooterLinkProps,
+	FooterLogos,
+	type FooterLogosProps,
+	type FooterProps,
+	FooterSocial,
+	type FooterSocialProps,
+	FooterSocials,
+	type FooterSocialsProps,
+} from './Footer'
 export { Heading, type HeadingLevel, headingLevels, type HeadingProps, type HeadingSpec, headingSpecs } from './Heading'
 export {
 	NavigationMenu,
