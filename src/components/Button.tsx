@@ -76,30 +76,20 @@ export type ButtonProps =
 		label?: string
 		iconBefore?: IconName
 		iconAfter?: IconName
+		/** When provided, renders the button as an anchor element instead of a button */
+		href?: string
 	}
 
-export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-	({ label, iconBefore, iconAfter, className, variant, ...props }, ref) => {
+export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonProps>(
+	({ label, iconBefore, iconAfter, className, variant, href, ...props }, ref) => {
 		const isIcon = variant === 'icon'
 		const isSmall = variant === 'tertiary-s'
 		const iconSize = isSmall ? ('s' as const) : ('m' as const)
 		const iconClass = isSmall ? 'size-4' : ICON_SIZE
 
-		if (isIcon) {
-			const name = iconBefore ?? iconAfter
-			return (
-				<ButtonRoot
-					ref={ref}
-					variant={variant}
-					className={className}
-					{...props}
-				>
-					{name && <Icon name={name} className={ICON_SIZE} />}
-				</ButtonRoot>
-			)
-		}
-
-		const paddingOverride = iconBefore && iconAfter
+		const paddingOverride = isIcon
+			? ''
+			: iconBefore && iconAfter
 			? 'px-npi-1'
 			: iconBefore
 			? 'pl-npi-1'
@@ -107,16 +97,39 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 			? 'pr-npi-1'
 			: ''
 
+		const inner = isIcon
+			? (() => {
+				const name = iconBefore ?? iconAfter
+				return name ? <Icon name={name} className={ICON_SIZE} /> : null
+			})()
+			: (
+				<>
+					{iconBefore && <Icon name={iconBefore} size={iconSize} className={iconClass} />}
+					{label && <span>{label}</span>}
+					{iconAfter && <Icon name={iconAfter} size={iconSize} className={iconClass} />}
+				</>
+			)
+
+		const mergedClassName = paddingOverride ? `${paddingOverride} ${className ?? ''}` : className
+
+		if (href) {
+			return (
+				<ButtonRoot asChild variant={variant} className={mergedClassName}>
+					<a ref={ref as React.Ref<HTMLAnchorElement>} href={href} {...(props as React.AnchorHTMLAttributes<HTMLAnchorElement>)}>
+						{inner}
+					</a>
+				</ButtonRoot>
+			)
+		}
+
 		return (
 			<ButtonRoot
-				ref={ref}
+				ref={ref as React.Ref<HTMLButtonElement>}
 				variant={variant}
-				className={`${paddingOverride} ${className ?? ''}`}
+				className={mergedClassName}
 				{...props}
 			>
-				{iconBefore && <Icon name={iconBefore} size={iconSize} className={iconClass} />}
-				{label && <span>{label}</span>}
-				{iconAfter && <Icon name={iconAfter} size={iconSize} className={iconClass} />}
+				{inner}
 			</ButtonRoot>
 		)
 	},

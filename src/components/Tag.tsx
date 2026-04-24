@@ -40,16 +40,18 @@ export interface TagProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonElem
 	inverted?: boolean
 	/** When provided, renders a × dismiss button inside the tag (size M only) */
 	onRemove?: () => void
+	/** When provided, renders the tag as an anchor element instead of a button */
+	href?: string
 }
 
-export const Tag = forwardRef<HTMLButtonElement, TagProps>(
-	({ label, size = 'M', iconBefore, iconAfter, inverted = false, onRemove, className, ...props }, ref) => {
+export const Tag = forwardRef<HTMLButtonElement | HTMLAnchorElement, TagProps>(
+	({ label, size = 'M', iconBefore, iconAfter, inverted = false, onRemove, href, className, ...props }, ref) => {
 		const showIconBefore = iconBefore != null && size === 'M'
-		const showRemove = onRemove != null && size === 'M'
+		const showRemove = onRemove != null && size === 'M' && !href
 		const showIconAfter = iconAfter != null && size === 'M' && !showRemove
 
-		return (
-			<TagRoot ref={ref} size={size} inverted={inverted} className={className} {...props}>
+		const inner = (
+			<>
 				{showIconBefore && <Icon name={iconBefore} size="s" className="size-4 shrink-0" />}
 				<span>{label}</span>
 				{showIconAfter && <Icon name={iconAfter} size="s" className="size-4 shrink-0" />}
@@ -74,6 +76,22 @@ export const Tag = forwardRef<HTMLButtonElement, TagProps>(
 						<Icon name="zavrit" size="s" className="size-4 shrink-0" />
 					</span>
 				)}
+			</>
+		)
+
+		if (href) {
+			return (
+				<TagRoot asChild size={size} inverted={inverted} className={className}>
+					<a ref={ref as React.Ref<HTMLAnchorElement>} href={href} {...(props as React.AnchorHTMLAttributes<HTMLAnchorElement>)}>
+						{inner}
+					</a>
+				</TagRoot>
+			)
+		}
+
+		return (
+			<TagRoot ref={ref as React.Ref<HTMLButtonElement>} size={size} inverted={inverted} className={className} {...props}>
+				{inner}
 			</TagRoot>
 		)
 	},

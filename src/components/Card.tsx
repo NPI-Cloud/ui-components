@@ -2,16 +2,18 @@ import { clsx } from 'clsx'
 import { forwardRef, Fragment } from 'react'
 import { twMerge } from 'tailwind-merge'
 import { Icon, type IconName } from '../icons'
+import { Button } from './Button'
 import { Heading } from './Heading'
+import { Tag } from './Tag'
 import { Text } from './Text'
 
-export const cardAspects = ['16/9', '1/1', '4/3', '3/2', '3/4'] as const
+export const cardAspects = ['16/9', '1/1', '4/3', '3/2', '3/4', 'line'] as const
 export type CardAspect = (typeof cardAspects)[number]
 
 export const cardIndicators = ['video', 'podcast', 'gallery'] as const
 export type CardIndicator = (typeof cardIndicators)[number]
 
-const aspectClassMap: Record<CardAspect, string> = {
+const aspectClassMap: Record<Exclude<CardAspect, 'line'>, string> = {
 	'16/9': 'aspect-[16/9]',
 	'1/1': 'aspect-square',
 	'4/3': 'aspect-[4/3]',
@@ -25,6 +27,18 @@ const indicatorIconMap: Record<CardIndicator, IconName> = {
 	gallery: 'galery',
 }
 
+export interface CardLink {
+	/** Visible label */
+	label: string
+	/** Optional href — when set the slot renders as an anchor with its own click target */
+	href?: string
+}
+
+export interface CardCta extends CardLink {
+	/** Optional icon rendered before the label (defaults to `stahnout` download icon) */
+	iconBefore?: IconName
+}
+
 export interface CardProps extends Omit<React.HTMLAttributes<HTMLElement>, 'title'> {
 	/** Main heading */
 	title: string
@@ -36,7 +50,7 @@ export interface CardProps extends Omit<React.HTMLAttributes<HTMLElement>, 'titl
 	description?: string
 	/** Content for the visual area (image, video, etc.) */
 	visual?: React.ReactNode
-	/** Aspect ratio of the visual area. Only applies when card is in narrow/vertical layout */
+	/** Aspect ratio of the visual area. Use `'line'` for a thin colored bar instead of an image. */
 	aspect?: CardAspect
 	/** Hide the visual area entirely */
 	hideVisual?: boolean
@@ -46,15 +60,23 @@ export interface CardProps extends Omit<React.HTMLAttributes<HTMLElement>, 'titl
 	href?: string
 	/** Drop the light drop-shadow for placement on dark backgrounds */
 	inverted?: boolean
-	/** Additional content rendered after the description (tags, CTAs, etc.) */
+	/** Optional clickable tag rendered after the description (independent click target) */
+	tag?: CardLink
+	/** Optional tertiary CTA / download rendered at the bottom (independent click target) */
+	cta?: CardCta
+	/** Additional content rendered after the description (extra tags, custom CTAs, etc.) */
 	children?: React.ReactNode
 }
 
 // @container makes the Card responsive to its own width.
 // @md (≥28rem / 448px) → horizontal layout (M)
 // @4xl (≥56rem / 896px) → wider visual (L)
-const rootClass = '@container flex w-full flex-col overflow-hidden rounded-npi-s bg-npi-white transition-shadow @md:flex-row'
+const rootClass = 'group relative @container flex w-full flex-col overflow-hidden rounded-npi-s bg-npi-white transition-shadow @md:flex-row'
 const rootShadowClass = 'shadow-npi-m hover:shadow-npi-m-hover'
+
+// Bumps the title to L-size typography (Bitter Regular 28px / level-4 spec) when the card is at @4xl width.
+const titleClass = 'text-npi-blue @4xl:text-[1.75rem] @4xl:font-normal transition-colors'
+const titleHoverClass = 'group-hover:text-npi-blue-hover'
 
 export const Card = forwardRef<HTMLElement, CardProps>(({
 	title,
@@ -67,68 +89,95 @@ export const Card = forwardRef<HTMLElement, CardProps>(({
 	indicator,
 	href,
 	inverted = false,
+	tag,
+	cta,
 	children,
 	className,
 	...props
 }, ref) => {
-	const Root = href ? 'a' : 'article'
-
 	return (
-		<Root
-			ref={ref as React.Ref<HTMLElement & HTMLAnchorElement>}
+		<article
+			ref={ref}
 			className={twMerge(
 				clsx(
 					rootClass,
 					!inverted && rootShadowClass,
-					href && 'cursor-pointer no-underline',
+					href && 'cursor-pointer',
 					className,
 				),
 			)}
-			{...(href ? { href } : {})}
 			{...props}
 		>
 			{!hideVisual && (
-				<div
-					className={clsx(
-						'relative flex items-end justify-end bg-npi-blue-dark p-npi-2',
-						// Narrow (S): full-width with caller-provided aspect
-						'w-full',
-						aspectClassMap[aspect],
-						// @md (M): fixed 200×267 visual on the left
-						'@md:w-npi-50 @md:shrink-0 @md:aspect-[3/4]',
-						// @4xl (L): wider 400px / 16:9 visual
-						'@4xl:w-[400px] @4xl:aspect-[16/9]',
-					)}
-				>
-					{visual}
-					{indicator && (
-						<span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-npi-white p-npi-1 text-npi-blue">
-							<Icon name={indicatorIconMap[indicator]} className="size-6" />
-						</span>
-					)}
-				</div>
+				aspect === 'line'
+					? <div aria-hidden className='h-2 w-full shrink-0 bg-npi-blue @md:h-auto @md:w-2 @md:self-stretch' />
+					: (
+						<div
+							className={clsx(
+								'relative flex items-end justify-end bg-npi-blue-dark p-npi-2',
+								// Narrow (S): full-width with caller-provided aspect, no inner radius (clipped by overflow-hidden)
+								'w-full',
+								aspectClassMap[aspect],
+								// @md (M): fixed 200×267 visual on the left, 4px inner radius (designer note 12:246)
+								'@md:w-npi-50 @md:shrink-0 @md:aspect-[3/4] @md:rounded-npi-xxs',
+								// @4xl (L): wider 400px / 16:9 visual, same 4px inner radius (12:247)
+								'@4xl:w-[400px] @4xl:aspect-[16/9]',
+							)}
+						>
+							{visual}
+							{indicator && (
+								<span className='flex size-10 shrink-0 items-center justify-center rounded-full bg-npi-white p-npi-1 text-npi-blue'>
+									<Icon name={indicatorIconMap[indicator]} className='size-6' />
+								</span>
+							)}
+						</div>
+					)
 			)}
-			<div className="flex w-full flex-col items-start gap-npi-4 px-npi-6 pt-npi-6 pb-npi-8 @md:flex-1 @md:p-npi-8">
-				{label && <Text variant="label">{label}</Text>}
-				<Heading level={5} className="text-npi-blue">
-					{title}
+			<div className='flex w-full flex-col items-start gap-npi-4 px-npi-6 pt-npi-6 pb-npi-8 @md:flex-1 @md:p-npi-8'>
+				{label && <Text variant='label'>{label}</Text>}
+				<Heading level={5} className={clsx(titleClass, href && titleHoverClass)}>
+					{href
+						? (
+							<a
+								href={href}
+								className='text-inherit no-underline outline-none focus-visible:ring-4 focus-visible:ring-npi-blue-light rounded-npi-xxs before:absolute before:inset-0 before:content-[""]'
+							>
+								{title}
+							</a>
+						)
+						: title}
 				</Heading>
 				{meta && meta.length > 0 && (
-					<div className="flex w-full items-center gap-2.5">
+					<div className='flex w-full items-center gap-2.5'>
 						{meta.map((item, i) => (
 							<Fragment key={i}>
-								{i > 0 && <span aria-hidden className="block size-1.5 shrink-0 rounded-full bg-npi-gray-300" />}
-								<Text variant="l" secondary className="whitespace-nowrap">
+								{i > 0 && <span aria-hidden className='block size-1.5 shrink-0 rounded-full bg-npi-gray-300' />}
+								<Text variant='l' secondary className='whitespace-nowrap'>
 									{item}
 								</Text>
 							</Fragment>
 						))}
 					</div>
 				)}
-				{description && <Text variant="l">{description}</Text>}
+				{description && <Text variant='l'>{description}</Text>}
+				{tag && (
+					<div className='relative z-10'>
+						<Tag size='S' label={tag.label} href={tag.href} />
+					</div>
+				)}
+				{cta && (
+					<div className='relative z-10'>
+						<Button
+							variant='tertiary'
+							label={cta.label}
+							iconBefore={cta.iconBefore ?? 'stahnout'}
+							href={cta.href}
+						/>
+					</div>
+				)}
 				{children}
 			</div>
-		</Root>
+		</article>
 	)
 })
 Card.displayName = 'Card'
