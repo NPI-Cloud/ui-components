@@ -13,6 +13,8 @@ export { Banner, type BannerAction, type BannerIndicator, bannerIndicators, type
 export { Breadcrumbs, type BreadcrumbsItem, type BreadcrumbsProps } from './Breadcrumbs'
 export { Button, type ButtonProps, buttonVariants } from './Button'
 export { Card, type CardAspect, cardAspects, type CardIndicator, cardIndicators, type CardProps } from './Card'
+export { Carousel, type CarouselProps } from './Carousel'
+export { CarouselControls, type CarouselControlsProps } from './CarouselControls'
 export { Checkbox, type CheckboxProps, type CheckboxSize, checkboxSizes } from './Checkbox'
 export {
 	Footer,
