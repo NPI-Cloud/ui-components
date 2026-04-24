@@ -110,7 +110,7 @@ export const Card = forwardRef<HTMLElement, CardProps>(({
 		>
 			{!hideVisual && (
 				aspect === 'line'
-					? <div aria-hidden className='h-2 w-full shrink-0 bg-npi-blue @md:h-auto @md:w-2 @md:self-stretch' />
+					? <div aria-hidden className="h-2 w-full shrink-0 bg-npi-blue @md:h-auto @md:w-2 @md:self-stretch" />
 					: (
 						<div
 							className={clsx(
@@ -126,15 +126,15 @@ export const Card = forwardRef<HTMLElement, CardProps>(({
 						>
 							{visual}
 							{indicator && (
-								<span className='flex size-10 shrink-0 items-center justify-center rounded-full bg-npi-white p-npi-1 text-npi-blue'>
-									<Icon name={indicatorIconMap[indicator]} className='size-6' />
+								<span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-npi-white p-npi-1 text-npi-blue">
+									<Icon name={indicatorIconMap[indicator]} className="size-6" />
 								</span>
 							)}
 						</div>
 					)
 			)}
-			<div className='flex w-full flex-col items-start gap-npi-4 px-npi-6 pt-npi-6 pb-npi-8 @md:flex-1 @md:p-npi-8'>
-				{label && <Text variant='label'>{label}</Text>}
+			<div className="flex w-full flex-col items-start gap-npi-4 px-npi-6 pt-npi-6 pb-npi-8 @md:flex-1 @md:p-npi-8">
+				{label && <Text variant="label">{label}</Text>}
 				<Heading level={5} className={clsx(titleClass, href && titleHoverClass)}>
 					{href
 						? (
@@ -148,27 +148,27 @@ export const Card = forwardRef<HTMLElement, CardProps>(({
 						: title}
 				</Heading>
 				{meta && meta.length > 0 && (
-					<div className='flex w-full items-center gap-2.5'>
+					<div className="flex w-full items-center gap-2.5">
 						{meta.map((item, i) => (
 							<Fragment key={i}>
-								{i > 0 && <span aria-hidden className='block size-1.5 shrink-0 rounded-full bg-npi-gray-300' />}
-								<Text variant='l' secondary className='whitespace-nowrap'>
+								{i > 0 && <span aria-hidden className="block size-1.5 shrink-0 rounded-full bg-npi-gray-300" />}
+								<Text variant="l" secondary className="whitespace-nowrap">
 									{item}
 								</Text>
 							</Fragment>
 						))}
 					</div>
 				)}
-				{description && <Text variant='l'>{description}</Text>}
+				{description && <Text variant="l">{description}</Text>}
 				{tag && (
-					<div className='relative z-10'>
-						<Tag size='S' label={tag.label} href={tag.href} />
+					<div className="relative z-10">
+						<Tag size="S" label={tag.label} href={tag.href} />
 					</div>
 				)}
 				{cta && (
-					<div className='relative z-10'>
+					<div className="relative z-10">
 						<Button
-							variant='tertiary'
+							variant="tertiary"
 							label={cta.label}
 							iconBefore={cta.iconBefore ?? 'stahnout'}
 							href={cta.href}
