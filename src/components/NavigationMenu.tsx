@@ -8,6 +8,7 @@ import {
 	forwardRef,
 	type HTMLAttributes,
 	isValidElement,
+	type ReactElement,
 	type ReactNode,
 	useContext,
 	useState,
@@ -791,18 +792,27 @@ export const NavigationSubnav = forwardRef<HTMLDivElement, NavigationSubnavProps
 )
 NavigationSubnav.displayName = 'NavigationSubnav'
 
-export interface NavigationSubnavColumnsProps extends HTMLAttributes<HTMLDivElement> {}
+export interface NavigationSubnavGridProps extends HTMLAttributes<HTMLDivElement> {
+	/** Number of columns. Defaults to `max(child.column) + 1`. Cells with `column` outside this range overflow per CSS grid rules. */
+	columns?: number
+}
 
-export const NavigationSubnavColumns = forwardRef<HTMLDivElement, NavigationSubnavColumnsProps>(
-	({ className, children, ...props }, ref) => {
+/**
+ * Wide-subnav 2D grid container. Children are `NavigationSubnavCell` components placed by
+ * explicit `(column, row)`. On mobile (inside drawer) the grid collapses to a flat vertical
+ * stack of cells in source order, with promo cards split off into a second tablet column when
+ * present (matching the previous `NavigationSubnavColumns` drawer behaviour).
+ */
+export const NavigationSubnavGrid = forwardRef<HTMLDivElement, NavigationSubnavGridProps>(
+	({ columns, className, children, ...props }, ref) => {
 		const insideDrawer = useContext(InsideDrawerContext)
 
 		if (insideDrawer) {
-			// Split children: Promo cards vs. everything else (link columns). At tablet+ when a Promo
-			// exists, render as 2 cols — all link columns stacked in col 1, Promo in col 2.
 			const kids = Children.toArray(children)
-			const promos = kids.filter(c => isValidElement(c) && c.type === NavigationPromo)
-			const items = kids.filter(c => !(isValidElement(c) && c.type === NavigationPromo))
+			const isPromoCell = (c: ReactNode): c is ReactElement<NavigationSubnavCellProps> =>
+				isValidElement<NavigationSubnavCellProps>(c) && c.type === NavigationSubnavCell && hasOnlyPromoChildren(c)
+			const promos = kids.filter(isPromoCell)
+			const items = kids.filter(c => !isPromoCell(c))
 			const hasPromo = promos.length > 0
 
 			return (
@@ -823,10 +833,13 @@ export const NavigationSubnavColumns = forwardRef<HTMLDivElement, NavigationSubn
 			)
 		}
 
+		const resolvedColumns = columns ?? deriveColumnCount(children)
+
 		return (
 			<div
 				ref={ref}
-				className={twMerge(clsx('grid grid-cols-[repeat(auto-fit,minmax(0,1fr))] gap-npi-10', className))}
+				style={{ gridTemplateColumns: `repeat(${resolvedColumns}, minmax(0, 1fr))` }}
+				className={twMerge(clsx('grid gap-x-npi-10 gap-y-npi-8', className))}
 				{...props}
 			>
 				{children}
@@ -834,18 +847,56 @@ export const NavigationSubnavColumns = forwardRef<HTMLDivElement, NavigationSubn
 		)
 	},
 )
-NavigationSubnavColumns.displayName = 'NavigationSubnavColumns'
+NavigationSubnavGrid.displayName = 'NavigationSubnavGrid'
 
-export interface NavigationSubnavColumnProps extends HTMLAttributes<HTMLUListElement> {}
+function deriveColumnCount(children: ReactNode): number {
+	let max = 0
+	Children.forEach(children, child => {
+		if (isValidElement(child) && child.type === NavigationSubnavCell) {
+			const { column } = (child as ReactElement<NavigationSubnavCellProps>).props
+			if (column + 1 > max) max = column + 1
+		}
+	})
+	return Math.max(max, 1)
+}
 
-export const NavigationSubnavColumn = forwardRef<HTMLUListElement, NavigationSubnavColumnProps>(
-	({ className, children, ...props }, ref) => (
-		<ul ref={ref} className={twMerge(clsx('flex flex-col gap-npi-4', className))} {...props}>
-			{children}
-		</ul>
-	),
+function hasOnlyPromoChildren(cell: ReactElement<NavigationSubnavCellProps>): boolean {
+	const kids = Children.toArray(cell.props.children)
+	if (kids.length === 0) return false
+	return kids.every(c => isValidElement(c) && c.type === NavigationPromo)
+}
+
+export interface NavigationSubnavCellProps extends HTMLAttributes<HTMLDivElement> {
+	/** 0-based column index. */
+	column: number
+	/** 0-based row index. Omit for auto-flow within the column. */
+	row?: number
+}
+
+/**
+ * One cell inside `NavigationSubnavGrid`. On desktop, positions itself at `gridColumn: column+1`
+ * and (when `row` is given) `gridRow: row+1`. Inside the drawer the coordinates are ignored —
+ * cells render in source order as a flat vertical list.
+ */
+export const NavigationSubnavCell = forwardRef<HTMLDivElement, NavigationSubnavCellProps>(
+	({ column, row, className, style, children, ...props }, ref) => {
+		const insideDrawer = useContext(InsideDrawerContext)
+		const cellStyle = insideDrawer
+			? style
+			: { ...style, gridColumn: column + 1, gridRow: row != null ? row + 1 : undefined }
+		return (
+			<div
+				ref={ref}
+				style={cellStyle}
+				className={twMerge(clsx('flex flex-col gap-npi-4', className))}
+				{...props}
+			>
+				{children}
+			</div>
+		)
+	},
 )
-NavigationSubnavColumn.displayName = 'NavigationSubnavColumn'
+NavigationSubnavCell.displayName = 'NavigationSubnavCell'
 
 export interface NavigationSubnavGroupProps extends HTMLAttributes<HTMLLIElement> {
 	/** Group heading — rendered as a bold link (acts as a MenuItem). */
