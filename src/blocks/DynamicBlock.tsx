@@ -108,7 +108,7 @@ export function DynamicBlock({ dynamicSource, dynamicLimit, heading, ctaLabel, c
 					{sectionHeading}
 				</h2>
 			)}
-			<div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+			<div className="grid grid-cols-1 gap-6 @npi-tablet:grid-cols-2 @npi-desktop:grid-cols-3">
 				{cards.map((card, i) => <DynamicCard key={i} card={card} />)}
 			</div>
 			{ctaLabel && (

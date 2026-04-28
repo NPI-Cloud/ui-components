@@ -10,7 +10,7 @@ export interface ContentImageBlockProps {
 
 export function ContentImageBlock({ heading, bodyContent, ctaLabel, ctaUrl, imageUrl, imageAlt, imagePosition = 'right' }: ContentImageBlockProps) {
 	const textColumn = (
-		<div className="flex flex-col justify-center p-6 md:p-8">
+		<div className="flex flex-col justify-center p-6 @npi-tablet:p-8">
 			{heading && (
 				<h3 className="font-npi-sans text-(length:--npi-font-size-2xl) font-bold leading-tight text-npi-gray-900">
 					{heading}
@@ -36,7 +36,7 @@ export function ContentImageBlock({ heading, bodyContent, ctaLabel, ctaUrl, imag
 	)
 
 	const imageColumn = (
-		<div className="flex items-center justify-center p-4 md:p-6">
+		<div className="flex items-center justify-center p-4 @npi-tablet:p-6">
 			{imageUrl
 				? (
 					<img
@@ -60,7 +60,7 @@ export function ContentImageBlock({ heading, bodyContent, ctaLabel, ctaUrl, imag
 	)
 
 	return (
-		<div className="grid grid-cols-1 overflow-hidden rounded-s bg-white md:grid-cols-[40%_60%]">
+		<div className="grid grid-cols-1 overflow-hidden rounded-s bg-white @npi-tablet:grid-cols-[40%_60%]">
 			{imagePosition === 'left'
 				? (
 					<>

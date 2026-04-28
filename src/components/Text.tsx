@@ -29,7 +29,7 @@ export const textSpecs: Record<TextSize, TextSpec> = {
 // Hardcoded so Tailwind v4's source scanner can see the literal arbitrary values and generate CSS for them.
 // Must stay in sync with `textSpecs` above.
 const variantClasses: Record<TextSize, string> = {
-	xl: 'text-[1.25rem] md:text-[1.375rem] leading-[1.3]',
+	xl: 'text-[1.25rem] @npi-tablet:text-[1.375rem] leading-[1.3]',
 	l: 'text-[1rem] leading-[1.6]',
 	m: 'text-[0.875rem] leading-[1.3]',
 	s: 'text-[0.75rem] leading-[1.3]',

@@ -63,8 +63,8 @@ function DecorativeIllustration() {
 
 export function NewsletterBlock({ heading, ctaLabel, ctaUrl, imageUrl, imageAlt }: NewsletterBlockProps) {
 	return (
-		<div className="grid grid-cols-1 overflow-hidden rounded-s bg-npi-gray-50 md:grid-cols-2">
-			<div className="flex flex-col justify-center p-8 md:p-12 lg:p-16">
+		<div className="grid grid-cols-1 overflow-hidden rounded-s bg-npi-gray-50 @npi-tablet:grid-cols-2">
+			<div className="flex flex-col justify-center p-8 @npi-tablet:p-12 @npi-desktop:p-16">
 				{heading && (
 					<h2 className="font-npi-sans text-[length:var(--npi-font-size-4xl)] font-bold italic leading-tight text-npi-blue">
 						{heading}
@@ -81,7 +81,7 @@ export function NewsletterBlock({ heading, ctaLabel, ctaUrl, imageUrl, imageAlt 
 					</div>
 				)}
 			</div>
-			<div className="flex items-center justify-center p-4 md:p-8">
+			<div className="flex items-center justify-center p-4 @npi-tablet:p-8">
 				{imageUrl
 					? (
 						<img

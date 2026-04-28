@@ -125,8 +125,14 @@
 	--container-npi-layout: 1064px;
 
 	/* NPI Breakpoints — viewport widths. Enables `npi-tablet:`, etc. responsive variants */
-	--breakpoint-npi-tablet: 720px;
+	--breakpoint-npi-tablet: 768px;
 	--breakpoint-npi-desktop: 1064px;
+
+	/* NPI Container breakpoints — same widths as viewport breakpoints, used by blocks that
+	   need to react to their containing canvas (e.g. the web-builder responsive preview)
+	   rather than the viewport. Enables `@npi-tablet:`, `@npi-desktop:` container variants. */
+	--container-npi-tablet: 768px;
+	--container-npi-desktop: 1064px;
 
 	/* NPI Animations — Radix Accordion open/close using the content-height CSS var */
 	--animate-npi-accordion-down: npi-accordion-down 200ms ease-out;
