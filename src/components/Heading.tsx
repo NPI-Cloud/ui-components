@@ -7,20 +7,20 @@ export const headingLevels = [1, 2, 3, 4, 5, 6, 7] as const
 export type HeadingLevel = (typeof headingLevels)[number]
 
 export interface HeadingSpec {
-	desktop: string
-	mobile: string
-	weight: number
+	desktop: { size: string; weight: number }
+	mobile: { size: string; weight: number }
 	lineHeight: number
 }
 
+// Responsive switch happens at the `npi-tablet` breakpoint (720px).
 export const headingSpecs: Record<HeadingLevel, HeadingSpec> = {
-	1: { desktop: '3.5rem', mobile: '2.25rem', weight: 400, lineHeight: 1.2 },
-	2: { desktop: '2.5rem', mobile: '2rem', weight: 400, lineHeight: 1.2 },
-	3: { desktop: '2rem', mobile: '1.75rem', weight: 400, lineHeight: 1.2 },
-	4: { desktop: '1.75rem', mobile: '1.5rem', weight: 400, lineHeight: 1.2 },
-	5: { desktop: '1.5rem', mobile: '1.375rem', weight: 500, lineHeight: 1.2 },
-	6: { desktop: '1.25rem', mobile: '1.25rem', weight: 500, lineHeight: 1.2 },
-	7: { desktop: '1rem', mobile: '1.125rem', weight: 700, lineHeight: 1.2 },
+	1: { desktop: { size: '3.5rem', weight: 400 }, mobile: { size: '2.25rem', weight: 400 }, lineHeight: 1.2 },
+	2: { desktop: { size: '2.5rem', weight: 400 }, mobile: { size: '2rem', weight: 400 }, lineHeight: 1.2 },
+	3: { desktop: { size: '2rem', weight: 400 }, mobile: { size: '1.75rem', weight: 400 }, lineHeight: 1.2 },
+	4: { desktop: { size: '1.75rem', weight: 400 }, mobile: { size: '1.5rem', weight: 400 }, lineHeight: 1.2 },
+	5: { desktop: { size: '1.5rem', weight: 500 }, mobile: { size: '1.375rem', weight: 400 }, lineHeight: 1.2 },
+	6: { desktop: { size: '1.25rem', weight: 500 }, mobile: { size: '1.25rem', weight: 500 }, lineHeight: 1.2 },
+	7: { desktop: { size: '1rem', weight: 700 }, mobile: { size: '1.125rem', weight: 700 }, lineHeight: 1.2 },
 }
 
 export interface HeadingProps extends React.HTMLAttributes<HTMLHeadingElement> {
@@ -31,13 +31,13 @@ export interface HeadingProps extends React.HTMLAttributes<HTMLHeadingElement> {
 // Hardcoded so Tailwind v4's source scanner can see the literal arbitrary values and generate CSS for them.
 // Must stay in sync with `headingSpecs` above.
 const levelClasses: Record<HeadingLevel, string> = {
-	1: 'text-[2.25rem] md:text-[3.5rem] leading-[1.2] font-normal',
-	2: 'text-[2rem] md:text-[2.5rem] leading-[1.2] font-normal',
-	3: 'text-[1.75rem] md:text-[2rem] leading-[1.2] font-normal',
-	4: 'text-[1.5rem] md:text-[1.75rem] leading-[1.2] font-normal',
-	5: 'text-[1.375rem] md:text-[1.5rem] leading-[1.2] font-medium',
-	6: 'text-[1.25rem] md:text-[1.25rem] leading-[1.2] font-medium',
-	7: 'text-[1.125rem] md:text-[1rem] leading-[1.2] font-bold',
+	1: 'text-[2.25rem] npi-tablet:text-[3.5rem] leading-[1.2] font-normal',
+	2: 'text-[2rem] npi-tablet:text-[2.5rem] leading-[1.2] font-normal',
+	3: 'text-[1.75rem] npi-tablet:text-[2rem] leading-[1.2] font-normal',
+	4: 'text-[1.5rem] npi-tablet:text-[1.75rem] leading-[1.2] font-normal',
+	5: 'text-[1.375rem] npi-tablet:text-[1.5rem] leading-[1.2] font-normal npi-tablet:font-medium',
+	6: 'text-[1.25rem] npi-tablet:text-[1.25rem] leading-[1.2] font-medium',
+	7: 'text-[1.125rem] npi-tablet:text-[1rem] leading-[1.2] font-bold',
 }
 
 const headingCva = cva('font-npi-serif', {
