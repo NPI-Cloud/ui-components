@@ -18,12 +18,15 @@ export interface BreadcrumbsProps extends Omit<React.HTMLAttributes<HTMLElement>
 const textPaddingClass = 'pt-npi-1 pb-[3px]'
 const textSizeClass = 'text-[0.875rem] leading-[1.3]'
 
+const focusUnderlineClass = 'focus-visible:outline-none focus-visible:shadow-[0_2px_0_0_var(--npi-blue-light)]'
+
 const linkClass = clsx(
 	textPaddingClass,
 	textSizeClass,
 	'text-npi-text-link underline decoration-solid',
 	'hover:text-npi-text-link-hover active:text-npi-text-link-hover',
-	'focus-visible:outline-none focus-visible:no-underline focus-visible:shadow-[0_3px_0_0_currentColor]',
+	'focus-visible:no-underline',
+	focusUnderlineClass,
 )
 
 const currentTextClass = clsx(textPaddingClass, textSizeClass, 'text-npi-text-primary')
@@ -31,7 +34,7 @@ const currentTextClass = clsx(textPaddingClass, textSizeClass, 'text-npi-text-pr
 const homeLinkClass = clsx(
 	'inline-flex size-6 items-center justify-center rounded-npi-xxs text-npi-blue transition-colors',
 	'hover:text-npi-blue-hover active:text-npi-blue-hover',
-	'focus-visible:outline-none focus-visible:shadow-[0_3px_0_0_currentColor]',
+	focusUnderlineClass,
 )
 
 export const Breadcrumbs = forwardRef<HTMLElement, BreadcrumbsProps>(
@@ -57,7 +60,8 @@ export const Breadcrumbs = forwardRef<HTMLElement, BreadcrumbsProps>(
 							textSizeClass,
 							'text-npi-text-link underline decoration-solid',
 							'hover:text-npi-text-link-hover active:text-npi-text-link-hover',
-							'focus-visible:outline-none focus-visible:no-underline focus-visible:shadow-[0_3px_0_0_currentColor]',
+							'focus-visible:no-underline',
+							focusUnderlineClass,
 						)}
 					>
 						<Icon name="arrowVlevo" size="m" className="size-6 shrink-0" aria-hidden="true" />
