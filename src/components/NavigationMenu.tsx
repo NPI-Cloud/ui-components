@@ -16,6 +16,7 @@ import {
 import { createPortal } from 'react-dom'
 import { twMerge } from 'tailwind-merge'
 import { Icon, type IconName } from '../icons'
+import { Button } from './Button'
 import { Heading } from './Heading'
 import { Text } from './Text'
 
@@ -1022,3 +1023,208 @@ export const NavigationPromo = forwardRef<HTMLAnchorElement, NavigationPromoProp
 )
 NavigationPromo.displayName = 'NavigationPromo'
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Configured Navigation — opinionated NPI website navigation.
+//
+// Encodes the structural specification: optional dark NPI site-switcher strip,
+// a brand bar with optional search + CTA, a row of items (each either a plain
+// link or a dropdown), and a mobile drawer that mirrors the same affordances.
+// Pass plain data; the component composes `NavigationMenu` + the primitives
+// below the hood.
+//
+// Use the primitives (`NavigationMenu`, `NavigationMenuBar`, `NavigationMenuItem`,
+// `NavigationSubnav`, …) directly when you need a non-standard layout (e.g.,
+// promo cards placed at explicit `(column, row)` coordinates inside a wide
+// subnav, or extra slots inside the brand bar).
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface NavigationGroupCell {
+	kind: 'group'
+	/** Bold heading rendered as a link. */
+	heading: ReactNode
+	/** Optional click target for the heading. */
+	headingHref?: string
+	/** Indented links shown under the heading. */
+	items: { title: ReactNode; href?: string }[]
+}
+
+export interface NavigationPromoCell {
+	kind: 'promo'
+	/** `icon` = horizontal card with an icon and a bold title (default).
+	 *  `cover` = label above a cover image. */
+	variant?: NavigationPromoVariant
+	title: ReactNode
+	href?: string
+	/** Used by `icon` variant. */
+	icon?: IconName
+	/** Small caption above the title in `icon` variant. */
+	eyebrow?: string
+	/** Used by `cover` variant. */
+	coverSrc?: string
+}
+
+export type NavigationCell = NavigationGroupCell | NavigationPromoCell
+
+export interface NavigationDropdown {
+	/** `1` = narrow 320px panel, single column. `2`–`4` = wide 1064px panel; cells render in
+	 *  source order, chunked column-major across this many columns. */
+	columns: 1 | 2 | 3 | 4
+	cells: NavigationCell[]
+}
+
+export interface NavigationItem {
+	/** Visible label. */
+	label: string
+	/** Link target — used only when there's no `dropdown`. */
+	href?: string
+	/** Force the "current page" visual state (underline). The `open` state is owned by Radix. */
+	state?: 'default' | 'select'
+	/** When provided, the item renders as a dropdown trigger. */
+	dropdown?: NavigationDropdown
+}
+
+export interface NavigationBrand {
+	/** Square NPI logo (48×48). */
+	logoSrc: string
+	/** Site title rendered next to the logo. Omit to show only the logo. */
+	title?: string
+	href?: string
+	logoAlt?: string
+}
+
+export interface NavigationSearch {
+	/** Accessible label — placeholder handles the visible prompt. */
+	label: string
+	placeholder?: string
+	submitLabel?: string
+	onSubmit?: (value: string) => void
+}
+
+export interface NavigationCta {
+	label: string
+	href?: string
+	onClick?: () => void
+}
+
+export interface NavigationProps extends Omit<HTMLAttributes<HTMLElement>, 'children'> {
+	/** Top dark bar with NPI sites. Hidden when omitted. */
+	siteSwitcher?: NavigationMenuSiteSwitcherProps
+	brand: NavigationBrand
+	/** Search input — when provided, appears in the bar (desktop) and the drawer (mobile). */
+	search?: NavigationSearch
+	/** Primary CTA — appears in the bar (desktop) and as a regular item in the drawer (mobile). */
+	cta?: NavigationCta
+	items: NavigationItem[]
+}
+
+export const Navigation = forwardRef<HTMLElement, NavigationProps>((props, ref) => {
+	const { siteSwitcher, brand, search, cta, items, ...rest } = props
+	const itemNodes = items.map((item, index) => <NavigationConfiguredItem key={index} item={item} />)
+	const switcher = siteSwitcher && <NavigationMenuSiteSwitcher {...siteSwitcher} />
+
+	return (
+		<NavigationMenu ref={ref} {...rest}>
+			{switcher}
+			<NavigationMenuBar>
+				<NavigationMenuBrand
+					logoSrc={brand.logoSrc}
+					title={brand.title}
+					href={brand.href}
+					logoAlt={brand.logoAlt}
+				/>
+				{search && (
+					<NavigationMenuSearch
+						label={search.label}
+						placeholder={search.placeholder}
+						submitLabel={search.submitLabel}
+						onSubmit={search.onSubmit}
+						className="max-npi-desktop:hidden"
+					/>
+				)}
+				{cta && (
+					<NavigationMenuActions className="max-npi-desktop:hidden">
+						<Button variant="primary" label={cta.label} href={cta.href} onClick={cta.onClick} className="min-w-0!" />
+					</NavigationMenuActions>
+				)}
+				<NavigationMenuMobileToggle />
+			</NavigationMenuBar>
+			<NavigationMenuItems>{itemNodes}</NavigationMenuItems>
+			<NavigationMenuDrawer>
+				{search && (
+					<NavigationMenuSearch
+						label={search.label}
+						placeholder={search.placeholder}
+						submitLabel={search.submitLabel}
+						onSubmit={search.onSubmit}
+					/>
+				)}
+				<NavigationMenuItems>{itemNodes}</NavigationMenuItems>
+				{cta && <NavigationMenuItem label={cta.label} href={cta.href ?? '#'} onClick={cta.onClick} />}
+				{switcher}
+			</NavigationMenuDrawer>
+		</NavigationMenu>
+	)
+})
+Navigation.displayName = 'Navigation'
+
+function NavigationConfiguredItem({ item }: { item: NavigationItem }) {
+	if (!item.dropdown) {
+		return <NavigationMenuItem label={item.label} href={item.href ?? '#'} state={item.state} />
+	}
+	return (
+		<NavigationMenuItem label={item.label} state={item.state}>
+			<NavigationConfiguredDropdown dropdown={item.dropdown} />
+		</NavigationMenuItem>
+	)
+}
+
+function NavigationConfiguredDropdown({ dropdown }: { dropdown: NavigationDropdown }) {
+	const { columns, cells } = dropdown
+
+	if (columns === 1) {
+		return (
+			<NavigationSubnav variant="narrow">
+				<ul className="flex flex-col gap-npi-4">
+					{cells.map((cell, index) => <NavigationConfiguredCell key={index} cell={cell} />)}
+				</ul>
+			</NavigationSubnav>
+		)
+	}
+
+	const perColumn = Math.max(1, Math.ceil(cells.length / columns))
+	return (
+		<NavigationSubnav variant="wide">
+			<NavigationSubnavGrid columns={columns}>
+				{cells.map((cell, index) => (
+					<NavigationSubnavCell key={index} column={Math.min(Math.floor(index / perColumn), columns - 1)}>
+						<NavigationConfiguredCell cell={cell} />
+					</NavigationSubnavCell>
+				))}
+			</NavigationSubnavGrid>
+		</NavigationSubnav>
+	)
+}
+
+function NavigationConfiguredCell({ cell }: { cell: NavigationCell }) {
+	if (cell.kind === 'promo') {
+		return (
+			<NavigationPromo
+				variant={cell.variant ?? 'icon'}
+				title={cell.title}
+				eyebrow={cell.eyebrow}
+				icon={cell.icon}
+				coverSrc={cell.coverSrc}
+				href={cell.href}
+			/>
+		)
+	}
+	return (
+		<NavigationSubnavGroup heading={cell.heading} headingHref={cell.headingHref}>
+			{cell.items.map((item, index) => (
+				<NavigationSubnavItem key={index} href={item.href}>
+					{item.title}
+				</NavigationSubnavItem>
+			))}
+		</NavigationSubnavGroup>
+	)
+}

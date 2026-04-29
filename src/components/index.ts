@@ -47,6 +47,13 @@ export {
 } from './Footer'
 export { Heading, type HeadingLevel, headingLevels, type HeadingProps, type HeadingSpec, headingSpecs } from './Heading'
 export {
+	Navigation,
+	type NavigationBrand,
+	type NavigationCell,
+	type NavigationCta,
+	type NavigationDropdown,
+	type NavigationGroupCell,
+	type NavigationItem,
 	NavigationMenu,
 	NavigationMenuActions,
 	type NavigationMenuActionsProps,
@@ -73,9 +80,12 @@ export {
 	type NavigationMenuSiteSwitcherProps,
 	type NavigationMenuSiteSwitcherSite,
 	NavigationPromo,
+	type NavigationPromoCell,
 	type NavigationPromoProps,
 	type NavigationPromoVariant,
 	navigationPromoVariants,
+	type NavigationProps,
+	type NavigationSearch,
 	NavigationSubnav,
 	NavigationSubnavCell,
 	type NavigationSubnavCellProps,
