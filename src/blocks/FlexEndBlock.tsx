@@ -1,6 +1,6 @@
 export function FlexEndBlock() {
 	return (
-		<div className="px-3 py-1 bg-blue-50 border border-blue-200 border-dashed rounded-b-md text-xs text-blue-400 font-medium">
+		<div className="px-3 py-1.5 text-[10px] uppercase tracking-wider font-medium text-slate-300">
 			Konec sloupců
 		</div>
 	)
