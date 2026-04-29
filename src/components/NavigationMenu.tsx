@@ -11,6 +11,7 @@ import {
 	type ReactElement,
 	type ReactNode,
 	useContext,
+	useEffect,
 	useState,
 } from 'react'
 import { createPortal } from 'react-dom'
@@ -73,6 +74,16 @@ export const NavigationMenu = forwardRef<HTMLElement, NavigationMenuProps>(
 			toggle: () => setOpen(v => !v),
 			close: () => setOpen(false),
 		}
+		// Lock body scroll while the mobile drawer covers the viewport so the page behind it
+		// doesn't move when the user scrolls inside the drawer.
+		useEffect(() => {
+			if (typeof document === 'undefined' || !open) return
+			const previous = document.body.style.overflow
+			document.body.style.overflow = 'hidden'
+			return () => {
+				document.body.style.overflow = previous
+			}
+		}, [open])
 		return (
 			<MobileContext.Provider value={mobile}>
 				<header
@@ -341,8 +352,10 @@ export interface NavigationMenuDrawerProps extends HTMLAttributes<HTMLDivElement
 
 /**
  * Mobile drawer panel. Renders only below 1064px and only when the `NavigationMenuMobileToggle`
- * is toggled open. Children render as a vertical stack with dividers — pass `NavigationMenuSearch`,
- * `Button`, and `NavigationMenuItem`s (parents with `NavigationSubnav` become accordion sections).
+ * is toggled open. Anchored fixed below the 96px brand bar, fills the rest of the viewport, and
+ * scrolls internally when the drawer's contents overflow. Children render as a vertical stack
+ * with dividers — pass `NavigationMenuSearch`, `Button`, and `NavigationMenuItem`s (parents with
+ * `NavigationSubnav` become accordion sections).
  */
 export const NavigationMenuDrawer = forwardRef<HTMLDivElement, NavigationMenuDrawerProps>(
 	({ className, children, ...props }, ref) => {
@@ -354,7 +367,7 @@ export const NavigationMenuDrawer = forwardRef<HTMLDivElement, NavigationMenuDra
 					ref={ref}
 					className={twMerge(
 						clsx(
-							'flex w-full flex-col gap-npi-6 bg-npi-white px-npi-6 pt-npi-2 pb-npi-8 npi-desktop:hidden',
+							'fixed inset-x-0 bottom-0 top-24 z-40 flex flex-col gap-npi-6 overflow-y-auto bg-npi-white px-npi-6 pt-npi-2 pb-npi-8 npi-desktop:hidden',
 							className,
 						),
 					)}
