@@ -977,8 +977,8 @@ export const NavigationPromo = forwardRef<HTMLAnchorElement, NavigationPromoProp
 					href={href}
 					className={twMerge(
 						clsx(
-							'flex items-start gap-npi-4 rounded-npi-xs bg-npi-bg-light p-npi-6',
-							'hover:bg-npi-blue-lighter focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-npi-blue-light',
+							'flex items-start gap-npi-4 rounded-npi-xs bg-npi-bg-light p-npi-6 transition-shadow',
+							'hover:shadow-npi-m focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-npi-blue-light',
 							className,
 						),
 					)}
@@ -1021,3 +1021,4 @@ export const NavigationPromo = forwardRef<HTMLAnchorElement, NavigationPromoProp
 	},
 )
 NavigationPromo.displayName = 'NavigationPromo'
+
