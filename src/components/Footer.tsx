@@ -21,7 +21,7 @@ export const FooterShell = forwardRef<HTMLElement, FooterShellProps>(
 			className={twMerge(clsx('bg-npi-gray-50 font-npi-sans text-npi-text-primary', className))}
 			{...props}
 		>
-			<div className="mx-auto flex w-full max-w-npi-layout flex-col px-npi-6 py-npi-20 [&>*+*]:mt-npi-12 [&>*+*]:border-t [&>*+*]:border-npi-gray-200 [&>*+*]:pt-npi-12">
+			<div className="mx-auto flex w-full max-w-npi-layout flex-col px-npi-6 py-npi-10 npi-tablet:py-npi-20 [&>*+*]:mt-npi-12 [&>*+*]:border-t [&>*+*]:border-npi-gray-200 [&>*+*]:pt-npi-12">
 				{children}
 			</div>
 		</footer>
