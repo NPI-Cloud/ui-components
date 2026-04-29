@@ -4,14 +4,17 @@ import { twMerge } from 'tailwind-merge'
 import { Icon, type IconName } from '../icons'
 import { Text } from './Text'
 
-export interface FooterProps extends HTMLAttributes<HTMLElement> {}
+export interface FooterShellProps extends HTMLAttributes<HTMLElement> {}
 
 /**
- * Page footer. Renders a light-gray landmark with a 1064px content container
- * that stacks its section children (`FooterColumns`, `FooterLogos`, `FooterBottom`)
- * vertically, separating them with a 48px gap and a 1px divider.
+ * Bare footer landmark — a light-gray `<footer>` with the 1064px container,
+ * vertical stacking of section children, and 1px dividers between sections.
+ *
+ * Use this when you need a non-standard layout (e.g., custom signpost columns).
+ * For the standard NPI website footer (per-site links + Weby NPI + contact group
+ * + logos + bottom legal row), use `<Footer />` with the config props instead.
  */
-export const Footer = forwardRef<HTMLElement, FooterProps>(
+export const FooterShell = forwardRef<HTMLElement, FooterShellProps>(
 	({ className, children, ...props }, ref) => (
 		<footer
 			ref={ref}
@@ -24,7 +27,7 @@ export const Footer = forwardRef<HTMLElement, FooterProps>(
 		</footer>
 	),
 )
-Footer.displayName = 'Footer'
+FooterShell.displayName = 'FooterShell'
 
 export interface FooterColumnsProps extends HTMLAttributes<HTMLDivElement> {}
 
@@ -219,3 +222,210 @@ export const FooterBottom = forwardRef<HTMLDivElement, FooterBottomProps>(
 	),
 )
 FooterBottom.displayName = 'FooterBottom'
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Configured Footer — opinionated NPI website footer.
+//
+// Encodes the structural specification: 1 or 2 columns of website-headed links,
+// a "Weby NPI" column, a Kontakt + Sociální sítě column group, a row of logos,
+// and a legal/copyright bottom bar. Pass plain data; the component composes
+// `FooterShell` + the primitives below the hood.
+//
+// Use the primitives (`FooterShell`, `FooterColumns`, `FooterColumn`, …)
+// directly when you need a non-standard layout (e.g., extra signpost columns).
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface FooterColumnLinkItem {
+	/** Visible text. */
+	title: ReactNode
+	/** Link target. */
+	href: string
+	/** Which website-link column the row belongs to (0 = first, 1 = second). Ignored when `linkColumns === 'one'`. */
+	column?: 0 | 1
+}
+
+export interface FooterNpiSiteItem {
+	label: ReactNode
+	href: string
+}
+
+export interface FooterContactLinkItem {
+	/** Free-form text — e.g. "Datová schránka". */
+	title: ReactNode
+	href: string
+}
+
+export interface FooterContact {
+	/** Free-form rows (no icon) shown above email/phone/address. */
+	links?: FooterContactLinkItem[]
+	email?: string | null
+	phone?: string | null
+	/** Multi-line address; rendered with `whitespace-pre-line`. */
+	address?: string | null
+}
+
+export interface FooterSocialItem {
+	icon: IconName
+	/** Accessible label — typically the platform name. */
+	label: string
+	href: string
+}
+
+export interface FooterLogoItem {
+	src: string
+	alt: string
+	/** Optional click target — when omitted, the logo renders as a plain `<img>`. */
+	href?: string
+}
+
+export interface FooterBottomLinkItem {
+	title: ReactNode
+	href: string
+}
+
+export interface FooterProps extends Omit<HTMLAttributes<HTMLElement>, 'children'> {
+	/** Heading shown above the per-website link columns — typically the website's name. */
+	brandName: ReactNode
+	/** Whether per-website links span 1 or 2 columns. Defaults to `'one'`. */
+	linkColumns?: 'one' | 'two'
+	/** Per-website curated links. With `linkColumns === 'two'` items are split by `column`. */
+	links?: FooterColumnLinkItem[]
+	/** "Weby NPI" — links to other sites in the NPI network. Hidden when empty. */
+	npiSites?: FooterNpiSiteItem[]
+	/** Contact column content. */
+	contact?: FooterContact
+	/** Social-media row, shown next to the contact column. Hidden when empty. */
+	socials?: FooterSocialItem[]
+	/** Funder / partner logos. */
+	logos?: FooterLogoItem[]
+	/** Bottom-row legal links (Cookies, GDPR, …). */
+	bottomLinks?: FooterBottomLinkItem[]
+	/** Right-aligned copyright text on the bottom row. */
+	copyright?: ReactNode
+}
+
+export const Footer = forwardRef<HTMLElement, FooterProps>((props, ref) => {
+	const {
+		brandName,
+		linkColumns = 'one',
+		links = [],
+		npiSites = [],
+		contact,
+		socials = [],
+		logos = [],
+		bottomLinks = [],
+		copyright,
+		...rest
+	} = props
+
+	const showTwo = linkColumns === 'two'
+	const linksCol0 = links.filter(item => (item.column ?? 0) === 0)
+	const linksCol1 = showTwo ? links.filter(item => item.column === 1) : []
+	const hasContactRows = !!(contact?.links?.length || contact?.email || contact?.phone || contact?.address)
+
+	return (
+		<FooterShell ref={ref} {...rest}>
+			<FooterColumns>
+				<FooterColumn heading={brandName}>
+					{linksCol0.map((item, index) => (
+						<FooterLink key={index} href={item.href}>
+							{item.title}
+						</FooterLink>
+					))}
+				</FooterColumn>
+				{showTwo && (
+					<FooterColumn
+						heading={
+							<span aria-hidden="true" className="invisible">
+								{brandName}
+							</span>
+						}
+					>
+						{linksCol1.map((item, index) => (
+							<FooterLink key={index} href={item.href}>
+								{item.title}
+							</FooterLink>
+						))}
+					</FooterColumn>
+				)}
+				{npiSites.length > 0 && (
+					<FooterColumn heading="Weby NPI">
+						{npiSites.map((site, index) => (
+							<FooterLink key={index} href={site.href}>
+								{site.label}
+							</FooterLink>
+						))}
+					</FooterColumn>
+				)}
+				{(hasContactRows || socials.length > 0) && (
+					<FooterColumnGroup>
+						{hasContactRows && (
+							<FooterColumn heading="Kontakt">
+								{contact?.links?.map((item, index) => (
+									<FooterLink key={`free-${index}`} href={item.href}>
+										{item.title}
+									</FooterLink>
+								))}
+								{contact?.email && (
+									<FooterLink icon="dopis" href={`mailto:${contact.email}`}>
+										{contact.email}
+									</FooterLink>
+								)}
+								{contact?.phone && (
+									<FooterLink icon="telefon" href={`tel:${contact.phone.replace(/\s+/g, '')}`}>
+										{contact.phone}
+									</FooterLink>
+								)}
+								{contact?.address && (
+									<FooterLink icon="lokace" href="#">
+										<span className="whitespace-pre-line">{contact.address}</span>
+									</FooterLink>
+								)}
+							</FooterColumn>
+						)}
+						{socials.length > 0 && (
+							<FooterColumn heading="Sociální sítě">
+								<FooterSocials>
+									{socials.map((social, index) => <FooterSocial key={index} icon={social.icon} label={social.label} href={social.href} />)}
+								</FooterSocials>
+							</FooterColumn>
+						)}
+					</FooterColumnGroup>
+				)}
+			</FooterColumns>
+
+			{logos.length > 0 && (
+				<FooterLogos>
+					{logos.map((logo, index) => {
+						const img = (
+							<img
+								key={index}
+								src={logo.src}
+								alt={logo.alt}
+								className="h-npi-14 w-auto object-contain"
+							/>
+						)
+						return logo.href
+							? (
+								<a key={index} href={logo.href} className="inline-flex">
+									{img}
+								</a>
+							)
+							: img
+					})}
+				</FooterLogos>
+			)}
+
+			{(bottomLinks.length > 0 || copyright) && (
+				<FooterBottom copyright={copyright}>
+					{bottomLinks.map((item, index) => (
+						<FooterLink key={index} href={item.href}>
+							{item.title}
+						</FooterLink>
+					))}
+				</FooterBottom>
+			)}
+		</FooterShell>
+	)
+})
+Footer.displayName = 'Footer'
