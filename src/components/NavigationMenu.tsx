@@ -439,7 +439,10 @@ export const NavigationMenuItems = forwardRef<
 					// Full-width sticky bar at desktop: parent header dissolves via `npi-desktop:contents`,
 					// so this Root becomes a direct sibling of the page wrapper and `top-0` resolves against
 					// the actual viewport. White bg + z-index keep page content from showing through.
-					'relative flex w-full justify-center bg-npi-white max-npi-desktop:hidden npi-desktop:sticky npi-desktop:top-0 npi-desktop:z-30',
+					// The npi-shadow-s drop shadow lifts the bar off the page once it's stuck. The shadow is
+					// subtle (`0 2px 5px 0 #F0F0F0`) so it also reads cleanly when the bar sits in flow at
+					// the top of the page, separating it from the page content below.
+					'relative flex w-full justify-center bg-npi-white max-npi-desktop:hidden npi-desktop:sticky npi-desktop:top-0 npi-desktop:z-30 npi-desktop:shadow-npi-s',
 					className,
 				),
 			)}
