@@ -58,7 +58,8 @@ const toneRootClass: Record<BannerTone, string> = {
 //  - base (< @md / 448px): "S" — vertical stack, compact padding, h5 title
 //  - @md (≥ 448px):        "M" — horizontal, mid padding, h5 title
 //  - @4xl (≥ 896px):       "L" — horizontal, large padding/radius, h3 title
-const rootClass = '@container flex w-full flex-col overflow-hidden gap-npi-8 px-npi-6 pt-npi-10 pb-npi-6 rounded-npi-m '
+// `@container` lives on the wrapper, not the root, because CSS container queries can't self-reference.
+const rootClass = 'flex w-full flex-col overflow-hidden gap-npi-8 px-npi-6 pt-npi-10 pb-npi-6 rounded-npi-m '
 	+ '@md:flex-row @md:items-center @md:gap-npi-8 @md:p-npi-12 '
 	+ '@4xl:gap-npi-14 @4xl:px-npi-16 @4xl:py-npi-12 @4xl:rounded-npi-l'
 
@@ -131,53 +132,55 @@ export const Banner = forwardRef<HTMLElement, BannerProps>(({
 	const Root = asLink ? 'a' : 'article'
 
 	return (
-		<Root
-			ref={ref as React.Ref<HTMLElement & HTMLAnchorElement>}
-			className={twMerge(
-				clsx(
-					rootClass,
-					toneRootClass[tone],
-					asLink && 'cursor-pointer no-underline transition-shadow hover:shadow-npi-m',
-					className,
-				),
-			)}
-			{...(asLink ? { href } : {})}
-			{...props}
-		>
-			<div className="flex min-w-0 flex-1 flex-col gap-npi-6">
-				<div className="flex flex-col gap-npi-4">
-					{label && (
-						<Text variant="label" inverted={inverted}>
-							{label}
-						</Text>
-					)}
-					<h3 className={clsx(titleClass, inverted ? 'text-white' : 'text-npi-text-primary')}>
-						{title}
-					</h3>
-					{description && (
-						<Text variant="l" inverted={inverted}>
-							{description}
-						</Text>
+		<div className="@container w-full">
+			<Root
+				ref={ref as React.Ref<HTMLElement & HTMLAnchorElement>}
+				className={twMerge(
+					clsx(
+						rootClass,
+						toneRootClass[tone],
+						asLink && 'cursor-pointer no-underline transition-shadow hover:shadow-npi-m',
+						className,
+					),
+				)}
+				{...(asLink ? { href } : {})}
+				{...props}
+			>
+				<div className="flex min-w-0 flex-1 flex-col gap-npi-6">
+					<div className="flex flex-col gap-npi-4">
+						{label && (
+							<Text variant="label" inverted={inverted}>
+								{label}
+							</Text>
+						)}
+						<h3 className={clsx(titleClass, inverted ? 'text-white' : 'text-npi-text-primary')}>
+							{title}
+						</h3>
+						{description && (
+							<Text variant="l" inverted={inverted}>
+								{description}
+							</Text>
+						)}
+					</div>
+					{hasActions && (
+						<div className={actionsClass}>
+							{primaryAction && <BannerActionButton action={primaryAction} variant="primary" inverted={inverted} />}
+							{secondaryAction && <BannerActionButton action={secondaryAction} variant="secondary" inverted={inverted} />}
+						</div>
 					)}
 				</div>
-				{hasActions && (
-					<div className={actionsClass}>
-						{primaryAction && <BannerActionButton action={primaryAction} variant="primary" inverted={inverted} />}
-						{secondaryAction && <BannerActionButton action={secondaryAction} variant="secondary" inverted={inverted} />}
+				{!hideVisual && (
+					<div className={visualClass}>
+						{visual}
+						{indicator && (
+							<span className="absolute bottom-npi-2 right-npi-2 flex size-10 shrink-0 items-center justify-center rounded-full bg-npi-white p-npi-1 text-npi-blue">
+								<Icon name={indicatorIconMap[indicator]} className="size-6" />
+							</span>
+						)}
 					</div>
 				)}
-			</div>
-			{!hideVisual && (
-				<div className={visualClass}>
-					{visual}
-					{indicator && (
-						<span className="absolute bottom-npi-2 right-npi-2 flex size-10 shrink-0 items-center justify-center rounded-full bg-npi-white p-npi-1 text-npi-blue">
-							<Icon name={indicatorIconMap[indicator]} className="size-6" />
-						</span>
-					)}
-				</div>
-			)}
-		</Root>
+			</Root>
+		</div>
 	)
 })
 Banner.displayName = 'Banner'
