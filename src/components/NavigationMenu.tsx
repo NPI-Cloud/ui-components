@@ -415,6 +415,23 @@ export const NavigationMenuItems = forwardRef<
 >(({ className, children, ...props }, ref) => {
 	const insideDrawer = useContext(InsideDrawerContext)
 	const [widePortalEl, setWidePortalEl] = useState<HTMLDivElement | null>(null)
+	const [stuck, setStuck] = useState(false)
+	const sentinelRef = useRef<HTMLDivElement>(null)
+
+	// Drop the shadow only once the bar leaves its in-flow position and pins to the viewport top.
+	// A zero-height sentinel just before the bar is observed: when it leaves the viewport top, the
+	// bar is stuck. Works inside iframes too because IntersectionObserver uses the element's own
+	// document viewport by default.
+	useEffect(() => {
+		const sentinel = sentinelRef.current
+		if (!sentinel) return
+		const observer = new IntersectionObserver(
+			entries => setStuck(!entries[0]?.isIntersecting),
+			{ threshold: 0 },
+		)
+		observer.observe(sentinel)
+		return () => observer.disconnect()
+	}, [])
 
 	// Inside the drawer: render items as a tight vertical list. No Radix Root (no popovers), no
 	// horizontal max-width, no gap between rows — each row's own py + border-b handles spacing so
@@ -431,36 +448,40 @@ export const NavigationMenuItems = forwardRef<
 	}
 
 	return (
-		<RadixNavMenu.Root
-			ref={ref}
-			aria-label="Hlavní navigace"
-			className={twMerge(
-				clsx(
-					// Full-width sticky bar at desktop: parent header dissolves via `npi-desktop:contents`,
-					// so this Root becomes a direct sibling of the page wrapper and `top-0` resolves against
-					// the actual viewport. White bg + z-index keep page content from showing through.
-					// The npi-shadow-s drop shadow lifts the bar off the page once it's stuck. The shadow is
-					// subtle (`0 2px 5px 0 #F0F0F0`) so it also reads cleanly when the bar sits in flow at
-					// the top of the page, separating it from the page content below.
-					'relative flex w-full justify-center bg-npi-white max-npi-desktop:hidden npi-desktop:sticky npi-desktop:top-0 npi-desktop:z-30 npi-desktop:shadow-npi-s',
-					className,
-				),
-			)}
-			{...props}
-		>
-			<InsideItemsContext.Provider value={true}>
-				<WidePortalContext.Provider value={widePortalEl}>
-					<RadixNavMenu.List className="mx-auto flex w-full max-w-npi-layout items-center gap-npi-8 px-npi-6 pt-npi-2 pb-npi-6">
-						{children}
-					</RadixNavMenu.List>
-					{/* Wide-subnav portal target: spans full Root width, centered below the List. */}
-					<div
-						ref={setWidePortalEl}
-						className="pointer-events-none absolute left-0 right-0 top-full z-20 flex justify-center"
-					/>
-				</WidePortalContext.Provider>
-			</InsideItemsContext.Provider>
-		</RadixNavMenu.Root>
+		<>
+			<div ref={sentinelRef} aria-hidden className="max-npi-desktop:hidden h-0" />
+			<RadixNavMenu.Root
+				ref={ref}
+				aria-label="Hlavní navigace"
+				data-stuck={stuck ? '' : undefined}
+				className={twMerge(
+					clsx(
+						// Full-width sticky bar at desktop: parent header dissolves via `npi-desktop:contents`,
+						// so this Root becomes a direct sibling of the page wrapper and `top-0` resolves against
+						// the actual viewport. White bg + z-index keep page content from showing through.
+						// `data-[stuck]` toggles the drop shadow only once the bar pins to the viewport top
+						// (driven by an IntersectionObserver on the sentinel above). Dark, semi-transparent
+						// shadow so it stays visible above light AND dark page surfaces.
+						'relative flex w-full justify-center bg-npi-white max-npi-desktop:hidden npi-desktop:sticky npi-desktop:top-0 npi-desktop:z-30 npi-desktop:transition-shadow data-[stuck]:shadow-[0_2px_5px_0_rgba(0,0,0,0.12)]',
+						className,
+					),
+				)}
+				{...props}
+			>
+				<InsideItemsContext.Provider value={true}>
+					<WidePortalContext.Provider value={widePortalEl}>
+						<RadixNavMenu.List className="mx-auto flex w-full max-w-npi-layout items-center gap-npi-8 px-npi-6 pt-npi-2 pb-npi-6">
+							{children}
+						</RadixNavMenu.List>
+						{/* Wide-subnav portal target: spans full Root width, centered below the List. */}
+						<div
+							ref={setWidePortalEl}
+							className="pointer-events-none absolute left-0 right-0 top-full z-20 flex justify-center"
+						/>
+					</WidePortalContext.Provider>
+				</InsideItemsContext.Provider>
+			</RadixNavMenu.Root>
+		</>
 	)
 })
 NavigationMenuItems.displayName = 'NavigationMenuItems'
