@@ -102,12 +102,14 @@ export const NavigationMenu = forwardRef<HTMLElement, NavigationMenuProps>(
 					data-mobile-open={open ? '' : undefined}
 					className={twMerge(
 						clsx(
-							// `data-[mobile-open]` grows the header to viewport height so the absolutely-positioned drawer
-							// has room to render. Inside auto-sizing iframes (showcase) `100dvh` is circular with the
-							// iframe's scrollHeight, so we floor the min-height at 40rem (~typical mobile viewport).
-							// At desktop the whole nav sticks to the top of the viewport so the items bar stays
-							// visible while the user scrolls the page.
-							'relative flex flex-col font-npi-sans bg-npi-white data-[mobile-open]:min-h-[max(40rem,100dvh)] npi-desktop:sticky npi-desktop:top-0 npi-desktop:z-30',
+							// At mobile the header is a normal flex column with `bg-npi-white`; `data-[mobile-open]`
+							// grows it to viewport height so the absolutely-positioned drawer has room to render.
+							// Inside auto-sizing iframes (showcase) `100dvh` is circular with the iframe's scrollHeight,
+							// so we floor the min-height at 40rem (~typical mobile viewport).
+							// At desktop the header dissolves via `display: contents` so its children (site switcher,
+							// brand bar, items) become direct siblings of the page wrapper. That lets the items bar
+							// sticky-pin to the actual viewport while the bars above scroll away.
+							'relative flex flex-col font-npi-sans bg-npi-white data-[mobile-open]:min-h-[max(40rem,100dvh)] npi-desktop:contents',
 							className,
 						),
 					)}
@@ -222,14 +224,13 @@ export interface NavigationMenuBarProps extends HTMLAttributes<HTMLDivElement> {
 
 export const NavigationMenuBar = forwardRef<HTMLDivElement, NavigationMenuBarProps>(
 	({ className, children, ...props }, ref) => (
-		<div
-			ref={ref}
-			className={twMerge(
-				clsx('mx-auto flex h-24 w-full max-w-npi-layout items-center justify-between gap-npi-6 px-npi-6', className),
-			)}
-			{...props}
-		>
-			{children}
+		// Outer wrapper provides the full-bleed white backdrop so the bar still has its own background
+		// once the parent `<header>` dissolves at desktop (`npi-desktop:contents`). Inner div keeps the
+		// 1064 px content column with the existing layout.
+		<div ref={ref} className={twMerge(clsx('flex w-full justify-center bg-npi-white', className))} {...props}>
+			<div className="mx-auto flex h-24 w-full max-w-npi-layout items-center justify-between gap-npi-6 px-npi-6">
+				{children}
+			</div>
 		</div>
 	),
 )
@@ -434,13 +435,19 @@ export const NavigationMenuItems = forwardRef<
 			ref={ref}
 			aria-label="Hlavní navigace"
 			className={twMerge(
-				clsx('relative mx-auto flex w-full max-w-npi-layout justify-center px-npi-6 max-npi-desktop:hidden', className),
+				clsx(
+					// Full-width sticky bar at desktop: parent header dissolves via `npi-desktop:contents`,
+					// so this Root becomes a direct sibling of the page wrapper and `top-0` resolves against
+					// the actual viewport. White bg + z-index keep page content from showing through.
+					'relative flex w-full justify-center bg-npi-white max-npi-desktop:hidden npi-desktop:sticky npi-desktop:top-0 npi-desktop:z-30',
+					className,
+				),
 			)}
 			{...props}
 		>
 			<InsideItemsContext.Provider value={true}>
 				<WidePortalContext.Provider value={widePortalEl}>
-					<RadixNavMenu.List className="flex items-center gap-npi-8 pt-npi-2 pb-npi-6">
+					<RadixNavMenu.List className="mx-auto flex w-full max-w-npi-layout items-center gap-npi-8 px-npi-6 pt-npi-2 pb-npi-6">
 						{children}
 					</RadixNavMenu.List>
 					{/* Wide-subnav portal target: spans full Root width, centered below the List. */}
