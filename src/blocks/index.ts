@@ -1,4 +1,6 @@
 export { BlockColumns, type BlockColumnsMode, type BlockColumnsProps, type BlockColumnsRatio, blockColumnsRatios } from './BlockColumns'
+export { ButtonBlock, type ButtonBlockProps, type ButtonBlockVariant } from './ButtonBlock'
+export { CardBlock, type CardBlockProps } from './CardBlock'
 export { ColumnBlock } from './ColumnBlock'
 export { ContentImageBlock, type ContentImageBlockProps } from './ContentImageBlock'
 export { DynamicBlock, type DynamicBlockProps } from './DynamicBlock'
