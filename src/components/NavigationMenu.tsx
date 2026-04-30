@@ -12,6 +12,7 @@ import {
 	type ReactNode,
 	useContext,
 	useEffect,
+	useRef,
 	useState,
 } from 'react'
 import { createPortal } from 'react-dom'
@@ -69,27 +70,45 @@ export interface NavigationMenuProps extends HTMLAttributes<HTMLElement> {}
 export const NavigationMenu = forwardRef<HTMLElement, NavigationMenuProps>(
 	({ className, children, ...props }, ref) => {
 		const [open, setOpen] = useState(false)
+		const headerRef = useRef<HTMLElement>(null)
 		const mobile: MobileState = {
 			open,
 			toggle: () => setOpen(v => !v),
 			close: () => setOpen(false),
 		}
 		// Lock body scroll while the mobile drawer covers the viewport so the page behind it
-		// doesn't move when the user scrolls inside the drawer.
+		// doesn't move when the user scrolls inside the drawer. Use the document where the
+		// header is actually mounted so this works inside iframes (portaled previews) as well as
+		// in the host document.
 		useEffect(() => {
-			if (typeof document === 'undefined' || !open) return
-			const previous = document.body.style.overflow
-			document.body.style.overflow = 'hidden'
+			if (!open) return
+			const doc = headerRef.current?.ownerDocument
+			if (!doc) return
+			const previous = doc.body.style.overflow
+			doc.body.style.overflow = 'hidden'
 			return () => {
-				document.body.style.overflow = previous
+				doc.body.style.overflow = previous
 			}
 		}, [open])
+		const setRefs = (node: HTMLElement | null) => {
+			headerRef.current = node
+			if (typeof ref === 'function') ref(node)
+			else if (ref) ref.current = node
+		}
 		return (
 			<MobileContext.Provider value={mobile}>
 				<header
-					ref={ref}
+					ref={setRefs}
 					data-mobile-open={open ? '' : undefined}
-					className={twMerge(clsx('relative flex flex-col font-npi-sans bg-npi-white', className))}
+					className={twMerge(
+						clsx(
+							// `data-[mobile-open]` grows the header to viewport height so the absolutely-positioned drawer
+							// has room to render. Inside auto-sizing iframes (showcase) `100dvh` is circular with the
+							// iframe's scrollHeight, so we floor the min-height at 40rem (~typical mobile viewport).
+							'relative flex flex-col font-npi-sans bg-npi-white data-[mobile-open]:min-h-[max(40rem,100dvh)]',
+							className,
+						),
+					)}
 					{...props}
 				>
 					{children}
@@ -128,7 +147,10 @@ export const NavigationMenuSiteSwitcher = forwardRef<HTMLDivElement, NavigationM
 					ref={ref}
 					className={twMerge(
 						clsx(
-							'-mx-npi-6 -mb-npi-8 bg-npi-bg-dark px-npi-6 py-npi-6 text-[0.875rem] leading-[1.3] text-npi-white',
+							// `mt-auto` pushes the strip to the drawer's bottom — on a tall viewport an auto-margin
+							// gap above the strip absorbs the slack, on a short one it just sits after the items.
+							// `-mx-npi-6` reclaims the drawer's side padding so the dark surface spans edge to edge.
+							'-mx-npi-6 mt-auto bg-npi-bg-dark px-npi-6 py-npi-6 text-[0.875rem] leading-[1.3] text-npi-white',
 							className,
 						),
 					)}
@@ -352,10 +374,11 @@ export interface NavigationMenuDrawerProps extends HTMLAttributes<HTMLDivElement
 
 /**
  * Mobile drawer panel. Renders only below 1064px and only when the `NavigationMenuMobileToggle`
- * is toggled open. Anchored fixed below the 96px brand bar, fills the rest of the viewport, and
- * scrolls internally when the drawer's contents overflow. Children render as a vertical stack
- * with dividers — pass `NavigationMenuSearch`, `Button`, and `NavigationMenuItem`s (parents with
- * `NavigationSubnav` become accordion sections).
+ * is toggled open. Anchored absolutely below the 96px brand bar; the parent `NavigationMenu`
+ * stretches to `100dvh` while open so the drawer covers the full viewport and scrolls internally
+ * when the drawer's contents overflow. Children render as a vertical stack with dividers — pass
+ * `NavigationMenuSearch`, `Button`, and `NavigationMenuItem`s (parents with `NavigationSubnav`
+ * become accordion sections).
  */
 export const NavigationMenuDrawer = forwardRef<HTMLDivElement, NavigationMenuDrawerProps>(
 	({ className, children, ...props }, ref) => {
@@ -367,7 +390,7 @@ export const NavigationMenuDrawer = forwardRef<HTMLDivElement, NavigationMenuDra
 					ref={ref}
 					className={twMerge(
 						clsx(
-							'fixed inset-x-0 bottom-0 top-24 z-40 flex flex-col gap-npi-6 overflow-y-auto bg-npi-white px-npi-6 pt-npi-2 pb-npi-8 npi-desktop:hidden',
+							'absolute inset-x-0 bottom-0 top-24 z-40 flex flex-col gap-npi-6 overflow-y-auto bg-npi-white px-npi-6 pt-npi-2 npi-desktop:hidden',
 							className,
 						),
 					)}
