@@ -105,7 +105,9 @@ export const NavigationMenu = forwardRef<HTMLElement, NavigationMenuProps>(
 							// `data-[mobile-open]` grows the header to viewport height so the absolutely-positioned drawer
 							// has room to render. Inside auto-sizing iframes (showcase) `100dvh` is circular with the
 							// iframe's scrollHeight, so we floor the min-height at 40rem (~typical mobile viewport).
-							'relative flex flex-col font-npi-sans bg-npi-white data-[mobile-open]:min-h-[max(40rem,100dvh)]',
+							// At desktop the whole nav sticks to the top of the viewport so the items bar stays
+							// visible while the user scrolls the page.
+							'relative flex flex-col font-npi-sans bg-npi-white data-[mobile-open]:min-h-[max(40rem,100dvh)] npi-desktop:sticky npi-desktop:top-0 npi-desktop:z-30',
 							className,
 						),
 					)}
