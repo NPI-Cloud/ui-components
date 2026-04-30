@@ -14,7 +14,9 @@ export enum BlockType {
 	Dynamic = 'dynamic',
 }
 
-export type TextVariant = 'heading' | 'paragraph' | 'list'
+import type { TextSize, TextWeight } from './components/Text.js'
+
+export type TextVariant = TextSize
 
 export interface BaseBlockData {
 	id: string
@@ -34,6 +36,7 @@ export interface HeroBlockData extends BaseBlockData {
 export interface TextBlockData extends BaseBlockData {
 	type: BlockType.Text
 	textVariant: TextVariant
+	textWeight: TextWeight
 	content: string
 }
 
