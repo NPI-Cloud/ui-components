@@ -1,0 +1,51 @@
+import { Banner, type BannerIndicator, type BannerTone } from '../components/Banner'
+
+export type BannerBlockTone = BannerTone
+export type BannerBlockIndicator = BannerIndicator
+
+export interface BannerBlockProps {
+	title?: string | null
+	label?: string | null
+	description?: string | null
+	tone?: BannerBlockTone | null
+	indicator?: BannerBlockIndicator | null
+	imageUrl?: string | null
+	imageAlt?: string | null
+	ctaLabel?: string | null
+	ctaUrl?: string | null
+	secondaryCtaLabel?: string | null
+	secondaryCtaUrl?: string | null
+}
+
+export function BannerBlock({
+	title,
+	label,
+	description,
+	tone,
+	indicator,
+	imageUrl,
+	imageAlt,
+	ctaLabel,
+	ctaUrl,
+	secondaryCtaLabel,
+	secondaryCtaUrl,
+}: BannerBlockProps) {
+	const visual = imageUrl
+		? <img src={imageUrl} alt={imageAlt ?? ''} className="absolute inset-0 size-full object-cover" />
+		: undefined
+	const primaryAction = ctaLabel ? { label: ctaLabel, href: ctaUrl ?? undefined } : undefined
+	const secondaryAction = secondaryCtaLabel ? { label: secondaryCtaLabel, href: secondaryCtaUrl ?? undefined } : undefined
+	return (
+		<Banner
+			tone={tone ?? 'light'}
+			label={label ?? undefined}
+			title={title || 'Nadpis banneru'}
+			description={description ?? undefined}
+			visual={visual}
+			hideVisual={!imageUrl}
+			indicator={indicator ?? undefined}
+			primaryAction={primaryAction}
+			secondaryAction={secondaryAction}
+		/>
+	)
+}
