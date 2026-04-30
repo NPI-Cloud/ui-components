@@ -68,10 +68,11 @@ export interface CardProps extends Omit<React.HTMLAttributes<HTMLElement>, 'titl
 	children?: React.ReactNode
 }
 
-// @container makes the Card responsive to its own width.
+// The wrapper carries `@container` so the article (a descendant) can query its own width.
+// CSS container queries can't self-reference: an element with `container-type` is queryable only by descendants.
 // @md (≥28rem / 448px) → horizontal layout (M)
 // @4xl (≥56rem / 896px) → wider visual (L)
-const rootClass = 'group relative @container flex w-full flex-col overflow-hidden rounded-npi-s bg-npi-white transition-shadow @md:flex-row'
+const rootClass = 'group relative flex w-full flex-col overflow-hidden rounded-npi-s bg-npi-white transition-shadow @md:flex-row'
 const rootShadowClass = 'shadow-npi-m hover:shadow-npi-m-hover'
 
 // Bumps the title to L-size typography (Bitter Regular 28px / level-4 spec) when the card is at @4xl width.
@@ -96,88 +97,90 @@ export const Card = forwardRef<HTMLElement, CardProps>(({
 	...props
 }, ref) => {
 	return (
-		<article
-			ref={ref}
-			className={twMerge(
-				clsx(
-					rootClass,
-					!inverted && rootShadowClass,
-					href && 'cursor-pointer',
-					className,
-				),
-			)}
-			{...props}
-		>
-			{!hideVisual && (
-				aspect === 'line'
-					? <div aria-hidden className="h-2 w-full shrink-0 bg-npi-blue @md:h-auto @md:w-2 @md:self-stretch" />
-					: (
-						<div
-							className={clsx(
-								'relative flex items-end justify-end bg-npi-blue-dark p-npi-2',
-								// Narrow (S): full-width with caller-provided aspect, no inner radius (clipped by overflow-hidden)
-								'w-full',
-								aspectClassMap[aspect],
-								// @md (M): fixed 200×267 visual on the left, 4px inner radius (designer note 12:246)
-								'@md:w-npi-50 @md:shrink-0 @md:aspect-[3/4] @md:rounded-npi-xxs',
-								// @4xl (L): wider 400px / 16:9 visual, same 4px inner radius (12:247)
-								'@4xl:w-[400px] @4xl:aspect-[16/9]',
-							)}
-						>
-							{visual}
-							{indicator && (
-								<span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-npi-white p-npi-1 text-npi-blue">
-									<Icon name={indicatorIconMap[indicator]} className="size-6" />
-								</span>
-							)}
-						</div>
-					)
-			)}
-			<div className="flex w-full flex-col items-start gap-npi-4 px-npi-6 pt-npi-6 pb-npi-8 @md:flex-1 @md:p-npi-8">
-				{label && <Text variant="label">{label}</Text>}
-				<Heading level={5} className={clsx(titleClass, href && titleHoverClass)}>
-					{href
-						? (
-							<a
-								href={href}
-								className='text-inherit no-underline outline-none focus-visible:ring-4 focus-visible:ring-npi-blue-light rounded-npi-xxs before:absolute before:inset-0 before:content-[""]'
+		<div className="@container w-full">
+			<article
+				ref={ref}
+				className={twMerge(
+					clsx(
+						rootClass,
+						!inverted && rootShadowClass,
+						href && 'cursor-pointer',
+						className,
+					),
+				)}
+				{...props}
+			>
+				{!hideVisual && (
+					aspect === 'line'
+						? <div aria-hidden className="h-2 w-full shrink-0 bg-npi-blue @md:h-auto @md:w-2 @md:self-stretch" />
+						: (
+							<div
+								className={clsx(
+									'relative flex items-end justify-end bg-npi-blue-dark p-npi-2',
+									// Narrow (S): full-width with caller-provided aspect, no inner radius (clipped by overflow-hidden)
+									'w-full',
+									aspectClassMap[aspect],
+									// @md (M): fixed 200×267 visual on the left, 4px inner radius (designer note 12:246)
+									'@md:w-npi-50 @md:shrink-0 @md:aspect-[3/4] @md:rounded-npi-xxs',
+									// @4xl (L): wider 400px / 16:9 visual, same 4px inner radius (12:247)
+									'@4xl:w-[400px] @4xl:aspect-[16/9]',
+								)}
 							>
-								{title}
-							</a>
+								{visual}
+								{indicator && (
+									<span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-npi-white p-npi-1 text-npi-blue">
+										<Icon name={indicatorIconMap[indicator]} className="size-6" />
+									</span>
+								)}
+							</div>
 						)
-						: title}
-				</Heading>
-				{meta && meta.length > 0 && (
-					<div className="flex w-full items-center gap-2.5">
-						{meta.map((item, i) => (
-							<Fragment key={i}>
-								{i > 0 && <span aria-hidden className="block size-1.5 shrink-0 rounded-full bg-npi-gray-300" />}
-								<Text variant="l" secondary className="whitespace-nowrap">
-									{item}
-								</Text>
-							</Fragment>
-						))}
-					</div>
 				)}
-				{description && <Text variant="l">{description}</Text>}
-				{tag && (
-					<div className="relative z-10">
-						<Tag size="S" label={tag.label} href={tag.href} />
-					</div>
-				)}
-				{cta && (
-					<div className="relative z-10">
-						<Button
-							variant="tertiary"
-							label={cta.label}
-							iconBefore={cta.iconBefore ?? 'stahnout'}
-							href={cta.href}
-						/>
-					</div>
-				)}
-				{children}
-			</div>
-		</article>
+				<div className="flex w-full flex-col items-start gap-npi-4 px-npi-6 pt-npi-6 pb-npi-8 @md:flex-1 @md:p-npi-8">
+					{label && <Text variant="label">{label}</Text>}
+					<Heading level={5} className={clsx(titleClass, href && titleHoverClass)}>
+						{href
+							? (
+								<a
+									href={href}
+									className='text-inherit no-underline outline-none focus-visible:ring-4 focus-visible:ring-npi-blue-light rounded-npi-xxs before:absolute before:inset-0 before:content-[""]'
+								>
+									{title}
+								</a>
+							)
+							: title}
+					</Heading>
+					{meta && meta.length > 0 && (
+						<div className="flex w-full items-center gap-2.5">
+							{meta.map((item, i) => (
+								<Fragment key={i}>
+									{i > 0 && <span aria-hidden className="block size-1.5 shrink-0 rounded-full bg-npi-gray-300" />}
+									<Text variant="l" secondary className="whitespace-nowrap">
+										{item}
+									</Text>
+								</Fragment>
+							))}
+						</div>
+					)}
+					{description && <Text variant="l">{description}</Text>}
+					{tag && (
+						<div className="relative z-10">
+							<Tag size="S" label={tag.label} href={tag.href} />
+						</div>
+					)}
+					{cta && (
+						<div className="relative z-10">
+							<Button
+								variant="tertiary"
+								label={cta.label}
+								iconBefore={cta.iconBefore ?? 'stahnout'}
+								href={cta.href}
+							/>
+						</div>
+					)}
+					{children}
+				</div>
+			</article>
+		</div>
 	)
 })
 Card.displayName = 'Card'
