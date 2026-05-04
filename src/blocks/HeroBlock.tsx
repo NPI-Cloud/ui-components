@@ -2,7 +2,7 @@ import { clsx } from 'clsx'
 import { Heading } from '../components/Heading'
 import { Text } from '../components/Text'
 
-export const heroSizes = ['homepage-1-1', 'homepage-7-5', 'subpage-2-1', 'subpage-1-1'] as const
+export const heroSizes = ['homepage11', 'homepage75', 'subpage21', 'subpage11'] as const
 export type HeroSize = (typeof heroSizes)[number]
 
 export interface HeroBlockProps {
@@ -18,11 +18,11 @@ export interface HeroBlockProps {
 	secondaryCtaLabel?: string | null
 	/** Optional secondary CTA URL */
 	secondaryCtaUrl?: string | null
-	/** Visual image URL shown on the right (stacks below on mobile) */
-	imageUrl?: string | null
+	/** Image relation as it comes from Contember (manyHasOne Image) */
+	image?: { url?: string | null } | null
 	imageAlt?: string | null
-	/** Layout variant — controls content/visual width split and visual aspect ratio */
-	size?: HeroSize
+	/** Layout variant — controls content/visual width split and visual aspect ratio. Schema enum values. */
+	heroSize?: HeroSize | null
 }
 
 const baseCta =
@@ -32,13 +32,13 @@ const secondaryCtaClass = `${baseCta} bg-transparent border border-npi-blue text
 
 const sizeConfig: Record<HeroSize, { gridCols: string; visualAspect: string }> = {
 	// 50/50 split, 4:3 visual — homepage default
-	'homepage-1-1': { gridCols: '@npi-tablet:grid-cols-2', visualAspect: 'aspect-[4/3]' },
+	homepage11: { gridCols: '@npi-tablet:grid-cols-2', visualAspect: 'aspect-[4/3]' },
 	// ~59/41 split, 4:3 visual — wider content for homepage with longer copy
-	'homepage-7-5': { gridCols: '@npi-tablet:grid-cols-[59fr_41fr]', visualAspect: 'aspect-[4/3]' },
+	homepage75: { gridCols: '@npi-tablet:grid-cols-[59fr_41fr]', visualAspect: 'aspect-[4/3]' },
 	// ~68/32 split, 4:3 visual — content-heavy subpage hero
-	'subpage-2-1': { gridCols: '@npi-tablet:grid-cols-[68fr_32fr]', visualAspect: 'aspect-[4/3]' },
+	subpage21: { gridCols: '@npi-tablet:grid-cols-[68fr_32fr]', visualAspect: 'aspect-[4/3]' },
 	// 50/50 split, 16:9 visual — compact subpage hero
-	'subpage-1-1': { gridCols: '@npi-tablet:grid-cols-2', visualAspect: 'aspect-[16/9]' },
+	subpage11: { gridCols: '@npi-tablet:grid-cols-2', visualAspect: 'aspect-[16/9]' },
 }
 
 export function HeroBlock({
@@ -48,12 +48,13 @@ export function HeroBlock({
 	ctaUrl,
 	secondaryCtaLabel,
 	secondaryCtaUrl,
-	imageUrl,
+	image,
 	imageAlt,
-	size = 'homepage-1-1',
+	heroSize,
 }: HeroBlockProps) {
 	const hasCta = ctaLabel || secondaryCtaLabel
-	const config = sizeConfig[size]
+	const config = sizeConfig[heroSize ?? 'homepage11']
+	const imageUrl = image?.url
 
 	return (
 		<section className={clsx('grid grid-cols-1 items-center gap-npi-8 @npi-tablet:gap-npi-10', config.gridCols)}>
