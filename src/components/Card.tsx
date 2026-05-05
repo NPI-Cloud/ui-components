@@ -40,8 +40,8 @@ export interface CardCta extends CardLink {
 }
 
 export interface CardProps extends Omit<React.HTMLAttributes<HTMLElement>, 'title'> {
-	/** Main heading */
-	title: string
+	/** Main heading. Required unless `visualOnly` is true. */
+	title?: string
 	/** Small caps label shown above the title */
 	label?: string
 	/** Meta info shown below the title, separated by bullets */
@@ -60,6 +60,12 @@ export interface CardProps extends Omit<React.HTMLAttributes<HTMLElement>, 'titl
 	href?: string
 	/** Drop the light drop-shadow for placement on dark backgrounds */
 	inverted?: boolean
+	/**
+	 * Render only the visual (no text content). Used in 3-or-4-per-row gallery grids
+	 * where the title/meta are baked into the artwork (e.g. podcast covers).
+	 * `title` is used as the link's accessible label when `href` is set.
+	 */
+	visualOnly?: boolean
 	/** Optional clickable tag rendered after the description (independent click target) */
 	tag?: CardLink
 	/** Optional tertiary CTA / download rendered at the bottom (independent click target) */
@@ -86,17 +92,56 @@ export const Card = forwardRef<HTMLElement, CardProps>(({
 	meta,
 	description,
 	visual,
-	aspect = '16/9',
+	aspect,
 	hideVisual = false,
 	indicator,
 	href,
 	inverted = false,
+	visualOnly = false,
 	tag,
 	cta,
 	children,
 	className,
 	...props
 }, ref) => {
+	// Visual-only cards default to square (Figma "karty jen s vizuálem" / 12:184) since text is baked
+	// into the artwork; standard cards default to 16:9.
+	const resolvedAspect: CardAspect = aspect ?? (visualOnly ? '1/1' : '16/9')
+
+	if (visualOnly) {
+		const visualAspect: Exclude<CardAspect, 'line'> = resolvedAspect === 'line' ? '1/1' : resolvedAspect
+		return (
+			<article
+				ref={ref}
+				className={twMerge(
+					clsx(
+						'group relative block w-full overflow-hidden rounded-npi-s bg-npi-white transition-shadow',
+						!inverted && rootShadowClass,
+						href && 'cursor-pointer',
+						className,
+					),
+				)}
+				{...props}
+			>
+				<div className={clsx('relative flex items-end justify-end bg-npi-blue-dark p-npi-2', aspectClassMap[visualAspect])}>
+					{visual}
+					{indicator && (
+						<span className="relative z-10 flex size-10 shrink-0 items-center justify-center rounded-full bg-npi-white p-npi-1 text-npi-blue">
+							<Icon name={indicatorIconMap[indicator]} className="size-6" />
+						</span>
+					)}
+					{href && (
+						<a
+							href={href}
+							aria-label={title}
+							className="absolute inset-0 outline-none focus-visible:ring-4 focus-visible:ring-npi-blue-light"
+						/>
+					)}
+				</div>
+			</article>
+		)
+	}
+
 	return (
 		<div className="@container w-full">
 			<article
@@ -112,7 +157,7 @@ export const Card = forwardRef<HTMLElement, CardProps>(({
 				{...props}
 			>
 				{!hideVisual && (
-					aspect === 'line'
+					resolvedAspect === 'line'
 						? <div aria-hidden className="h-2 w-full shrink-0 bg-npi-blue @md:h-auto @md:w-2 @md:self-stretch" />
 						: (
 							<div
@@ -120,7 +165,7 @@ export const Card = forwardRef<HTMLElement, CardProps>(({
 									'relative flex items-end justify-end bg-npi-blue-dark p-npi-2',
 									// Narrow (S): full-width with caller-provided aspect, no inner radius (clipped by overflow-hidden)
 									'w-full',
-									aspectClassMap[aspect],
+									aspectClassMap[resolvedAspect],
 									// @md (M): 200px-wide visual on the left, 4px inner radius (designer note 12:246 — "volitelný poměr" = aspect kept configurable)
 									'@md:w-npi-50 @md:shrink-0 @md:rounded-npi-xxs',
 									// @4xl (L): wider 400px visual with bigger indicator inset (designer note 12:247 — also "volitelný poměr")
