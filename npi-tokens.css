@@ -97,10 +97,12 @@
 		--npi-radius-l: 32px;
 		--npi-radius-xl: 40px;
 
-		/* NPI Shadows */
-		--npi-shadow-s: 0 2px 5px 0 #F0F0F0;
-		--npi-shadow-s-hover: 0 2px 10px 0 #F0F0F0;
-		--npi-shadow-m: 0 20px 45px 0 #F0F0F0;
-		--npi-shadow-m-hover: 0 20px 50px 0 #E0E0E0;
+		/* NPI Shadows — neutral semi-transparent black so the drop renders correctly on both light
+		 * and dark surfaces. Previous #F0F0F0 worked on white but read as a white halo on dark
+		 * backgrounds (e.g. shadow extending onto a dark-blue visual-only card neighbour). */
+		--npi-shadow-s: 0 2px 5px 0 rgba(0, 0, 0, 0.04);
+		--npi-shadow-s-hover: 0 2px 10px 0 rgba(0, 0, 0, 0.06);
+		--npi-shadow-m: 0 20px 45px 0 rgba(0, 0, 0, 0.06);
+		--npi-shadow-m-hover: 0 20px 50px 0 rgba(0, 0, 0, 0.1);
 	}
 }
