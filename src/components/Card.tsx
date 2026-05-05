@@ -128,7 +128,7 @@ export const Card = forwardRef<HTMLElement, CardProps>(({
 							>
 								{visual}
 								{indicator && (
-									<span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-npi-white p-npi-1 text-npi-blue">
+									<span className="relative z-10 flex size-10 shrink-0 items-center justify-center rounded-full bg-npi-white p-npi-1 text-npi-blue">
 										<Icon name={indicatorIconMap[indicator]} className="size-6" />
 									</span>
 								)}
