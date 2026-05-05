@@ -70,9 +70,10 @@ export interface CardProps extends Omit<React.HTMLAttributes<HTMLElement>, 'titl
 
 // The wrapper carries `@container` so the article (a descendant) can query its own width.
 // CSS container queries can't self-reference: an element with `container-type` is queryable only by descendants.
-// @md (≥28rem / 448px) → horizontal layout (M)
-// @4xl (≥56rem / 896px) → wider visual (L)
-const rootClass = 'group relative flex w-full flex-col overflow-hidden rounded-npi-s bg-npi-white transition-shadow @md:flex-row'
+// @md (≥28rem / 448px) → horizontal layout (M) with 32px outer padding + 32px gap (designer note 12:246)
+// @4xl (≥56rem / 896px) → wider visual (L), same 32px outer padding + 32px gap (designer note 12:247)
+const rootClass =
+	'group relative flex w-full flex-col overflow-hidden rounded-npi-s bg-npi-white transition-shadow @md:flex-row @md:gap-npi-8 @md:p-npi-8'
 const rootShadowClass = 'shadow-npi-m hover:shadow-npi-m-hover'
 
 // Bumps the title to L-size typography (Bitter Regular 28px / level-4 spec) when the card is at @4xl width.
@@ -120,10 +121,10 @@ export const Card = forwardRef<HTMLElement, CardProps>(({
 									// Narrow (S): full-width with caller-provided aspect, no inner radius (clipped by overflow-hidden)
 									'w-full',
 									aspectClassMap[aspect],
-									// @md (M): fixed 200×267 visual on the left, 4px inner radius (designer note 12:246)
-									'@md:w-npi-50 @md:shrink-0 @md:aspect-[3/4] @md:rounded-npi-xxs',
-									// @4xl (L): wider 400px / 16:9 visual, same 4px inner radius (12:247)
-									'@4xl:w-[400px] @4xl:aspect-[16/9]',
+									// @md (M): 200px-wide visual on the left, 4px inner radius (designer note 12:246 — "volitelný poměr" = aspect kept configurable)
+									'@md:w-npi-50 @md:shrink-0 @md:rounded-npi-xxs',
+									// @4xl (L): wider 400px visual with bigger indicator inset (designer note 12:247 — also "volitelný poměr")
+									'@4xl:w-[400px] @4xl:p-npi-4',
 								)}
 							>
 								{visual}
@@ -135,7 +136,7 @@ export const Card = forwardRef<HTMLElement, CardProps>(({
 							</div>
 						)
 				)}
-				<div className="flex w-full flex-col items-start gap-npi-4 px-npi-6 pt-npi-6 pb-npi-8 @md:flex-1 @md:p-npi-8">
+				<div className="flex w-full flex-col items-start gap-npi-4 px-npi-6 pt-npi-6 pb-npi-8 @md:flex-1 @md:p-0">
 					{label && <Text variant="label">{label}</Text>}
 					<Heading level={5} className={clsx(titleClass, href && titleHoverClass)}>
 						{href
