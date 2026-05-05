@@ -115,7 +115,8 @@ export const Card = forwardRef<HTMLElement, CardProps>(({
 				ref={ref}
 				className={twMerge(
 					clsx(
-						'group relative block w-full overflow-hidden rounded-npi-s bg-npi-white transition-shadow',
+						// Capped at 1/3 of the layout (npi-layout = 1064px → ~354px) so the card sits naturally in a 3-per-row grid.
+						'group relative block w-full max-w-[calc(var(--container-npi-layout)/3)] overflow-hidden rounded-npi-s bg-npi-white transition-shadow',
 						!inverted && rootShadowClass,
 						href && 'cursor-pointer',
 						className,
