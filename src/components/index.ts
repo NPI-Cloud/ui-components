@@ -46,6 +46,7 @@ export {
 	type FooterSocialsProps,
 } from './Footer'
 export { Heading, type HeadingLevel, headingLevels, type HeadingProps, type HeadingSpec, headingSpecs } from './Heading'
+export { Input, type InputProps } from './Input'
 export {
 	Navigation,
 	type NavigationBrand,
