@@ -110,6 +110,19 @@ export {
 	navigationSubnavVariants,
 } from './NavigationMenu'
 export { Pagination, type PaginationProps, type PaginationVariant, paginationVariants } from './Pagination'
+export {
+	ContactCard,
+	type ContactCardProps,
+	ProfileCard,
+	type ProfileCardOrientation,
+	profileCardOrientations,
+	type ProfileCardProps,
+	type ProfileCardSize,
+	profileCardSizes,
+	type ProfileCardSocial,
+	type ProfileCardSocialPlatform,
+	profileCardSocialPlatforms,
+} from './ProfileCard'
 export { type ProgressStep, ProgressSteps, type ProgressStepsProps, type ProgressStepStatus, progressStepStatuses } from './ProgressSteps'
 export { Radio, type RadioProps } from './Radio'
 export { Rating, type RatingProps } from './Rating'
