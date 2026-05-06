@@ -130,6 +130,7 @@ export { Scrollbar, type ScrollbarDirection, scrollbarDirections, type Scrollbar
 export { Select, type SelectOption, type SelectProps } from './Select'
 export { Slider, type SliderProps, type SliderSize, sliderSizes } from './Slider'
 export { StatusIndicator, type StatusIndicatorProps, type StatusIndicatorTone, statusIndicatorTones } from './StatusIndicator'
+export { StickyBar, type StickyBarPosition, stickyBarPositions, type StickyBarProps, type StickyBarTone, stickyBarTones } from './StickyBar'
 export { Switch, type SwitchProps } from './Switch'
 export { Tab, type TabProps, type TabSize, tabSizes, type TabVariant, tabVariants } from './Tab'
 export { Tag, type TagProps, type TagSize, tagSizes } from './Tag'
