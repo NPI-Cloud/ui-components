@@ -57,6 +57,7 @@ export {
 } from './Footer'
 export { Heading, type HeadingLevel, headingLevels, type HeadingProps, type HeadingSpec, headingSpecs } from './Heading'
 export { Input, type InputProps } from './Input'
+export { Modal, type ModalProps } from './Modal'
 export {
 	Navigation,
 	type NavigationBrand,
