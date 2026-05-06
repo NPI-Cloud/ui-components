@@ -17,6 +17,14 @@ export { Carousel, type CarouselProps } from './Carousel'
 export { CarouselControls, type CarouselControlsProps } from './CarouselControls'
 export { Checkbox, type CheckboxProps, type CheckboxSize, checkboxSizes } from './Checkbox'
 export {
+	type DateRange,
+	DateTimePicker,
+	type DateTimePickerMode,
+	dateTimePickerModes,
+	type DateTimePickerProps,
+	type DateTimePickerValue,
+} from './DateTimePicker'
+export {
 	Footer,
 	FooterBottom,
 	type FooterBottomLinkItem,
