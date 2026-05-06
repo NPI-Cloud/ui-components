@@ -108,6 +108,7 @@ export {
 	type NavigationSubnavVariant,
 	navigationSubnavVariants,
 } from './NavigationMenu'
+export { Pagination, type PaginationProps, type PaginationVariant, paginationVariants } from './Pagination'
 export { Radio, type RadioProps } from './Radio'
 export { Select, type SelectOption, type SelectProps } from './Select'
 export { StatusIndicator, type StatusIndicatorProps, type StatusIndicatorTone, statusIndicatorTones } from './StatusIndicator'
