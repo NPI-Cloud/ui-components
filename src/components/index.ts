@@ -101,6 +101,7 @@ export {
 	navigationSubnavVariants,
 } from './NavigationMenu'
 export { Radio, type RadioProps } from './Radio'
+export { Select, type SelectOption, type SelectProps } from './Select'
 export { StatusIndicator, type StatusIndicatorProps, type StatusIndicatorTone, statusIndicatorTones } from './StatusIndicator'
 export { Switch, type SwitchProps } from './Switch'
 export { Tab, type TabProps, type TabSize, tabSizes, type TabVariant, tabVariants } from './Tab'
