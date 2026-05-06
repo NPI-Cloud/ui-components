@@ -156,6 +156,26 @@ export { StatusIndicator, type StatusIndicatorProps, type StatusIndicatorTone, s
 export { StickyBar, type StickyBarPosition, stickyBarPositions, type StickyBarProps, type StickyBarTone, stickyBarTones } from './StickyBar'
 export { Switch, type SwitchProps } from './Switch'
 export { Tab, type TabProps, type TabSize, tabSizes, type TabVariant, tabVariants } from './Tab'
+export {
+	Table,
+	type TableAlign,
+	tableAligns,
+	TableBody,
+	type TableBodyProps,
+	TableCell,
+	type TableCellProps,
+	tableDensities,
+	type TableDensity,
+	TableHead,
+	TableHeader,
+	type TableHeaderProps,
+	type TableHeadProps,
+	type TableProps,
+	TableRow,
+	type TableRowProps,
+	type TableSortDirection,
+	tableSortDirections,
+} from './Table'
 export { Tag, type TagProps, type TagSize, tagSizes } from './Tag'
 export { Testimonial, type TestimonialProps, type TestimonialSize, testimonialSizes } from './Testimonial'
 export { Text, type TextProps, type TextSize, type TextSpec, textSpecs, textVariants, type TextWeight, textWeights } from './Text'
