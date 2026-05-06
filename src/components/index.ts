@@ -59,6 +59,17 @@ export {
 export { Heading, type HeadingLevel, headingLevels, type HeadingProps, type HeadingSpec, headingSpecs } from './Heading'
 export { Input, type InputProps } from './Input'
 export { Lightbox, type LightboxImage, type LightboxProps } from './Lightbox'
+export {
+	Map,
+	MAP_VIEWBOX_HEIGHT,
+	MAP_VIEWBOX_WIDTH,
+	type MapProps,
+	type MapRegionCode,
+	mapRegionCodes,
+	type MapRegionDef,
+	mapRegions,
+	type MapValue,
+} from './Map'
 export { Modal, type ModalProps } from './Modal'
 export {
 	Navigation,
