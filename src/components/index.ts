@@ -70,6 +70,14 @@ export {
 	mapRegions,
 	type MapValue,
 } from './Map'
+export {
+	MapAddress,
+	type MapAddressLocation,
+	type MapAddressOrientation,
+	mapAddressOrientations,
+	type MapAddressPhone,
+	type MapAddressProps,
+} from './MapAddress'
 export { Modal, type ModalProps } from './Modal'
 export {
 	Navigation,
