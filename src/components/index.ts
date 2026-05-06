@@ -139,5 +139,6 @@ export { Tab, type TabProps, type TabSize, tabSizes, type TabVariant, tabVariant
 export { Tag, type TagProps, type TagSize, tagSizes } from './Tag'
 export { Testimonial, type TestimonialProps, type TestimonialSize, testimonialSizes } from './Testimonial'
 export { Text, type TextProps, type TextSize, type TextSpec, textSpecs, textVariants, type TextWeight, textWeights } from './Text'
+export { Toast, type ToastProps, type ToastTone, toastTones } from './Toast'
 export { Tooltip, type TooltipPlacement, tooltipPlacements, type TooltipProps } from './Tooltip'
 export { UploadDropzone, type UploadDropzoneProps } from './UploadDropzone'
