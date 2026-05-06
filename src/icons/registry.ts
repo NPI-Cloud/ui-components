@@ -16,6 +16,7 @@ import { FiltrM, FiltrS } from './Filtr'
 import { FotoaparatM, FotoaparatS } from './Fotoaparat'
 import { GaleryM, GaleryS } from './Galery'
 import { HvezdaM, HvezdaS } from './Hvezda'
+import { HvezdaFillM, HvezdaFillS } from './HvezdaFill'
 import { InfoM, InfoS } from './Info'
 import { InstagramM, InstagramS } from './Instagram'
 import { KalendarM, KalendarS } from './Kalendar'
@@ -118,6 +119,7 @@ export const iconRegistryM = {
 	fotoaparat: FotoaparatM,
 	galery: GaleryM,
 	hvezda: HvezdaM,
+	hvezdaFill: HvezdaFillM,
 	info: InfoM,
 	instagram: InstagramM,
 	kalendar: KalendarM,
@@ -219,6 +221,7 @@ export const iconRegistryS = {
 	fotoaparat: FotoaparatS,
 	galery: GaleryS,
 	hvezda: HvezdaS,
+	hvezdaFill: HvezdaFillS,
 	info: InfoS,
 	instagram: InstagramS,
 	kalendar: KalendarS,

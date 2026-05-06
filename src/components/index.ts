@@ -112,6 +112,7 @@ export {
 export { Pagination, type PaginationProps, type PaginationVariant, paginationVariants } from './Pagination'
 export { type ProgressStep, ProgressSteps, type ProgressStepsProps, type ProgressStepStatus, progressStepStatuses } from './ProgressSteps'
 export { Radio, type RadioProps } from './Radio'
+export { Rating, type RatingProps } from './Rating'
 export { Select, type SelectOption, type SelectProps } from './Select'
 export { StatusIndicator, type StatusIndicatorProps, type StatusIndicatorTone, statusIndicatorTones } from './StatusIndicator'
 export { Switch, type SwitchProps } from './Switch'
