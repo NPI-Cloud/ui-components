@@ -16,6 +16,7 @@ export { Card, type CardAspect, cardAspects, type CardIndicator, cardIndicators,
 export { Carousel, type CarouselProps } from './Carousel'
 export { CarouselControls, type CarouselControlsProps } from './CarouselControls'
 export { Checkbox, type CheckboxProps, type CheckboxSize, checkboxSizes } from './Checkbox'
+export { Counter, type CounterProps } from './Counter'
 export {
 	type DateRange,
 	DateTimePicker,
