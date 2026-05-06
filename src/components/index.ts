@@ -133,5 +133,6 @@ export { StatusIndicator, type StatusIndicatorProps, type StatusIndicatorTone, s
 export { Switch, type SwitchProps } from './Switch'
 export { Tab, type TabProps, type TabSize, tabSizes, type TabVariant, tabVariants } from './Tab'
 export { Tag, type TagProps, type TagSize, tagSizes } from './Tag'
+export { Testimonial, type TestimonialProps, type TestimonialSize, testimonialSizes } from './Testimonial'
 export { Text, type TextProps, type TextSize, type TextSpec, textSpecs, textVariants, type TextWeight, textWeights } from './Text'
 export { Tooltip, type TooltipPlacement, tooltipPlacements, type TooltipProps } from './Tooltip'
