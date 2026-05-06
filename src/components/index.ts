@@ -114,6 +114,7 @@ export { type ProgressStep, ProgressSteps, type ProgressStepsProps, type Progres
 export { Radio, type RadioProps } from './Radio'
 export { Rating, type RatingProps } from './Rating'
 export { Select, type SelectOption, type SelectProps } from './Select'
+export { Slider, type SliderProps, type SliderSize, sliderSizes } from './Slider'
 export { StatusIndicator, type StatusIndicatorProps, type StatusIndicatorTone, statusIndicatorTones } from './StatusIndicator'
 export { Switch, type SwitchProps } from './Switch'
 export { Tab, type TabProps, type TabSize, tabSizes, type TabVariant, tabVariants } from './Tab'
