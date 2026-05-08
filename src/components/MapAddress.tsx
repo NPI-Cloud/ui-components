@@ -97,8 +97,8 @@ const orientationWrapperClass: Record<MapAddressOrientation, string> = {
 }
 
 const orientationMapClass: Record<MapAddressOrientation, string> = {
-	horizontal: 'relative w-full overflow-hidden rounded-npi-m bg-npi-bg-light',
-	vertical: 'relative w-full overflow-hidden rounded-npi-m bg-npi-bg-light',
+	horizontal: 'relative w-full overflow-hidden rounded-npi-s bg-npi-bg-light',
+	vertical: 'relative w-full overflow-hidden rounded-npi-s bg-npi-bg-light',
 }
 
 const orientationCardClass: Record<MapAddressOrientation, string> = {
@@ -163,7 +163,7 @@ export const MapAddress = forwardRef<HTMLElement, MapAddressProps>((props, ref) 
 			<article
 				className={twMerge(
 					clsx(
-						'flex flex-col items-start gap-npi-4 rounded-npi-m bg-npi-white p-npi-10 shadow-npi-m',
+						'flex flex-col items-start gap-npi-4 rounded-npi-s bg-npi-white p-npi-10 shadow-npi-m',
 						orientationCardClass[orientation],
 						cardClassName,
 					),
