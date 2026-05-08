@@ -37,6 +37,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
 	const effectiveType = isPassword ? (revealed ? 'text' : 'password') : type
 
 	const hasError = error != null && error !== ''
+	const errorId = id ? `${id}-error` : undefined
 	const trailingIcon: IconName | undefined = isPassword ? (revealed ? 'schovat' : 'ukazat') : iconAfter
 
 	return (
@@ -51,11 +52,14 @@ export const Input = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
 				>
 					<span>
 						{label}
-						{required && <span className="ml-[0.25em] text-npi-status-error">*</span>}
+						{required && <span className={clsx('ml-[0.25em]', disabled ? 'text-npi-text-secondary' : 'text-npi-status-error')}>*</span>}
 					</span>
 					{helperText && (
 						<span
-							className="inline-flex shrink-0 cursor-help text-npi-text-primary"
+							className={clsx(
+								'inline-flex shrink-0 cursor-help',
+								disabled ? 'text-npi-text-secondary' : 'text-npi-text-primary',
+							)}
 							role="img"
 							aria-label={helperText}
 							title={helperText}
@@ -67,8 +71,8 @@ export const Input = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
 			)}
 			<div
 				className={clsx(
-					'group relative flex h-npi-12 w-full items-center gap-npi-3 rounded-npi-xxs border bg-npi-bg-white px-npi-4 transition-colors',
-					'focus-within:outline-4 focus-within:outline-npi-blue-light',
+					'group relative flex h-npi-12 w-full items-center gap-npi-3 rounded-npi-xxs border bg-npi-bg-white px-npi-4 outline outline-0 outline-npi-blue-light transition-colors',
+					'focus-within:outline-4',
 					hasError
 						? 'border-npi-status-error'
 						: disabled
@@ -82,9 +86,10 @@ export const Input = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
 					type={effectiveType}
 					disabled={disabled}
 					aria-invalid={hasError || undefined}
+					aria-describedby={hasError && errorId ? errorId : undefined}
 					className={clsx(
 						'peer h-full min-w-0 flex-1 bg-transparent font-npi-sans text-[1rem] leading-[1.5] outline-none',
-						'placeholder:font-normal placeholder:italic placeholder:text-npi-text-secondary',
+						'placeholder:font-normal placeholder:text-npi-text-secondary',
 						'font-bold text-npi-text-primary',
 						'disabled:cursor-not-allowed disabled:text-npi-text-secondary',
 					)}
@@ -116,7 +121,11 @@ export const Input = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
 					: null}
 			</div>
 			{hasError && (
-				<p className="font-npi-sans text-[0.875rem] leading-[1.3] text-right text-npi-status-error">
+				<p
+					id={errorId}
+					role="alert"
+					className="font-npi-sans text-[0.875rem] leading-[1.3] text-right text-npi-status-error"
+				>
 					{error}
 				</p>
 			)}
