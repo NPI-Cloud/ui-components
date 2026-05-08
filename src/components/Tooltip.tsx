@@ -1,18 +1,30 @@
 import { clsx } from 'clsx'
-import { forwardRef, type HTMLAttributes, type ReactNode, useCallback, useEffect, useId, useRef, useState } from 'react'
+import {
+	cloneElement,
+	forwardRef,
+	type HTMLAttributes,
+	isValidElement,
+	type ReactElement,
+	type ReactNode,
+	useCallback,
+	useEffect,
+	useId,
+	useRef,
+	useState,
+} from 'react'
 import { twMerge } from 'tailwind-merge'
 
 export const tooltipPlacements = ['top', 'right', 'bottom', 'left'] as const
 export type TooltipPlacement = (typeof tooltipPlacements)[number]
 
 export interface TooltipProps extends Omit<HTMLAttributes<HTMLSpanElement>, 'content'> {
-	/** Trigger element — Tooltip wraps it. Receives `aria-describedby` and listeners on its parent span. */
+	/** Trigger element — Tooltip wraps it. `aria-describedby` and listeners are attached to the focusable child element when possible. */
 	children: ReactNode
 	/** Tooltip body content. Plain text or rich nodes. */
 	content: ReactNode
 	/** Placement relative to the trigger. Defaults to `'top'`. */
 	placement?: TooltipPlacement
-	/** Delay before showing (ms). Defaults to `200`. */
+	/** Delay before showing (ms). Defaults to `300`. */
 	delayShow?: number
 	/** Delay before hiding (ms). Defaults to `0`. */
 	delayHide?: number
@@ -56,7 +68,7 @@ export const Tooltip = forwardRef<HTMLSpanElement, TooltipProps>((props, ref) =>
 		children,
 		content,
 		placement = 'top',
-		delayShow = 200,
+		delayShow = 300,
 		delayHide = 0,
 		disabled = false,
 		forceOpen = false,
@@ -113,19 +125,73 @@ export const Tooltip = forwardRef<HTMLSpanElement, TooltipProps>((props, ref) =>
 		)
 	}
 
+	// Inject ARIA + listeners onto the focusable trigger child so screen readers
+	// announce the tooltip on focus and Escape works without relying on bubbling.
+	// Compose with any handlers the child already has — never silently override.
+	type TriggerProps = {
+		'aria-describedby'?: string
+		onMouseEnter?: (e: React.MouseEvent) => void
+		onMouseLeave?: (e: React.MouseEvent) => void
+		onFocus?: (e: React.FocusEvent) => void
+		onBlur?: (e: React.FocusEvent) => void
+		onKeyDown?: (e: React.KeyboardEvent) => void
+	}
+
+	let trigger: ReactNode
+	if (isValidElement<TriggerProps>(children)) {
+		const childElement = children as ReactElement<TriggerProps>
+		const childProps = childElement.props
+		const composedAriaDescribedBy = isOpen
+			? [childProps['aria-describedby'], tooltipId].filter(Boolean).join(' ')
+			: childProps['aria-describedby']
+		trigger = cloneElement<TriggerProps>(childElement, {
+			'aria-describedby': composedAriaDescribedBy,
+			onMouseEnter: e => {
+				childProps.onMouseEnter?.(e)
+				show()
+			},
+			onMouseLeave: e => {
+				childProps.onMouseLeave?.(e)
+				hide()
+			},
+			onFocus: e => {
+				childProps.onFocus?.(e)
+				show()
+			},
+			onBlur: e => {
+				childProps.onBlur?.(e)
+				hide()
+			},
+			onKeyDown: e => {
+				childProps.onKeyDown?.(e)
+				handleKeyDown(e)
+			},
+		})
+	} else {
+		// Fallback: children is a string / Fragment / array that can't be cloned.
+		// Wrap in a focusable span so the same a11y guarantees apply.
+		trigger = (
+			<span
+				tabIndex={0}
+				aria-describedby={isOpen ? tooltipId : undefined}
+				onMouseEnter={show}
+				onMouseLeave={hide}
+				onFocus={show}
+				onBlur={hide}
+				onKeyDown={handleKeyDown}
+			>
+				{children}
+			</span>
+		)
+	}
+
 	return (
 		<span
 			ref={ref}
 			className={twMerge(clsx('relative inline-flex', className))}
-			onMouseEnter={show}
-			onMouseLeave={hide}
-			onFocus={show}
-			onBlur={hide}
-			onKeyDown={handleKeyDown}
-			aria-describedby={isOpen ? tooltipId : undefined}
 			{...rest}
 		>
-			{children}
+			{trigger}
 			{isOpen && (
 				<span
 					role="tooltip"
