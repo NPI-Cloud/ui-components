@@ -298,18 +298,22 @@ export const DateTimePicker = forwardRef<HTMLButtonElement, DateTimePickerProps>
 						disabled ? 'text-npi-text-secondary' : 'text-npi-text-primary',
 					)}
 				>
-					<span>
-						{label}
-						{required && <span className="ml-[0.25em] text-npi-status-error">*</span>}
+					<span className="flex flex-1 items-center gap-npi-2">
+						<span>{label}</span>
+						{helperText && (
+							<span
+								className="inline-flex shrink-0 cursor-help text-npi-text-primary"
+								role="img"
+								aria-label={helperText}
+								title={helperText}
+							>
+								<Icon name="info" size="s" className="size-4" />
+							</span>
+						)}
 					</span>
-					{helperText && (
-						<span
-							className="inline-flex shrink-0 cursor-help text-npi-text-primary"
-							role="img"
-							aria-label={helperText}
-							title={helperText}
-						>
-							<Icon name="info" size="s" className="size-4" />
+					{required && (
+						<span className="whitespace-nowrap text-[0.875rem] leading-[1.3] text-npi-status-error">
+							Povinné pole
 						</span>
 					)}
 				</label>
@@ -508,6 +512,7 @@ function DayCell(props: DayCellProps) {
 					: !inCurrentMonth
 					? 'cursor-pointer text-npi-gray-400 hover:text-npi-text-primary'
 					: 'cursor-pointer text-npi-text-primary',
+				!disabled && inCurrentMonth && !showSelectedDot && !showRangeBackground && 'hover:bg-npi-bg-light',
 				showRangeBackground && 'bg-npi-blue-lighter',
 			)}
 		>
