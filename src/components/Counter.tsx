@@ -71,6 +71,12 @@ export const Counter = forwardRef<HTMLDivElement, CounterProps>((props, ref) => 
 		<div
 			ref={ref}
 			className={twMerge(clsx('inline-flex items-center gap-npi-4 font-npi-sans', className))}
+			role="spinbutton"
+			aria-valuenow={value}
+			aria-valuemin={lowerBound}
+			aria-valuemax={upperBound}
+			aria-valuetext={typeof valueLabel === 'string' ? valueLabel : undefined}
+			aria-disabled={disabled || undefined}
 			{...rest}
 		>
 			<button
@@ -87,9 +93,7 @@ export const Counter = forwardRef<HTMLDivElement, CounterProps>((props, ref) => 
 					'inline-flex min-w-[1.125rem] justify-center text-center font-bold text-[1rem] leading-[1.5] tabular-nums',
 					disabled ? 'text-npi-text-secondary' : 'text-npi-text-primary',
 				)}
-				role="status"
-				aria-live="polite"
-				aria-label={typeof valueLabel === 'string' ? valueLabel : undefined}
+				aria-hidden="true"
 			>
 				{value}
 			</span>
