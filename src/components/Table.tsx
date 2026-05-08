@@ -31,7 +31,7 @@ const TableContext = createContext<TableContextValue>({ density: 'comfortable' }
  * - `condensed` (úsporná)  → 11px    → row height 40px, body text 14px
  */
 const cellDensityClasses: Record<TableDensity, string> = {
-	comfortable: 'py-[22px] text-[1rem] leading-[1.5]',
+	comfortable: 'pt-[22px] pb-[23px] text-[1rem] leading-[1.5]',
 	compact: 'py-[14px] text-[1rem] leading-[1.5]',
 	condensed: 'py-[11px] text-[0.875rem] leading-[1.3]',
 }
@@ -159,10 +159,7 @@ export const TableHead = forwardRef<HTMLTableCellElement, TableHeadProps>(
 				{sortable && (
 					<Icon
 						name={sortDirection === 'asc' ? 'arrowNahoru' : 'arrowDolu'}
-						className={clsx(
-							'size-6 shrink-0 transition-opacity',
-							sortDirection ? 'opacity-100' : 'opacity-60',
-						)}
+						className="size-6 shrink-0"
 						aria-hidden="true"
 					/>
 				)}
