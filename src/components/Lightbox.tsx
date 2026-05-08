@@ -43,18 +43,20 @@ const dialogClass = 'm-0 size-full max-h-screen max-w-full bg-transparent p-0 '
 	+ 'open:flex open:items-center open:justify-center '
 	+ 'focus:outline-none'
 
-// Inner stage:
-//  - 64px (`py-npi-16`) top/bottom padding so portrait photos breathe per the Figma annotation
-//    "horní i spodní odsazení 64 px".
-//  - Width capped at the global NPI layout max (`max-w-npi-layout` = 1064px) per
-//    "Šířka je maximální stejně jako layout - 1 064 px".
-//  - Horizontal padding ensures the prev/next chevrons don't sit flush with the viewport edge
-//    (40px chevron + 40px outer breathing = `px-npi-20` on desktop). On mobile the image is full
-//    width per the mobile annotation, so chevrons overlay the image.
-const stageClass = 'relative flex h-full w-full max-w-npi-layout items-center justify-center px-npi-20 py-npi-16 md:px-npi-20'
+// Outer chevron-anchor layer: full viewport width, vertically centers its child. The prev/next
+// chevrons are absolutely positioned against this layer so they can sit in the gutter outside
+// the 1064px content stack on wide viewports while clamping to the screen edge on narrow ones.
+const stageClass = 'relative flex h-full w-full items-center justify-center'
 
-// The image fills the available stage space while preserving aspect ratio. `object-contain`
-// keeps portrait photos within the 64px top/bottom safe-area; landscape photos fill width.
+// Inner content stack: capped at the global NPI layout max (`max-w-npi-layout` = 1064px) per
+// "Šířka je maximální stejně jako layout - 1 064 px". No horizontal padding so the image can
+// actually reach 1064px wide. 64px (`py-npi-16`) top/bottom padding so portrait photos breathe
+// per the Figma annotation "horní i spodní odsazení 64 px".
+const contentStackClass = 'flex max-h-full w-full max-w-npi-layout flex-col items-center justify-center py-npi-16'
+
+// The image fills the available content-stack space while preserving aspect ratio.
+// `object-contain` keeps portrait photos within the 64px top/bottom safe-area; landscape photos
+// fill width up to the 1064px cap.
 const imageClass = 'block max-h-full max-w-full object-contain'
 
 // Close: top-right, 40px right and 64px from the dialog top per the Figma annotations.
@@ -62,11 +64,14 @@ const imageClass = 'block max-h-full max-w-full object-contain'
 // inverted icon Button variant — no need to invent a new chrome here.
 const closeButtonClass = 'absolute right-npi-10 top-npi-16 z-10'
 
-// Prev/next chevrons sit on the inner stage edges, vertically centered. 40px from the stage edge
-// matches the Figma annotation "40 px" between the image edge and the chevron centre.
+// Prev/next chevrons sit 40px outside the 1064px content stack on wide viewports (so the chevron
+// centre is in the gutter, matching the Figma annotation "40 px" between image edge and chevron
+// centre). On narrower viewports we clamp them to a 16px screen edge minimum so they remain
+// visible. Calc: half-viewport − half-stack (532px) − chevron-gap (40px) − chevron-half (20px) =
+// `calc(50% - 532px - 60px)`. `max(<calc>, 16px)` keeps a 16px screen edge on narrow viewports.
 const navButtonBaseClass = 'absolute top-1/2 -translate-y-1/2 z-10'
-const prevButtonClass = `${navButtonBaseClass} left-0`
-const nextButtonClass = `${navButtonBaseClass} right-0`
+const prevButtonClass = `${navButtonBaseClass} left-[max(calc(50%-532px-60px),16px)]`
+const nextButtonClass = `${navButtonBaseClass} right-[max(calc(50%-532px-60px),16px)]`
 
 // Caption: white sans, centered, sits below the image. Mirrors the muted secondary tone
 // used on inverted overlays elsewhere in the system.
@@ -205,11 +210,12 @@ export const Lightbox = forwardRef<HTMLDialogElement, LightboxProps>((props, ref
 			{current && (
 				<div className={stageClass}>
 					{
-						/* Image + caption stack. Clicks inside the stage shouldn't bubble into the
-					    backdrop click handler. */
+						/* Inner content stack — capped at 1064px so the image can reach the Figma max
+					    width on wide viewports. Clicks inside shouldn't bubble into the backdrop
+					    click handler. */
 					}
 					<div
-						className="flex max-h-full max-w-full flex-col items-center justify-center"
+						className={contentStackClass}
 						onClick={(event) => event.stopPropagation()}
 					>
 						<img src={current.src} alt={current.alt} className={imageClass} />
