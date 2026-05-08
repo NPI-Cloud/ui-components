@@ -273,15 +273,15 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>((props, ref) =>
 						? 'border-npi-status-error'
 						: disabled
 						? 'border-npi-gray-300 bg-npi-gray-50 cursor-not-allowed'
-						: 'border-npi-gray-300 hover:border-npi-text-primary cursor-pointer',
+						: 'border-npi-gray-300 hover:border-npi-blue cursor-pointer',
 				)}
 			>
 				<span
 					className={clsx(
-						'min-w-0 flex-1 truncate text-[1rem] leading-[1.5]',
+						'min-w-0 flex-1 truncate text-[1rem] leading-[1.3]',
 						showPlaceholder
 							? clsx('font-normal italic', disabled ? 'text-npi-text-secondary' : 'text-npi-text-secondary')
-							: clsx('font-bold', disabled ? 'text-npi-text-secondary' : 'text-npi-text-primary'),
+							: clsx('font-normal', disabled ? 'text-npi-text-secondary' : 'text-npi-text-primary'),
 					)}
 				>
 					{showPlaceholder ? placeholder : triggerLabel}
@@ -331,7 +331,7 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>((props, ref) =>
 									'flex cursor-pointer items-center gap-npi-3 px-npi-4 py-npi-3 text-[1rem] leading-[1.5] text-npi-text-primary transition-colors',
 									option.disabled && 'cursor-not-allowed text-npi-text-secondary',
 									!option.disabled && active && 'bg-npi-gray-50',
-									!option.disabled && (active || selected) ? 'font-bold' : 'font-normal',
+									!option.disabled && active ? 'font-bold' : 'font-normal',
 								)}
 							>
 								{multiple && (
