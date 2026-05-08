@@ -18,8 +18,8 @@ const TabRoot = uic('button', {
 		variant: {
 			// Verze 1 — segmented switch item: 16px / 7px padding, 4px radius, 16px bold label
 			segmented: 'rounded-npi-xxs px-npi-4 py-[7px] text-[1rem] leading-[1.5] font-bold text-center',
-			// Verze 2 — free-floating pill chip: 12px / 4px padding, fully rounded
-			pill: 'rounded-full px-npi-3 py-npi-1 font-normal',
+			// Verze 2 — free-floating pill chip: 4px vertical padding, fully rounded (horizontal padding set per size)
+			pill: 'rounded-full py-npi-1 font-normal',
 			// Verze 3 — view-mode switcher with leading icon: 8px / 4px padding, 4px radius, 8px gap
 			icon: 'rounded-npi-xxs px-npi-2 py-npi-1 gap-npi-2 text-[0.875rem] leading-[1.3] font-normal',
 		},
@@ -47,9 +47,9 @@ const TabRoot = uic('button', {
 			selected: false,
 			className: 'bg-transparent text-npi-blue hover:text-npi-blue-hover',
 		},
-		// Pill — sizes (only meaningful for pill)
-		{ variant: 'pill', size: 'M', className: 'text-[0.75rem] leading-[14px]' },
-		{ variant: 'pill', size: 'L', className: 'text-[1rem] leading-[1.5]' },
+		// Pill — sizes: M = 12px horizontal padding + small text, L = 16px horizontal padding + body text
+		{ variant: 'pill', size: 'M', className: 'px-npi-3 text-[0.75rem] leading-[14px]' },
+		{ variant: 'pill', size: 'L', className: 'px-npi-4 text-[1rem] leading-[22px]' },
 		// Pill — selected: blue fill, white text, hover deepens
 		{
 			variant: 'pill',
