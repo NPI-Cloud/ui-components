@@ -168,7 +168,7 @@ export const UploadDropzone = forwardRef<HTMLDivElement, UploadDropzoneProps>((p
 				onDragLeave={handleDragLeave}
 				onDrop={handleDrop}
 				className={clsx(
-					'flex flex-col items-center gap-npi-4 rounded-npi-s border-[1.5px] border-dashed bg-npi-bg-white px-npi-10 py-npi-6 transition-colors',
+					'flex flex-col items-center gap-npi-4 rounded-npi-xs border-[1.5px] border-dashed bg-npi-bg-white px-npi-10 py-npi-6 transition-colors',
 					'focus-visible:outline-4 focus-visible:outline-npi-blue-light',
 					disabled
 						? 'cursor-not-allowed opacity-60'
