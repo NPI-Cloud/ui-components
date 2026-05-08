@@ -20,7 +20,8 @@ export interface TestimonialProps extends Omit<React.HTMLAttributes<HTMLElement>
 	size?: TestimonialSize
 	/**
 	 * Show the decorative blue quote-mark glyph in the leading column.
-	 * When set, the quote text is rendered without the surrounding curly quotes.
+	 * When set, the quote text is rendered without surrounding curly quotes —
+	 * leading/trailing „", "", and " marks are stripped automatically.
 	 */
 	withQuoteIcon?: boolean
 	/**
@@ -103,17 +104,23 @@ export const Testimonial = forwardRef<HTMLElement, TestimonialProps>((props, ref
 		...rest
 	} = props
 
-	const avatarPx = size === 'S' ? 56 : 96
+	// Per Figma, the icon variant always renders the profile card at S metrics (avatar 56,
+	// name 14/700/1.3, gap 2px) regardless of the `size` prop — only the blockquote
+	// typography follows `size`.
+	const profileSize: TestimonialSize = withQuoteIcon ? 'S' : size
+	const avatarPx = profileSize === 'S' ? 56 : 96
 
-	// Quote-string normalization: when the design shows the curly Czech quotes „…" the consumer
-	// can either include them in `quote` or omit them. With the leading quote-mark glyph we drop
-	// the curly marks (Figma 368:8273 / 368:8271 render the quote without curly „...").
-	// We don't strip them programmatically — leave that decision to the caller.
+	// Quote-string normalization: with the leading quote-mark glyph (Figma 368:8273 / 368:8271)
+	// we render the quote without surrounding curly „...". Strip leading/trailing curly Czech
+	// („"), English smart (""), and straight (") quote marks when `withQuoteIcon` is true.
+	const displayedQuote = withQuoteIcon && typeof quote === 'string'
+		? quote.replace(/^[„“”"]+|[„“”"]+$/g, '').trim()
+		: quote
 
 	const inner = (
 		<>
 			<blockquote className={clsx(quoteTextClass[size], 'm-0')}>
-				{quote}
+				{displayedQuote}
 			</blockquote>
 			<figcaption className="flex items-center gap-npi-4">
 				{authorAvatarSrc && (
@@ -122,11 +129,11 @@ export const Testimonial = forwardRef<HTMLElement, TestimonialProps>((props, ref
 						alt={authorAvatarAlt ?? authorName}
 						width={avatarPx}
 						height={avatarPx}
-						className={clsx('shrink-0 rounded-full object-cover', avatarSizeClass[size])}
+						className={clsx('shrink-0 rounded-full object-cover', avatarSizeClass[profileSize])}
 					/>
 				)}
-				<div className={clsx('flex flex-col items-start justify-center', authorTextGapClass[size])}>
-					<p className={authorNameClass[size]}>{authorName}</p>
+				<div className={clsx('flex flex-col items-start justify-center', authorTextGapClass[profileSize])}>
+					<p className={authorNameClass[profileSize]}>{authorName}</p>
 					{authorRole && <p className={authorRoleClass}>{authorRole}</p>}
 				</div>
 			</figcaption>
@@ -155,11 +162,14 @@ export const Testimonial = forwardRef<HTMLElement, TestimonialProps>((props, ref
 			className={twMerge(
 				clsx(
 					'm-0 flex w-full',
+					// Figma 368:8269 — boxed+icon variant uses 40px symmetric padding; plain boxed uses 48/40.
+					// We emit a single padding utility per branch because twMerge cannot resolve arbitrary
+					// `px-npi-12` vs `px-npi-10` token classes (last-wins is unreliable across versions).
 					boxed
-						? 'rounded-npi-m bg-npi-bg-light px-npi-12 py-npi-10'
+						? (withQuoteIcon
+							? 'rounded-npi-m bg-npi-bg-light p-npi-10'
+							: 'rounded-npi-m bg-npi-bg-light px-npi-12 py-npi-10')
 						: '',
-					// When boxed + icon, Figma 368:8269 uses 40px symmetric padding instead of 48/40.
-					boxed && withQuoteIcon ? 'px-npi-10 py-npi-10' : '',
 					className,
 				),
 			)}
