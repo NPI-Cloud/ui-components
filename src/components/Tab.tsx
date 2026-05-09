@@ -1,4 +1,17 @@
-import { forwardRef } from 'react'
+import { clsx } from 'clsx'
+import {
+	createContext,
+	forwardRef,
+	type KeyboardEvent,
+	type MouseEvent,
+	type ReactNode,
+	useCallback,
+	useContext,
+	useId,
+	useMemo,
+	useState,
+} from 'react'
+import { twMerge } from 'tailwind-merge'
 import { Icon, type IconName } from '../icons'
 import { uic } from '../utils/uic'
 
@@ -7,6 +20,16 @@ export type TabVariant = (typeof tabVariants)[number]
 
 export const tabSizes = ['M', 'L'] as const
 export type TabSize = (typeof tabSizes)[number]
+
+interface TabsContextValue {
+	value: string
+	setValue: (value: string) => void
+	variant: TabVariant
+	size: TabSize
+	idPrefix: string
+}
+
+const TabsContext = createContext<TabsContextValue | null>(null)
 
 const TabRoot = uic('button', {
 	baseClass: [
@@ -78,24 +101,194 @@ const TabRoot = uic('button', {
 	displayName: 'TabRoot',
 })
 
-export interface TabProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'children'> {
-	/** Visual style — `segmented` (compact switch row), `pill` (free-floating chip), `icon` (view-mode switcher with leading icon) */
-	variant: TabVariant
-	/** Size variant — only meaningful for `pill` (M = 12px, L = 16px). Ignored otherwise. */
+export interface TabsProps {
+	/** Currently selected tab value (controlled). */
+	value?: string
+	/** Default selected tab value (uncontrolled). */
+	defaultValue?: string
+	/** Called whenever the selected tab changes. */
+	onValueChange?: (value: string) => void
+	/** Visual style propagated to all `Tab` children that don't override it. */
+	variant?: TabVariant
+	/** Size propagated to all `Tab` children that don't override it (only meaningful for `pill`). */
 	size?: TabSize
-	/** Whether this tab is currently active */
+	/** TabList + TabPanel children. */
+	children: ReactNode
+	className?: string
+}
+
+export const Tabs = ({
+	value: controlledValue,
+	defaultValue,
+	onValueChange,
+	variant = 'segmented',
+	size = 'M',
+	children,
+	className,
+}: TabsProps) => {
+	const [uncontrolled, setUncontrolled] = useState<string>(defaultValue ?? '')
+	const isControlled = controlledValue !== undefined
+	const value = isControlled ? controlledValue : uncontrolled
+
+	const setValue = useCallback((next: string) => {
+		if (!isControlled) setUncontrolled(next)
+		onValueChange?.(next)
+	}, [isControlled, onValueChange])
+
+	const idPrefix = useId()
+
+	const ctx = useMemo<TabsContextValue>(
+		() => ({ value, setValue, variant, size, idPrefix }),
+		[value, setValue, variant, size, idPrefix],
+	)
+
+	return (
+		<TabsContext.Provider value={ctx}>
+			<div className={className}>{children}</div>
+		</TabsContext.Provider>
+	)
+}
+Tabs.displayName = 'Tabs'
+
+const tabListLayoutByVariant: Record<TabVariant, string> = {
+	// Verze 1 — grey backdrop, 4px padding, 16px gap
+	segmented: 'inline-flex bg-npi-bg-light rounded-npi-xs p-npi-1 gap-npi-4',
+	// Verze 2 — free-floating chip cloud, can wrap
+	pill: 'inline-flex flex-wrap gap-npi-1',
+	// Verze 3 — grey backdrop with smaller gap
+	icon: 'inline-flex bg-npi-bg-light rounded-npi-xs p-npi-1 gap-npi-1',
+}
+
+export interface TabListProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'role' | 'aria-orientation'> {
+	'aria-label'?: string
+	children: ReactNode
+}
+
+export const TabList = forwardRef<HTMLDivElement, TabListProps>(
+	({ children, className, onKeyDown, ...rest }, ref) => {
+		const ctx = useContext(TabsContext)
+
+		const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+			onKeyDown?.(event)
+			if (event.defaultPrevented) return
+
+			const tabs = Array.from(
+				event.currentTarget.querySelectorAll<HTMLButtonElement>('[role="tab"]:not([disabled])'),
+			)
+			if (tabs.length === 0) return
+
+			const active = event.currentTarget.ownerDocument?.activeElement
+			const currentIndex = active ? tabs.indexOf(active as HTMLButtonElement) : -1
+
+			let nextIndex: number
+			switch (event.key) {
+				case 'ArrowRight':
+					nextIndex = currentIndex < tabs.length - 1 ? currentIndex + 1 : 0
+					break
+				case 'ArrowLeft':
+					nextIndex = currentIndex > 0 ? currentIndex - 1 : tabs.length - 1
+					break
+				case 'Home':
+					nextIndex = 0
+					break
+				case 'End':
+					nextIndex = tabs.length - 1
+					break
+				default:
+					return
+			}
+
+			event.preventDefault()
+			const next = tabs[nextIndex]
+			next?.focus()
+			next?.click()
+		}
+
+		const layoutClass = ctx ? tabListLayoutByVariant[ctx.variant] : 'inline-flex gap-npi-1'
+
+		return (
+			<div
+				ref={ref}
+				role="tablist"
+				aria-orientation="horizontal"
+				onKeyDown={handleKeyDown}
+				className={twMerge(clsx(layoutClass, className))}
+				{...rest}
+			>
+				{children}
+			</div>
+		)
+	},
+)
+TabList.displayName = 'TabList'
+
+export interface TabProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'children' | 'value'> {
+	/** Identifies which tab is active when wrapped in `<Tabs>`. Required for the functional Tabs API; omit only when using `Tab` standalone as a styled trigger. */
+	value?: string
+	/** Visual style — overrides the variant inherited from `<Tabs>`. */
+	variant?: TabVariant
+	/** Size — overrides the size inherited from `<Tabs>` (only meaningful for `pill`). */
+	size?: TabSize
+	/** Forces the active visual state. Ignored when used inside `<Tabs>` with a `value` (state comes from context). */
 	selected?: boolean
 	/** Icon rendered before the label (only meaningful for `icon` variant) */
 	iconBefore?: IconName
 	/** Tab label */
-	children: React.ReactNode
+	children: ReactNode
 }
 
 export const Tab = forwardRef<HTMLButtonElement, TabProps>(
-	({ variant, size = 'M', selected = false, iconBefore, children, className, ...props }, ref) => {
+	(
+		{
+			value,
+			variant: variantProp,
+			size: sizeProp,
+			selected: selectedProp,
+			iconBefore,
+			children,
+			className,
+			onClick,
+			...props
+		},
+		ref,
+	) => {
+		const ctx = useContext(TabsContext)
+		const inTabs = ctx !== null && value !== undefined
+
+		const variant: TabVariant = variantProp ?? ctx?.variant ?? 'segmented'
+		const size: TabSize = sizeProp ?? ctx?.size ?? 'M'
+
+		const selected = inTabs ? ctx.value === value : (selectedProp ?? false)
+
+		const ariaProps: React.ButtonHTMLAttributes<HTMLButtonElement> = inTabs
+			? {
+				role: 'tab',
+				id: `${ctx.idPrefix}-tab-${value}`,
+				'aria-selected': selected,
+				'aria-controls': `${ctx.idPrefix}-panel-${value}`,
+				tabIndex: selected ? 0 : -1,
+			}
+			: { 'aria-pressed': selected }
+
+		const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
+			onClick?.(event)
+			if (event.defaultPrevented) return
+			if (inTabs) ctx.setValue(value)
+		}
+
 		const showIcon = variant === 'icon' && iconBefore != null
+
 		return (
-			<TabRoot ref={ref} variant={variant} size={size} selected={selected} className={className} aria-pressed={selected} {...props}>
+			<TabRoot
+				ref={ref}
+				variant={variant}
+				size={size}
+				selected={selected}
+				className={className}
+				onClick={handleClick}
+				{...ariaProps}
+				{...props}
+			>
 				{showIcon && <Icon name={iconBefore} className="size-6 shrink-0" />}
 				<span>{children}</span>
 			</TabRoot>
@@ -103,3 +296,33 @@ export const Tab = forwardRef<HTMLButtonElement, TabProps>(
 	},
 )
 Tab.displayName = 'Tab'
+
+export interface TabPanelProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'role' | 'id' | 'aria-labelledby' | 'hidden'> {
+	/** Tab value this panel corresponds to. */
+	value: string
+	children: ReactNode
+}
+
+export const TabPanel = forwardRef<HTMLDivElement, TabPanelProps>(
+	({ value, children, ...rest }, ref) => {
+		const ctx = useContext(TabsContext)
+		if (!ctx) return null
+
+		const active = ctx.value === value
+		if (!active) return null
+
+		return (
+			<div
+				ref={ref}
+				role="tabpanel"
+				id={`${ctx.idPrefix}-panel-${value}`}
+				aria-labelledby={`${ctx.idPrefix}-tab-${value}`}
+				tabIndex={0}
+				{...rest}
+			>
+				{children}
+			</div>
+		)
+	},
+)
+TabPanel.displayName = 'TabPanel'

@@ -155,7 +155,20 @@ export { Slider, type SliderProps, type SliderSize, sliderSizes } from './Slider
 export { StatusIndicator, type StatusIndicatorProps, type StatusIndicatorTone, statusIndicatorTones } from './StatusIndicator'
 export { StickyBar, type StickyBarPosition, stickyBarPositions, type StickyBarProps, type StickyBarTone, stickyBarTones } from './StickyBar'
 export { Switch, type SwitchProps } from './Switch'
-export { Tab, type TabProps, type TabSize, tabSizes, type TabVariant, tabVariants } from './Tab'
+export {
+	Tab,
+	TabList,
+	type TabListProps,
+	TabPanel,
+	type TabPanelProps,
+	type TabProps,
+	Tabs,
+	type TabSize,
+	tabSizes,
+	type TabsProps,
+	type TabVariant,
+	tabVariants,
+} from './Tab'
 export {
 	Table,
 	type TableAlign,
