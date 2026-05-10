@@ -1,4 +1,5 @@
 export { BannerBlock, type BannerBlockIndicator, type BannerBlockProps, type BannerBlockTone } from './BannerBlock'
+export { BigNumberBlock, type BigNumberBlockProps, type BigNumberBlockSize } from './BigNumberBlock'
 export { BlockColumns, type BlockColumnsMode, type BlockColumnsProps, type BlockColumnsRatio, blockColumnsRatios } from './BlockColumns'
 export { ButtonBlock, type ButtonBlockProps, type ButtonBlockVariant } from './ButtonBlock'
 export { CardBlock, type CardBlockProps } from './CardBlock'
