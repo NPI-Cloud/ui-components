@@ -72,7 +72,10 @@ export const Input = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
 			<div
 				className={clsx(
 					'group relative flex h-npi-12 w-full items-center gap-npi-3 rounded-npi-xxs border bg-npi-bg-white px-npi-4 outline outline-0 outline-npi-blue-light transition-colors',
-					'focus-within:outline-4',
+					// Show the 4px focus ring only on keyboard focus (Tab), not on mouse click —
+					// matches Figma's distinct Focus vs Active states. `:has(:focus-visible)` lets
+					// the wrapper react to the inner input's focus-visible state.
+					'has-[:focus-visible]:outline-4',
 					hasError
 						? 'border-npi-status-error'
 						: disabled
