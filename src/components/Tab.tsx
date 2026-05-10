@@ -21,11 +21,15 @@ export type TabVariant = (typeof tabVariants)[number]
 export const tabSizes = ['M', 'L'] as const
 export type TabSize = (typeof tabSizes)[number]
 
+export const tabsOrientations = ['horizontal', 'vertical'] as const
+export type TabsOrientation = (typeof tabsOrientations)[number]
+
 interface TabsContextValue {
 	value: string
 	setValue: (value: string) => void
 	variant: TabVariant
 	size: TabSize
+	orientation: TabsOrientation
 	idPrefix: string
 }
 
@@ -112,6 +116,12 @@ export interface TabsProps {
 	variant?: TabVariant
 	/** Size propagated to all `Tab` children that don't override it (only meaningful for `pill`). */
 	size?: TabSize
+	/**
+	 * Layout direction. `horizontal` (default) stacks TabList above TabPanels; `vertical` puts
+	 * TabList on the left and TabPanel on the right. The keyboard handler also flips: ←/→ for
+	 * horizontal, ↑/↓ for vertical.
+	 */
+	orientation?: TabsOrientation
 	/** TabList + TabPanel children. */
 	children: ReactNode
 	className?: string
@@ -123,6 +133,7 @@ export const Tabs = ({
 	onValueChange,
 	variant = 'segmented',
 	size = 'M',
+	orientation = 'horizontal',
 	children,
 	className,
 }: TabsProps) => {
@@ -138,25 +149,39 @@ export const Tabs = ({
 	const idPrefix = useId()
 
 	const ctx = useMemo<TabsContextValue>(
-		() => ({ value, setValue, variant, size, idPrefix }),
-		[value, setValue, variant, size, idPrefix],
+		() => ({ value, setValue, variant, size, orientation, idPrefix }),
+		[value, setValue, variant, size, orientation, idPrefix],
 	)
+
+	const wrapperClass = orientation === 'vertical'
+		? 'flex flex-row items-start gap-npi-6'
+		: 'flex flex-col'
 
 	return (
 		<TabsContext.Provider value={ctx}>
-			<div className={className}>{children}</div>
+			<div className={twMerge(wrapperClass, className)}>{children}</div>
 		</TabsContext.Provider>
 	)
 }
 Tabs.displayName = 'Tabs'
 
-const tabListLayoutByVariant: Record<TabVariant, string> = {
-	// Verze 1 — grey backdrop, 4px padding, 16px gap
-	segmented: 'inline-flex bg-npi-bg-light rounded-npi-xs p-npi-1 gap-npi-4',
-	// Verze 2 — free-floating chip cloud, can wrap
-	pill: 'inline-flex flex-wrap gap-npi-1',
-	// Verze 3 — grey backdrop with smaller gap
-	icon: 'inline-flex bg-npi-bg-light rounded-npi-xs p-npi-1 gap-npi-1',
+const tabListLayoutByVariant: Record<TabVariant, Record<TabsOrientation, string>> = {
+	segmented: {
+		// Verze 1 — grey backdrop, 4px padding, 16px gap, single row that scrolls horizontally if it overflows
+		horizontal: 'inline-flex max-w-full overflow-x-auto bg-npi-bg-light rounded-npi-xs p-npi-1 gap-npi-4',
+		vertical: 'inline-flex flex-col items-start bg-npi-bg-light rounded-npi-xs p-npi-1 gap-npi-1',
+	},
+	pill: {
+		// Verze 2 — free-floating chip cloud, wraps to multiple rows
+		horizontal: 'inline-flex flex-wrap gap-npi-1',
+		// Vertical pill — stacks as a sidebar nav (no backdrop)
+		vertical: 'inline-flex flex-col items-start gap-npi-1',
+	},
+	icon: {
+		// Verze 3 — grey backdrop with smaller gap
+		horizontal: 'inline-flex bg-npi-bg-light rounded-npi-xs p-npi-1 gap-npi-1',
+		vertical: 'inline-flex flex-col items-start bg-npi-bg-light rounded-npi-xs p-npi-1 gap-npi-1',
+	},
 }
 
 export interface TabListProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'role' | 'aria-orientation'> {
@@ -167,6 +192,7 @@ export interface TabListProps extends Omit<React.HTMLAttributes<HTMLDivElement>,
 export const TabList = forwardRef<HTMLDivElement, TabListProps>(
 	({ children, className, onKeyDown, ...rest }, ref) => {
 		const ctx = useContext(TabsContext)
+		const isVertical = ctx?.orientation === 'vertical'
 
 		const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
 			onKeyDown?.(event)
@@ -180,22 +206,20 @@ export const TabList = forwardRef<HTMLDivElement, TabListProps>(
 			const active = event.currentTarget.ownerDocument?.activeElement
 			const currentIndex = active ? tabs.indexOf(active as HTMLButtonElement) : -1
 
+			const nextKey = isVertical ? 'ArrowDown' : 'ArrowRight'
+			const prevKey = isVertical ? 'ArrowUp' : 'ArrowLeft'
+
 			let nextIndex: number
-			switch (event.key) {
-				case 'ArrowRight':
-					nextIndex = currentIndex < tabs.length - 1 ? currentIndex + 1 : 0
-					break
-				case 'ArrowLeft':
-					nextIndex = currentIndex > 0 ? currentIndex - 1 : tabs.length - 1
-					break
-				case 'Home':
-					nextIndex = 0
-					break
-				case 'End':
-					nextIndex = tabs.length - 1
-					break
-				default:
-					return
+			if (event.key === nextKey) {
+				nextIndex = currentIndex < tabs.length - 1 ? currentIndex + 1 : 0
+			} else if (event.key === prevKey) {
+				nextIndex = currentIndex > 0 ? currentIndex - 1 : tabs.length - 1
+			} else if (event.key === 'Home') {
+				nextIndex = 0
+			} else if (event.key === 'End') {
+				nextIndex = tabs.length - 1
+			} else {
+				return
 			}
 
 			event.preventDefault()
@@ -204,13 +228,15 @@ export const TabList = forwardRef<HTMLDivElement, TabListProps>(
 			next?.click()
 		}
 
-		const layoutClass = ctx ? tabListLayoutByVariant[ctx.variant] : 'inline-flex gap-npi-1'
+		const layoutClass = ctx
+			? tabListLayoutByVariant[ctx.variant][ctx.orientation]
+			: 'inline-flex gap-npi-1'
 
 		return (
 			<div
 				ref={ref}
 				role="tablist"
-				aria-orientation="horizontal"
+				aria-orientation={isVertical ? 'vertical' : 'horizontal'}
 				onKeyDown={handleKeyDown}
 				className={twMerge(clsx(layoutClass, className))}
 				{...rest}
@@ -227,7 +253,11 @@ export interface TabProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonElem
 	value?: string
 	/** Visual style — overrides the variant inherited from `<Tabs>`. */
 	variant?: TabVariant
-	/** Size — overrides the size inherited from `<Tabs>` (only meaningful for `pill`). */
+	/**
+	 * Size — overrides the size inherited from `<Tabs>` (only meaningful for `pill`).
+	 * Pill `M` is 22px tall; on touch surfaces prefer `L` (30px) so the hit target is closer to the
+	 * WCAG 2.5.8 recommendation of 24×24.
+	 */
 	size?: TabSize
 	/** Forces the active visual state. Ignored when used inside `<Tabs>` with a `value` (state comes from context). */
 	selected?: boolean
@@ -304,12 +334,15 @@ export interface TabPanelProps extends Omit<React.HTMLAttributes<HTMLDivElement>
 }
 
 export const TabPanel = forwardRef<HTMLDivElement, TabPanelProps>(
-	({ value, children, ...rest }, ref) => {
+	({ value, children, className, ...rest }, ref) => {
 		const ctx = useContext(TabsContext)
 		if (!ctx) return null
 
 		const active = ctx.value === value
 		if (!active) return null
+
+		// In vertical mode the TabPanel sits next to TabList in a flex row — take the remaining space.
+		const verticalClass = ctx.orientation === 'vertical' ? 'min-w-0 flex-1' : ''
 
 		return (
 			<div
@@ -318,6 +351,7 @@ export const TabPanel = forwardRef<HTMLDivElement, TabPanelProps>(
 				id={`${ctx.idPrefix}-panel-${value}`}
 				aria-labelledby={`${ctx.idPrefix}-tab-${value}`}
 				tabIndex={0}
+				className={twMerge(verticalClass, className)}
 				{...rest}
 			>
 				{children}

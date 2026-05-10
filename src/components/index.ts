@@ -165,6 +165,8 @@ export {
 	Tabs,
 	type TabSize,
 	tabSizes,
+	type TabsOrientation,
+	tabsOrientations,
 	type TabsProps,
 	type TabVariant,
 	tabVariants,
