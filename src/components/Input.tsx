@@ -1,5 +1,5 @@
 import { clsx } from 'clsx'
-import { forwardRef, type InputHTMLAttributes, type ReactNode, useState } from 'react'
+import { type FocusEvent, forwardRef, type InputHTMLAttributes, type PointerEvent, type ReactNode, useRef, useState } from 'react'
 import { twMerge } from 'tailwind-merge'
 import { Icon, type IconName } from '../icons'
 
@@ -29,6 +29,9 @@ export const Input = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
 		className,
 		type = 'text',
 		id,
+		onFocus,
+		onBlur,
+		onPointerDown,
 		...rest
 	} = props
 
@@ -39,6 +42,34 @@ export const Input = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
 	const hasError = error != null && error !== ''
 	const errorId = id ? `${id}-error` : undefined
 	const trailingIcon: IconName | undefined = isPassword ? (revealed ? 'schovat' : 'ukazat') : iconAfter
+
+	// Modality tracking: show the 4px focus ring only when focus arrived from the keyboard.
+	// Browsers match :focus-visible on text-input clicks (per spec), so we cannot use a CSS-only
+	// approach — fall back to a tiny JS-tracked flag. A pointerdown anywhere inside the field
+	// (input or trailing button) marks the upcoming focus as mouse/touch-initiated.
+	const [keyboardFocus, setKeyboardFocus] = useState(false)
+	const pointerInitiatedRef = useRef(false)
+
+	const handleWrapperPointerDown = (event: PointerEvent<HTMLDivElement>) => {
+		pointerInitiatedRef.current = true
+	}
+
+	const handleInputFocus = (event: FocusEvent<HTMLInputElement>) => {
+		setKeyboardFocus(!pointerInitiatedRef.current)
+		pointerInitiatedRef.current = false
+		onFocus?.(event)
+	}
+
+	const handleInputBlur = (event: FocusEvent<HTMLInputElement>) => {
+		setKeyboardFocus(false)
+		pointerInitiatedRef.current = false
+		onBlur?.(event)
+	}
+
+	const handleInputPointerDown = (event: PointerEvent<HTMLInputElement>) => {
+		pointerInitiatedRef.current = true
+		onPointerDown?.(event)
+	}
 
 	return (
 		<div className={twMerge(clsx('flex w-full flex-col gap-npi-2 font-npi-sans', className))}>
@@ -70,12 +101,13 @@ export const Input = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
 				</label>
 			)}
 			<div
+				onPointerDown={handleWrapperPointerDown}
 				className={clsx(
-					'group relative flex h-npi-12 w-full items-center gap-npi-3 rounded-npi-xxs border bg-npi-bg-white px-npi-4 outline outline-0 outline-npi-blue-light transition-colors',
-					// Show the 4px focus ring only on keyboard focus (Tab), not on mouse click —
-					// matches Figma's distinct Focus vs Active states. `:has(:focus-visible)` lets
-					// the wrapper react to the inner input's focus-visible state.
-					'has-[:focus-visible]:outline-4',
+					'group relative flex h-npi-12 w-full items-center gap-npi-3 rounded-npi-xxs border bg-npi-bg-white px-npi-4 outline outline-0 outline-npi-blue-light transition-[outline-width,border-color]',
+					// Ring shows ONLY when focus arrived via keyboard (Tab / Shift+Tab) — matches
+					// Figma's distinct Focus vs Active states. Mouse/touch focus shows just the
+					// default border + cursor (Active state).
+					keyboardFocus && 'outline-4',
 					hasError
 						? 'border-npi-status-error'
 						: disabled
@@ -96,6 +128,9 @@ export const Input = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
 						'font-bold text-npi-text-primary',
 						'disabled:cursor-not-allowed disabled:text-npi-text-secondary',
 					)}
+					onFocus={handleInputFocus}
+					onBlur={handleInputBlur}
+					onPointerDown={handleInputPointerDown}
 					{...rest}
 				/>
 				{isPassword
