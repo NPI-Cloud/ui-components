@@ -6,15 +6,11 @@ import { twMerge } from 'tailwind-merge'
 export const bigNumberSizes = ['M', 'L'] as const
 export type BigNumberSize = (typeof bigNumberSizes)[number]
 
-export interface BigNumberProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'prefix'> {
-	/** The big numeric value. Pass as `ReactNode` so the consumer formats it (locale, separators, currency). */
+export interface BigNumberProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
+	/** The big numeric value. Pass as `ReactNode` so the consumer formats it (locale, separators, currency, signs, units). */
 	value: ReactNode
 	/** Descriptive label shown below the number. */
 	label: ReactNode
-	/** Optional content rendered inline before the number (e.g. currency symbol). */
-	prefix?: ReactNode
-	/** Optional content rendered inline after the number (e.g. `%`, `Kč`, `+`). */
-	suffix?: ReactNode
 	/**
 	 * Visual size.
 	 * - `L` (default) — desktop, 100px Bitter (`text-[6.25rem]`).
@@ -42,14 +38,10 @@ const numberCva = cva('font-npi-serif font-normal leading-none text-npi-blue', {
 	},
 })
 
-export const BigNumber = forwardRef<HTMLDivElement, BigNumberProps>(({ value, label, prefix, suffix, size = 'L', className, ...rest }, ref) => {
+export const BigNumber = forwardRef<HTMLDivElement, BigNumberProps>(({ value, label, size = 'L', className, ...rest }, ref) => {
 	return (
 		<div ref={ref} className={twMerge(clsx('flex flex-col items-start gap-npi-2', className))} {...rest}>
-			<p className={numberCva({ size })}>
-				{prefix}
-				{value}
-				{suffix}
-			</p>
+			<p className={numberCva({ size })}>{value}</p>
 			<p className="font-npi-sans text-[1rem] leading-[1.5] text-npi-text-primary">
 				{label}
 			</p>
