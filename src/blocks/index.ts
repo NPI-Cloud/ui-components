@@ -25,5 +25,13 @@ export { ImageBlock, type ImageBlockProps } from './ImageBlock'
 export { NotFoundPage, type NotFoundPageProps, type NotFoundPageTheme, notFoundPageThemes } from './NotFoundPage'
 export { type PodcastPlatformIcon, type PodcastPlatformLink, PodcastTemplate, type PodcastTemplateProps } from './PodcastTemplate'
 export { ProfileCardBlock, type ProfileCardBlockOrientation, type ProfileCardBlockProps, type ProfileCardBlockSize } from './ProfileCardBlock'
-export { TextBlock, type TextBlockProps } from './TextBlock'
+export {
+	TextBlock,
+	type TextBlockProps,
+	type TextBlockRichAnchor,
+	type TextBlockRichContent,
+	type TextBlockRichInline,
+	type TextBlockRichLeaf,
+	type TextBlockRichParagraph,
+} from './TextBlock'
 export { VideoTemplate, type VideoTemplateProps } from './VideoTemplate'
