@@ -1,3 +1,4 @@
+import { clsx } from 'clsx'
 import { Fragment, type ReactNode } from 'react'
 import { Text, type TextSize } from '../components/Text.js'
 
@@ -29,6 +30,8 @@ export interface TextBlockRichContent {
 export interface TextBlockProps {
 	variant?: TextBlockVariant | null
 	content?: TextBlockRichContent | string | null
+	/** Wrap in a soft grey rounded box (matches `<Testimonial boxed>`). */
+	boxed?: boolean | null
 }
 
 const FALLBACK_PARAGRAPH: TextBlockRichParagraph = {
@@ -36,10 +39,10 @@ const FALLBACK_PARAGRAPH: TextBlockRichParagraph = {
 	children: [{ text: 'Textový blok' }],
 }
 
-export function TextBlock({ variant, content }: TextBlockProps) {
+export function TextBlock({ variant, content, boxed }: TextBlockProps) {
 	const paragraphs = normalizeContent(content)
 	return (
-		<div className="flex flex-col gap-npi-6">
+		<div className={clsx('flex flex-col gap-npi-6', boxed && 'rounded-npi-m bg-npi-bg-light px-npi-12 py-npi-10')}>
 			{paragraphs.map((paragraph, index) => (
 				<Text key={index} variant={variant ?? 'l'}>
 					{renderInlines(paragraph.children)}
