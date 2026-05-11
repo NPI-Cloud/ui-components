@@ -34,4 +34,5 @@ export {
 	type TextBlockRichLeaf,
 	type TextBlockRichParagraph,
 } from './TextBlock'
+export { VideoBlock, type VideoBlockProps } from './VideoBlock'
 export { VideoTemplate, type VideoTemplateProps } from './VideoTemplate'

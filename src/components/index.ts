@@ -19,7 +19,7 @@ export { CarouselControls, type CarouselControlsProps } from './CarouselControls
 export { Checkbox, type CheckboxProps, type CheckboxSize, checkboxSizes } from './Checkbox'
 export { CookieBanner, type CookieBannerMode, cookieBannerModes, type CookieBannerProps, type CookieCategory } from './CookieBanner'
 export { Counter, type CounterProps } from './Counter'
-export { CoverMedia, type CoverMediaProps, toEmbedUrl } from './CoverMedia'
+export { CoverMedia, type CoverMediaProps } from './CoverMedia'
 export {
 	type DateRange,
 	DateTimePicker,
@@ -198,3 +198,4 @@ export { Text, type TextProps, type TextSize, type TextSpec, textSpecs, textVari
 export { Toast, type ToastProps, type ToastTone, toastTones } from './Toast'
 export { Tooltip, type TooltipPlacement, tooltipPlacements, type TooltipProps } from './Tooltip'
 export { UploadDropzone, type UploadDropzoneProps } from './UploadDropzone'
+export { toEmbedUrl, Video, type VideoProps } from './Video'

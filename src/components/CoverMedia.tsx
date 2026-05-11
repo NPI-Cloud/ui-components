@@ -1,4 +1,5 @@
 import { Text } from './Text'
+import { toEmbedUrl } from './Video'
 
 export interface CoverMediaProps {
 	/** Static image URL — used as the cover when `videoUrl` is empty (or unsupported). */
@@ -46,28 +47,6 @@ export function CoverMedia({ imageUrl, imageAlt, videoUrl, placeholderLabel = 'V
 	)
 }
 
-/** Translate a public-facing video URL to its `iframe`-embeddable form. Returns `null` for unsupported sources. */
-export function toEmbedUrl(url: string): string | null {
-	const trimmed = url.trim()
-	if (!trimmed) return null
-
-	// YouTube — youtu.be/<id>
-	const ytShort = trimmed.match(/youtu\.be\/([\w-]+)/)
-	if (ytShort) return youtubeEmbed(ytShort[1])
-
-	// YouTube — youtube.com/embed/<id>
-	const ytEmbed = trimmed.match(/youtube\.com\/embed\/([\w-]+)/)
-	if (ytEmbed) return youtubeEmbed(ytEmbed[1])
-
-	// YouTube — youtube.com/watch?v=<id>
-	const ytWatch = trimmed.match(/[?&]v=([\w-]+)/)
-	if (ytWatch && /youtube\.com/.test(trimmed)) return youtubeEmbed(ytWatch[1])
-
-	// Vimeo — vimeo.com/<id> or vimeo.com/video/<id>
-	const vimeo = trimmed.match(/vimeo\.com\/(?:video\/)?(\d+)/)
-	if (vimeo) return `https://player.vimeo.com/video/${vimeo[1]}?dnt=1`
-
-	return null
-}
-
-const youtubeEmbed = (id: string) => `https://www.youtube-nocookie.com/embed/${id}?rel=0&modestbranding=1`
+// Re-exported here for backward compatibility — moved to `./Video` so the new `<Video>`
+// primitive and `CoverMedia` share the same parser.
+export { toEmbedUrl }
