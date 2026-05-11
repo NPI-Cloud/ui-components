@@ -39,13 +39,13 @@ const FALLBACK_PARAGRAPH: TextBlockRichParagraph = {
 export function TextBlock({ variant, content }: TextBlockProps) {
 	const paragraphs = normalizeContent(content)
 	return (
-		<>
+		<div className="flex flex-col gap-npi-6">
 			{paragraphs.map((paragraph, index) => (
 				<Text key={index} variant={variant ?? 'l'}>
 					{renderInlines(paragraph.children)}
 				</Text>
 			))}
-		</>
+		</div>
 	)
 }
 
@@ -74,7 +74,7 @@ function renderInlines(children: TextBlockRichInline[]): ReactNode {
 	return children.map((node, index) => {
 		if ('type' in node && node.type === 'anchor') {
 			return (
-				<a key={index} href={node.href} className="underline">
+				<a key={index} href={node.href} className="text-npi-blue underline">
 					{renderLeaves(node.children)}
 				</a>
 			)
