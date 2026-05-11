@@ -179,11 +179,19 @@ export function ContentTemplateShareRow({ share }: { share: ContentTemplateShare
 	)
 }
 
-/** Outer `<article>` wrapper used by every content template — applies vertical rhythm. */
+/**
+ * Outer wrapper used by every content template. Sits inside the centered NPI layout
+ * (`max-w-npi-layout`, 1064px) and left-aligns the article at 2/3 of that width (~709px).
+ * The 1/3 of empty space on the right is intentional — keeps the prose at a comfortable
+ * reading measure while staying anchored to the layout grid that the rest of the page uses.
+ * Callers don't impose any width themselves; the template owns its place in the layout.
+ */
 export function ContentTemplateShell({ children, className }: { children: ReactNode; className?: string }) {
 	return (
-		<article className={clsx('flex flex-col gap-npi-12 font-npi-sans', className)}>
-			{children}
-		</article>
+		<div className="mx-auto w-full max-w-npi-layout px-npi-6">
+			<article className={clsx('flex w-full max-w-[calc(var(--container-npi-layout)*2/3)] flex-col gap-npi-12 font-npi-sans', className)}>
+				{children}
+			</article>
+		</div>
 	)
 }
