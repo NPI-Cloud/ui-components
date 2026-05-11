@@ -10,7 +10,6 @@ export {
 	type ContentTemplateAuthor,
 	type ContentTemplateBaseProps,
 	ContentTemplateBullet,
-	ContentTemplateCover,
 	ContentTemplateHeader,
 	ContentTemplateMeta,
 	type ContentTemplateShare,
@@ -21,7 +20,7 @@ export { FlexEndBlock } from './FlexEndBlock'
 export { FlexStartBlock, type FlexStartBlockProps } from './FlexStartBlock'
 export { HeadingBlock, type HeadingBlockLevel, type HeadingBlockProps } from './HeadingBlock'
 export { HeroBlock, type HeroBlockProps, type HeroSize, heroSizes } from './HeroBlock'
-export { ImageBlock, type ImageBlockProps } from './ImageBlock'
+export { MediaBlock, type MediaBlockAspect, mediaBlockAspects, type MediaBlockFit, mediaBlockFits, type MediaBlockProps } from './MediaBlock'
 export { NotFoundPage, type NotFoundPageProps, type NotFoundPageTheme, notFoundPageThemes } from './NotFoundPage'
 export { type PodcastPlatformIcon, type PodcastPlatformLink, PodcastTemplate, type PodcastTemplateProps } from './PodcastTemplate'
 export { ProfileCardBlock, type ProfileCardBlockOrientation, type ProfileCardBlockProps, type ProfileCardBlockSize } from './ProfileCardBlock'

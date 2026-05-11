@@ -3,6 +3,7 @@ import { type ReactNode, useEffect, useRef, useState } from 'react'
 import { Breadcrumbs, type BreadcrumbsItem } from '../components/Breadcrumbs'
 import { Text } from '../components/Text'
 import { Icon, type IconName } from '../icons'
+import { MediaBlock } from './MediaBlock'
 
 export interface ContentTemplateAuthor {
 	name: string
@@ -24,7 +25,7 @@ export interface ContentTemplateBaseProps {
 	breadcrumbs?: BreadcrumbsItem[]
 	/** Page title — renders as `<h1>` at the level-2 size from the design. */
 	title: string
-	/** Pre-rendered cover (e.g. `<img className="size-full object-cover" />` or a video iframe). When omitted, a placeholder is shown. */
+	/** Cover area for the page — typically a `<MediaBlock>`. When omitted, a placeholder is shown. */
 	coverSlot?: ReactNode
 	/** Optional author. Renders alongside the date when both are present. */
 	author?: ContentTemplateAuthor | null
@@ -50,21 +51,8 @@ export function ContentTemplateHeader(
 			<h1 className="font-npi-serif text-[2rem] leading-[1.2] font-normal text-npi-text-primary @npi-tablet:text-[2.5rem]">
 				{title}
 			</h1>
-			<ContentTemplateCover>{coverSlot}</ContentTemplateCover>
+			{coverSlot ?? <MediaBlock />}
 		</header>
-	)
-}
-
-/** Cover frame — 16:9 ratio, rounded corners, light blue placeholder when empty. */
-export function ContentTemplateCover({ children }: { children?: ReactNode }) {
-	return (
-		<div className="relative aspect-[16/9] w-full overflow-hidden rounded-npi-xxs bg-npi-blue-lighter">
-			{children ?? (
-				<div className="absolute inset-0 flex items-center justify-center">
-					<Text variant="l" className="text-npi-text-primary">Vizuál, foto, video</Text>
-				</div>
-			)}
-		</div>
 	)
 }
 
