@@ -5,7 +5,7 @@ export type BannerBlockIndicator = BannerIndicator
 
 export interface BannerBlockProps {
 	title?: string | null
-	label?: string | null
+	eyebrow?: string | null
 	description?: string | null
 	tone?: BannerBlockTone | null
 	indicator?: BannerBlockIndicator | null
@@ -19,7 +19,7 @@ export interface BannerBlockProps {
 
 export function BannerBlock({
 	title,
-	label,
+	eyebrow,
 	description,
 	tone,
 	indicator,
@@ -38,7 +38,7 @@ export function BannerBlock({
 	return (
 		<Banner
 			tone={tone ?? 'light'}
-			label={label ?? undefined}
+			label={eyebrow ?? undefined}
 			title={title || 'Nadpis banneru'}
 			description={description ?? undefined}
 			visual={visual}

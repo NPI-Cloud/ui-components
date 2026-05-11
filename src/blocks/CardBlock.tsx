@@ -17,7 +17,7 @@ const aspectMap: Record<Exclude<CardBlockAspect, 'none' | 'visualOnly'>, CardAsp
 
 export interface CardBlockProps {
 	title?: string | null
-	label?: string | null
+	eyebrow?: string | null
 	description?: string | null
 	metaDate?: string | null
 	metaText?: string | null
@@ -46,7 +46,7 @@ const buildMeta = (date: string | null | undefined, text: string | null | undefi
 }
 
 export function CardBlock(
-	{ title, label, description, metaDate, metaText, imageUrl, imageAlt, aspect, indicator, tagLabel, tagUrl, href, ctaLabel, ctaUrl }: CardBlockProps,
+	{ title, eyebrow, description, metaDate, metaText, imageUrl, imageAlt, aspect, indicator, tagLabel, tagUrl, href, ctaLabel, ctaUrl }: CardBlockProps,
 ) {
 	const visual = imageUrl
 		? <img src={imageUrl} alt={imageAlt ?? ''} className="absolute inset-0 size-full object-cover" />
@@ -73,7 +73,7 @@ export function CardBlock(
 	return (
 		<Card
 			title={title || 'Karta'}
-			label={label ?? undefined}
+			label={eyebrow ?? undefined}
 			description={description ?? undefined}
 			meta={buildMeta(metaDate, metaText)}
 			visual={visual}
