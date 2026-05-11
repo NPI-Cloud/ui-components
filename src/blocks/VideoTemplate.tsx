@@ -19,8 +19,11 @@ export function VideoTemplate(
 	return (
 		<ContentTemplateShell className={className}>
 			<ContentTemplateHeader breadcrumbs={breadcrumbs} title={title} coverSlot={coverSlot} />
-			<ContentTemplateMeta author={author} date={date} />
-			{children}
+			{/* Meta + body sit tight together — design has no padding below the author/date row. */}
+			<div className="flex flex-col">
+				<ContentTemplateMeta author={author} date={date} />
+				{children}
+			</div>
 			{share && <ContentTemplateShareRow share={share} />}
 			{belowSlot}
 		</ContentTemplateShell>

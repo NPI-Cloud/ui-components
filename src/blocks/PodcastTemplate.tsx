@@ -35,25 +35,28 @@ export function PodcastTemplate(
 	return (
 		<ContentTemplateShell className={className}>
 			<ContentTemplateHeader breadcrumbs={breadcrumbs} title={title} coverSlot={coverSlot} />
-			<ContentTemplateMeta author={author} date={date} />
-			{hasPlatforms && (
-				<div className="flex flex-col gap-npi-4">
-					<Text variant="l">Přehrajte si podcast na platformách</Text>
-					<div className="flex flex-wrap items-center gap-npi-6">
-						{platforms.map(platform => (
-							<a
-								key={platform.href}
-								href={platform.href}
-								className="inline-flex items-center gap-npi-2 text-npi-text-link transition-colors hover:text-npi-text-link-hover focus-visible:outline-none focus-visible:shadow-[0_2px_0_0_var(--npi-blue-light)]"
-							>
-								<Icon name={platform.iconName} size="m" className="size-8" aria-hidden="true" />
-								<Text variant="l" weight="bold" className="text-inherit">{platform.label}</Text>
-							</a>
-						))}
+			{/* Meta + platforms + body sit tight together — design has no padding below the author/date row. */}
+			<div className="flex flex-col">
+				<ContentTemplateMeta author={author} date={date} />
+				{hasPlatforms && (
+					<div className="flex flex-col gap-npi-4">
+						<Text variant="l">Přehrajte si podcast na platformách</Text>
+						<div className="flex flex-wrap items-center gap-npi-6">
+							{platforms.map(platform => (
+								<a
+									key={platform.href}
+									href={platform.href}
+									className="inline-flex items-center gap-npi-2 text-npi-text-link transition-colors hover:text-npi-text-link-hover focus-visible:outline-none focus-visible:shadow-[0_2px_0_0_var(--npi-blue-light)]"
+								>
+									<Icon name={platform.iconName} size="m" className="size-8" aria-hidden="true" />
+									<Text variant="l" weight="bold" className="text-inherit">{platform.label}</Text>
+								</a>
+							))}
+						</div>
 					</div>
-				</div>
-			)}
-			{children}
+				)}
+				{children}
+			</div>
 			{share && <ContentTemplateShareRow share={share} />}
 			{belowSlot}
 		</ContentTemplateShell>
