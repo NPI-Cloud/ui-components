@@ -3,6 +3,7 @@ import { forwardRef, Fragment } from 'react'
 import { twMerge } from 'tailwind-merge'
 import { Icon, type IconName } from '../icons'
 import { Button } from './Button'
+import { DownloadButton, type DownloadVariant } from './DownloadButton'
 import { Heading } from './Heading'
 import { Tag } from './Tag'
 import { Text } from './Text'
@@ -70,6 +71,11 @@ export interface CardProps extends Omit<React.HTMLAttributes<HTMLElement>, 'titl
 	tag?: CardLink
 	/** Optional tertiary CTA / download rendered at the bottom (independent click target) */
 	cta?: CardCta
+	/**
+	 * Downloadable file rendered in the tertiary-CTA slot. Takes precedence over `cta` —
+	 * single variant downloads directly; multiple variants open a format dropdown.
+	 */
+	download?: { label?: string; variants: DownloadVariant[] }
 	/** Additional content rendered after the description (extra tags, custom CTAs, etc.) */
 	children?: React.ReactNode
 }
@@ -100,6 +106,7 @@ export const Card = forwardRef<HTMLElement, CardProps>(({
 	visualOnly = false,
 	tag,
 	cta,
+	download,
 	children,
 	className,
 	...props
@@ -214,16 +221,22 @@ export const Card = forwardRef<HTMLElement, CardProps>(({
 							<Tag size="S" label={tag.label} href={tag.href} />
 						</div>
 					)}
-					{cta && (
-						<div className="relative z-10">
-							<Button
-								variant="tertiary"
-								label={cta.label}
-								iconBefore={cta.iconBefore ?? 'stahnout'}
-								href={cta.href}
-							/>
-						</div>
-					)}
+					{download && download.variants.length > 0
+						? (
+							<div className="relative z-10">
+								<DownloadButton label={download.label ?? cta?.label ?? 'Stáhnout'} variants={download.variants} />
+							</div>
+						)
+						: cta && (
+							<div className="relative z-10">
+								<Button
+									variant="tertiary"
+									label={cta.label}
+									iconBefore={cta.iconBefore ?? 'stahnout'}
+									href={cta.href}
+								/>
+							</div>
+						)}
 					{children}
 				</div>
 			</article>
