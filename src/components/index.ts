@@ -27,6 +27,7 @@ export {
 	type DateTimePickerProps,
 	type DateTimePickerValue,
 } from './DateTimePicker'
+export { DownloadButton, type DownloadButtonProps, type DownloadVariant } from './DownloadButton'
 export {
 	Footer,
 	FooterBottom,
