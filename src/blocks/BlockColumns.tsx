@@ -1,3 +1,5 @@
+'use client'
+
 import { clsx } from 'clsx'
 import { Children, type ReactNode } from 'react'
 import { twMerge } from 'tailwind-merge'

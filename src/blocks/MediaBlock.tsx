@@ -1,3 +1,5 @@
+'use client'
+
 import { clsx } from 'clsx'
 import { Text } from '../components/Text'
 import { toEmbedUrl } from '../components/Video'

@@ -1,3 +1,5 @@
+'use client'
+
 import { uic } from '../utils/uic'
 
 export const badgeTones = ['success', 'error', 'warning', 'info', 'neutral', 'neutral-solid'] as const

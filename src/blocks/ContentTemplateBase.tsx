@@ -1,3 +1,5 @@
+'use client'
+
 import { clsx } from 'clsx'
 import { type ReactNode, useEffect, useRef, useState } from 'react'
 import { Breadcrumbs, type BreadcrumbsItem } from '../components/Breadcrumbs'

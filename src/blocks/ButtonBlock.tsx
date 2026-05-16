@@ -1,5 +1,7 @@
-import { Button } from '../components/Button.js'
-import { type IconName, iconRegistryM } from '../icons/index.js'
+'use client'
+
+import { Button } from '../components/Button'
+import { type IconName, iconRegistryM } from '../icons'
 
 export type ButtonBlockVariant = 'primary' | 'secondary' | 'tertiary' | 'tertiarySmall' | 'icon'
 

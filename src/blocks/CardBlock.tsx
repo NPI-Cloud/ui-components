@@ -1,5 +1,7 @@
-import { Card, type CardAspect, type CardIndicator } from '../components/Card.js'
-import type { DownloadVariant } from '../components/DownloadButton.js'
+'use client'
+
+import { Card, type CardAspect, type CardIndicator } from '../components/Card'
+import type { DownloadVariant } from '../components/DownloadButton'
 
 // Persisted as enum keys in the schema (slashes aren't valid PG enum identifiers); map back to component values.
 // `none` hides the visual area entirely instead of mapping to a Card aspect.

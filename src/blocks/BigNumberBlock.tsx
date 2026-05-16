@@ -1,3 +1,5 @@
+'use client'
+
 import { BigNumber, type BigNumberSize } from '../components/BigNumber'
 
 export type BigNumberBlockSize = 'm' | 'l'

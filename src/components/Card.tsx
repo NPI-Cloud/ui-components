@@ -1,3 +1,5 @@
+'use client'
+
 import { clsx } from 'clsx'
 import { forwardRef, Fragment } from 'react'
 import { twMerge } from 'tailwind-merge'

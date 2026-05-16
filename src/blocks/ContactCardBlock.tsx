@@ -1,3 +1,5 @@
+'use client'
+
 import { ContactCard } from '../components/ProfileCard'
 
 export interface ContactCardBlockProps {

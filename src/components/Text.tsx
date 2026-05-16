@@ -1,3 +1,5 @@
+'use client'
+
 import { uic } from '../utils/uic'
 
 export const textVariants = ['xl', 'l', 'm', 's', 'xs', 'label'] as const

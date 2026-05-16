@@ -1,3 +1,5 @@
+'use client'
+
 import { clsx } from 'clsx'
 import { Heading } from '../components/Heading'
 import { Text } from '../components/Text'

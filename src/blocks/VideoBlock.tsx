@@ -1,3 +1,5 @@
+'use client'
+
 import { Video } from '../components/Video'
 
 export interface VideoBlockProps {

@@ -1,3 +1,5 @@
+'use client'
+
 import { ProfileCard, type ProfileCardOrientation, type ProfileCardSize } from '../components/ProfileCard'
 
 export type ProfileCardBlockSize = 's' | 'm'

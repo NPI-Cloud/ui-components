@@ -1,3 +1,5 @@
+'use client'
+
 import { forwardRef } from 'react'
 import { Icon, type IconName } from '../icons'
 import { uic } from '../utils/uic'

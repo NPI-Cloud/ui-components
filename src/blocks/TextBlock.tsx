@@ -1,6 +1,8 @@
+'use client'
+
 import { clsx } from 'clsx'
 import { Fragment, type ReactNode } from 'react'
-import { Text, type TextSize } from '../components/Text.js'
+import { Text, type TextSize } from '../components/Text'
 
 type TextBlockVariant = TextSize
 

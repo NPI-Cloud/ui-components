@@ -1,3 +1,5 @@
+'use client'
+
 import * as RadixAccordion from '@radix-ui/react-accordion'
 import { clsx } from 'clsx'
 import { forwardRef, type ReactNode, useId } from 'react'

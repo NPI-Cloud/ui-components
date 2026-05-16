@@ -14,7 +14,7 @@ export enum BlockType {
 	Dynamic = 'dynamic',
 }
 
-import type { TextSize, TextWeight } from './components/Text.js'
+import type { TextSize, TextWeight } from './components/Text'
 
 export type TextVariant = TextSize
 

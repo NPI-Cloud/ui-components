@@ -1,3 +1,5 @@
+'use client'
+
 import { Banner, type BannerIndicator, type BannerTone } from '../components/Banner'
 
 export type BannerBlockTone = BannerTone

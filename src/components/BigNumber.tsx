@@ -1,3 +1,5 @@
+'use client'
+
 import { cva } from 'class-variance-authority'
 import { clsx } from 'clsx'
 import { forwardRef, type HTMLAttributes, type ReactNode } from 'react'

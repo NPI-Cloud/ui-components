@@ -1,3 +1,5 @@
+'use client'
+
 import { clsx } from 'clsx'
 import { forwardRef, type ReactNode, type SVGAttributes, useCallback, useState } from 'react'
 import { twMerge } from 'tailwind-merge'

@@ -1,3 +1,5 @@
+'use client'
+
 import { clsx } from 'clsx'
 import { forwardRef, type HTMLAttributes, type KeyboardEvent, useCallback, useRef } from 'react'
 import { twMerge } from 'tailwind-merge'

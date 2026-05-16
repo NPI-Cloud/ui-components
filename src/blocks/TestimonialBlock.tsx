@@ -1,3 +1,5 @@
+'use client'
+
 import { Testimonial, type TestimonialSize } from '../components/Testimonial'
 
 export type TestimonialBlockSize = 's' | 'm'

@@ -1,3 +1,5 @@
+'use client'
+
 import { uic } from '../utils/uic'
 
 export const statusIndicatorTones = ['success', 'error'] as const

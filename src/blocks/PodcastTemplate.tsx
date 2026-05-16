@@ -1,3 +1,5 @@
+'use client'
+
 import { Text } from '../components/Text'
 import { Icon, type IconName } from '../icons'
 import {
