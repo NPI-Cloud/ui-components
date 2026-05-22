@@ -167,7 +167,7 @@ const roleTextClass = 'font-npi-sans font-normal text-[0.75rem] leading-[1.3] te
 
 // Contact link typography — Noto Sans 12/400 leading-1.3 in P 2727 (npi-blue).
 const contactLinkClass =
-	'font-npi-sans font-normal text-[0.75rem] leading-[1.3] text-npi-blue no-underline hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-npi-blue-light rounded-npi-xxs'
+	'font-npi-sans font-normal text-[0.75rem] leading-[1.3] text-npi-blue no-underline transition-colors hover:text-npi-blue-hover hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-npi-blue-light rounded-npi-xxs'
 
 // Vertical inter-line gap is 2px for size S and 4px for size M (Figma 368:7919 vs 368:7942) — neither in the npi spacing scale.
 const textGapClass: Record<ProfileCardSize, string> = {
@@ -289,7 +289,7 @@ export const ContactCard = forwardRef<HTMLElement, ContactCardProps>(({
 			{email && (
 				<a
 					href={`mailto:${email}`}
-					className="font-npi-sans font-normal text-[0.75rem] leading-[1.3] text-npi-blue no-underline hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-npi-blue-light rounded-npi-xxs"
+					className="font-npi-sans font-normal text-[0.75rem] leading-[1.3] text-npi-blue no-underline transition-colors hover:text-npi-blue-hover hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-npi-blue-light rounded-npi-xxs"
 				>
 					{email}
 				</a>
