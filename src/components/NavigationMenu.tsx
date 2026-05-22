@@ -141,51 +141,8 @@ export interface NavigationMenuSiteSwitcherProps extends HTMLAttributes<HTMLDivE
 
 export const NavigationMenuSiteSwitcher = forwardRef<HTMLDivElement, NavigationMenuSiteSwitcherProps>(
 	({ sites, currentLabel, className, ...props }, ref) => {
-		const insideDrawer = useContext(InsideDrawerContext)
 		const inList = sites.some(site => site.label === currentLabel)
 		const resolved = inList ? sites : [{ label: currentLabel, href: '#' }, ...sites]
-
-		// Inside the mobile drawer: render as a full-bleed dark block with a vertical list. Negates the
-		// drawer's side/bottom padding so the dark surface reaches the viewport edges and the drawer bottom.
-		if (insideDrawer) {
-			return (
-				<div
-					ref={ref}
-					className={twMerge(
-						clsx(
-							// `mt-auto` pushes the strip to the drawer's bottom — on a tall viewport an auto-margin
-							// gap above the strip absorbs the slack, on a short one it just sits after the items.
-							// `-mx-npi-6` reclaims the drawer's side padding so the dark surface spans edge to edge.
-							'-mx-npi-6 mt-auto bg-npi-bg-dark px-npi-6 py-npi-6 text-[0.875rem] leading-[1.3] text-npi-white',
-							className,
-						),
-					)}
-					{...props}
-				>
-					<ul className="flex flex-col gap-npi-4">
-						{resolved.map(site => {
-							const isCurrent = site.label === currentLabel
-							return (
-								<li key={site.label} className="flex">
-									<a
-										href={site.href}
-										aria-current={isCurrent ? 'page' : undefined}
-										className={clsx(
-											'inline-flex items-center transition-colors focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-npi-blue-light rounded-npi-xxs',
-											isCurrent
-												? 'text-npi-white underline underline-offset-4'
-												: 'text-npi-white/80 hover:text-npi-white',
-										)}
-									>
-										{site.label}
-									</a>
-								</li>
-							)
-						})}
-					</ul>
-				</div>
-			)
-		}
 
 		return (
 			<div
@@ -1231,7 +1188,6 @@ export const Navigation = forwardRef<HTMLElement, NavigationProps>((props, ref) 
 				)}
 				<NavigationMenuItems>{itemNodes}</NavigationMenuItems>
 				{cta && <NavigationMenuItem label={cta.label} href={cta.href ?? '#'} onClick={cta.onClick} />}
-				{switcher}
 			</NavigationMenuDrawer>
 		</NavigationMenu>
 	)
