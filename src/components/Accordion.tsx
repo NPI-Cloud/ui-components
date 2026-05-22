@@ -116,7 +116,7 @@ export const AccordionItem = forwardRef<HTMLDivElement, AccordionItemProps>(
 					<RadixAccordion.Header className="flex">
 						<RadixAccordion.Trigger
 							className={clsx(
-								'group flex flex-1 select-none items-center gap-npi-6 py-npi-6 outline-none',
+								'group flex flex-1 select-none items-start gap-npi-6 py-npi-6 outline-none',
 								'focus-visible:outline-4 focus-visible:outline-offset-0 focus-visible:outline-npi-blue-light',
 								'transition-colors',
 								disabled
