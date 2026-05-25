@@ -170,7 +170,7 @@ Tabs.displayName = 'Tabs'
 const tabListLayoutByVariant: Record<TabVariant, Record<TabsOrientation, string>> = {
 	segmented: {
 		// Verze 1 — grey backdrop, 4px padding, 16px gap, single row that scrolls horizontally if it overflows
-		horizontal: 'inline-flex max-w-full overflow-x-auto bg-npi-bg-light rounded-npi-xs p-npi-1 gap-npi-4',
+		horizontal: 'inline-flex self-start max-w-full overflow-x-auto bg-npi-bg-light rounded-npi-xs p-npi-1 gap-npi-4',
 		vertical: 'inline-flex flex-col items-start bg-npi-bg-light rounded-npi-xs p-npi-1 gap-npi-1',
 	},
 	pill: {
@@ -181,7 +181,7 @@ const tabListLayoutByVariant: Record<TabVariant, Record<TabsOrientation, string>
 	},
 	icon: {
 		// Verze 3 — grey backdrop with smaller gap
-		horizontal: 'inline-flex bg-npi-bg-light rounded-npi-xs p-npi-1 gap-npi-1',
+		horizontal: 'inline-flex self-start bg-npi-bg-light rounded-npi-xs p-npi-1 gap-npi-1',
 		vertical: 'inline-flex flex-col items-start bg-npi-bg-light rounded-npi-xs p-npi-1 gap-npi-1',
 	},
 }
