@@ -37,8 +37,7 @@ export const Accordion = forwardRef<HTMLDivElement, AccordionProps>(
 				className={twMerge(
 					clsx(
 						'flex flex-col font-npi-sans',
-						variant === 'boxed'
-							&& 'overflow-clip rounded-npi-xs bg-npi-gray-50 px-npi-8',
+						variant === 'boxed' && 'gap-npi-2',
 						className,
 					),
 				)}
@@ -108,6 +107,7 @@ export const AccordionItem = forwardRef<HTMLDivElement, AccordionItemProps>(
 				className={twMerge(
 					clsx(
 						variant === 'plain' && 'border-t border-npi-gray-200 last:border-b',
+						variant === 'boxed' && 'overflow-clip rounded-npi-xs bg-npi-gray-50 px-npi-8',
 						className,
 					),
 				)}
