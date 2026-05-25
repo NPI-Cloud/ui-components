@@ -25,7 +25,7 @@ export interface CarouselControlsProps extends Omit<React.HTMLAttributes<HTMLDiv
 }
 
 const arrowButtonClass = [
-	'inline-flex size-npi-10 shrink-0 items-center justify-center rounded-full bg-npi-white border border-npi-gray-200 text-npi-text-primary transition-colors cursor-pointer',
+	'inline-flex size-npi-10 shrink-0 items-center justify-center rounded-full bg-npi-white border border-npi-gray-200 text-npi-blue transition-colors cursor-pointer',
 	'hover:border-npi-blue-hover hover:text-npi-blue-hover',
 	'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-npi-blue-light',
 	'disabled:cursor-not-allowed disabled:border-npi-gray-200 disabled:text-npi-gray-300',
