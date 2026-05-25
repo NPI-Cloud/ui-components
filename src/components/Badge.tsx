@@ -2,7 +2,7 @@
 
 import { uic } from '../utils/uic'
 
-export const badgeTones = ['success', 'error', 'warning', 'info', 'neutral', 'neutral-solid'] as const
+export const badgeTones = ['success', 'error', 'warning', 'info', 'informative', 'neutral', 'neutral-solid'] as const
 export type BadgeTone = (typeof badgeTones)[number]
 
 export const Badge = uic('span', {
@@ -13,6 +13,7 @@ export const Badge = uic('span', {
 			error: 'border-2 border-npi-red text-npi-red',
 			warning: 'border-2 border-npi-yellow text-npi-text-primary',
 			info: 'border-2 border-npi-purple text-npi-purple',
+			informative: 'border-2 border-npi-gray-blue text-npi-blue-dark',
 			neutral: 'border-2 border-npi-gray-400 text-npi-gray-700',
 			'neutral-solid': 'bg-npi-gray-200 text-npi-gray-700',
 		},
