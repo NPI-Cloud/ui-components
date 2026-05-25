@@ -2,9 +2,13 @@ import type { ComponentType, SVGProps } from 'react'
 import { AppleM, AppleS } from './Apple'
 import { ApplePodcastsM, ApplePodcastsS } from './ApplePodcasts'
 import { ArrowDoluM, ArrowDoluS } from './ArrowDolu'
+import { ArrowDoluSmallM } from './ArrowDoluSmall'
 import { ArrowNahoruM, ArrowNahoruS } from './ArrowNahoru'
+import { ArrowNahoruSmallM } from './ArrowNahoruSmall'
 import { ArrowVlevoM, ArrowVlevoS } from './ArrowVlevo'
+import { ArrowVlevoSmallM } from './ArrowVlevoSmall'
 import { ArrowVpravoM, ArrowVpravoS } from './ArrowVpravo'
+import { ArrowVpravoSmallM } from './ArrowVpravoSmall'
 import { CasM, CasS } from './Cas'
 import { CheckM, CheckS } from './Check'
 import { DlazdiceM, DlazdiceS } from './Dlazdice'
@@ -105,9 +109,13 @@ export const iconRegistryM = {
 	apple: AppleM,
 	applePodcasts: ApplePodcastsM,
 	arrowDolu: ArrowDoluM,
+	arrowDoluSmall: ArrowDoluSmallM,
 	arrowNahoru: ArrowNahoruM,
+	arrowNahoruSmall: ArrowNahoruSmallM,
 	arrowVlevo: ArrowVlevoM,
+	arrowVlevoSmall: ArrowVlevoSmallM,
 	arrowVpravo: ArrowVpravoM,
+	arrowVpravoSmall: ArrowVpravoSmallM,
 	cas: CasM,
 	check: CheckM,
 	dlazdice: DlazdiceM,
