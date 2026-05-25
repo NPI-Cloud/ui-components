@@ -168,7 +168,7 @@ export const Card = forwardRef<HTMLElement, CardProps>(({
 			>
 				{!hideVisual && (
 					resolvedAspect === 'line'
-						? <div aria-hidden className="h-2 w-full shrink-0 bg-npi-blue @md:h-auto @md:w-2 @md:self-stretch" />
+						? <div aria-hidden className="h-npi-1 w-full shrink-0 bg-npi-blue-dark @md:h-auto @md:w-npi-1 @md:self-stretch" />
 						: (
 							<div
 								className={clsx(
