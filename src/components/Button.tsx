@@ -46,17 +46,17 @@ const ButtonRoot = uic('button', {
 			variant: 'secondary',
 			inverted: true,
 			className:
-				'border-npi-white text-npi-white hover:border-npi-gray-200 hover:text-npi-gray-200 disabled:text-npi-gray-300 disabled:border-npi-gray-300',
+				'border-npi-white text-npi-white hover:border-npi-blue-light hover:text-npi-blue-light disabled:text-npi-gray-300 disabled:border-npi-gray-300',
 		},
 		{
 			variant: 'tertiary',
 			inverted: true,
-			className: 'text-npi-white hover:text-npi-gray-200 active:text-npi-gray-200 disabled:text-npi-gray-300',
+			className: 'text-npi-white hover:text-npi-blue-light active:text-npi-blue-light disabled:text-npi-gray-300',
 		},
 		{
 			variant: 'tertiary-s',
 			inverted: true,
-			className: 'text-npi-white hover:text-npi-gray-200 active:text-npi-gray-200 disabled:text-npi-gray-300',
+			className: 'text-npi-white hover:text-npi-blue-light active:text-npi-blue-light disabled:text-npi-gray-300',
 		},
 		{
 			variant: 'icon',
