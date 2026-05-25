@@ -81,7 +81,7 @@ export const Breadcrumbs = forwardRef<HTMLElement, BreadcrumbsProps>(
 							<li key={i} className="inline-flex items-center gap-npi-2">
 								{!isHome && (
 									<Icon
-										name="arrowVpravo"
+										name="arrowVpravoSmall"
 										size="m"
 										className="size-6 shrink-0 text-npi-gray-400"
 										aria-hidden="true"
