@@ -105,7 +105,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
 			<div
 				onPointerDown={handleWrapperPointerDown}
 				className={clsx(
-					'group relative flex h-npi-12 w-full items-center gap-npi-3 rounded-npi-xxs border bg-npi-bg-white px-npi-4 outline outline-0 outline-npi-blue-light transition-[outline-width,border-color]',
+					'group relative flex h-npi-12 w-full items-center gap-npi-3 rounded-npi-xxs border bg-npi-bg-white px-npi-4 outline outline-0 outline-npi-blue transition-[outline-width,border-color]',
 					// Ring shows ONLY when focus arrived via keyboard (Tab / Shift+Tab) — matches
 					// Figma's distinct Focus vs Active states. Mouse/touch focus shows just the
 					// default border + cursor (Active state).
