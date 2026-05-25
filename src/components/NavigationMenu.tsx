@@ -470,7 +470,7 @@ function NavigationMenuDrawerAccordion({ label, rowClass, liClass, className, ch
 			>
 				<span className="whitespace-nowrap">{label}</span>
 				<Icon
-					name="arrowDolu"
+					name="arrowDoluSmall"
 					className={clsx('size-6 shrink-0 transition-transform duration-300 ease-out', open && '-rotate-180')}
 					aria-hidden="true"
 				/>
@@ -651,7 +651,7 @@ export const NavigationMenuItem = forwardRef<HTMLElement, NavigationMenuItemProp
 
 	const chevronNode = trailing === 'chevron' && (
 		<Icon
-			name="arrowDolu"
+			name="arrowDoluSmall"
 			className="size-6 shrink-0 transition-transform group-hover:-rotate-180 group-focus-visible:-rotate-180 group-data-[state=open]:-rotate-180"
 			aria-hidden="true"
 		/>
