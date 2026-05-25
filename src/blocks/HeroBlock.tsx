@@ -25,6 +25,8 @@ export interface HeroBlockProps {
 	imageAlt?: string | null
 	/** Layout variant — controls content/visual width split and visual aspect ratio. Schema enum values. */
 	heroSize?: HeroSize | null
+	/** When true, omit the visual column entirely (text-only intro). Content keeps the width dictated by `heroSize`. */
+	hideVisual?: boolean | null
 }
 
 const baseCta =
@@ -53,6 +55,7 @@ export function HeroBlock({
 	image,
 	imageAlt,
 	heroSize,
+	hideVisual,
 }: HeroBlockProps) {
 	const hasCta = ctaLabel || secondaryCtaLabel
 	const config = sizeConfig[heroSize ?? 'homepage11']
@@ -78,21 +81,23 @@ export function HeroBlock({
 					</div>
 				)}
 			</div>
-			<div className={clsx('relative w-full overflow-hidden', config.visualAspect)}>
-				{imageUrl
-					? (
-						<img
-							src={imageUrl}
-							alt={imageAlt ?? ''}
-							className="absolute inset-0 h-full w-full object-contain"
-						/>
-					)
-					: (
-						<div className="absolute inset-0 flex items-center justify-center bg-npi-blue-lighter">
-							<Text variant="l" className="text-npi-text-primary">Visual</Text>
-						</div>
-					)}
-			</div>
+			{!hideVisual && (
+				<div className={clsx('relative w-full overflow-hidden', config.visualAspect)}>
+					{imageUrl
+						? (
+							<img
+								src={imageUrl}
+								alt={imageAlt ?? ''}
+								className="absolute inset-0 h-full w-full object-contain"
+							/>
+						)
+						: (
+							<div className="absolute inset-0 flex items-center justify-center bg-npi-blue-lighter">
+								<Text variant="l" className="text-npi-text-primary">Visual</Text>
+							</div>
+						)}
+				</div>
+			)}
 		</section>
 	)
 }
