@@ -65,6 +65,7 @@ import { SchuzkaM, SchuzkaS } from './Schuzka'
 import { SeznamM, SeznamS } from './Seznam'
 import { SipkaDoluM, SipkaDoluS } from './SipkaDolu'
 import { SipkaNahoruM, SipkaNahoruS } from './SipkaNahoru'
+import { SipkaPlnaDoluM, SipkaPlnaDoluS } from './SipkaPlnaDolu'
 import { SipkaVlevoM, SipkaVlevoS } from './SipkaVlevo'
 import { SipkaVpravoM, SipkaVpravoS } from './SipkaVpravo'
 import { SloupcovyGrafM, SloupcovyGrafS } from './SloupcovyGraf'
@@ -172,6 +173,7 @@ export const iconRegistryM = {
 	seznam: SeznamM,
 	sipkaDolu: SipkaDoluM,
 	sipkaNahoru: SipkaNahoruM,
+	sipkaPlnaDolu: SipkaPlnaDoluM,
 	sipkaVlevo: SipkaVlevoM,
 	sipkaVpravo: SipkaVpravoM,
 	sloupcovyGraf: SloupcovyGrafM,
@@ -274,6 +276,7 @@ export const iconRegistryS = {
 	seznam: SeznamS,
 	sipkaDolu: SipkaDoluS,
 	sipkaNahoru: SipkaNahoruS,
+	sipkaPlnaDolu: SipkaPlnaDoluS,
 	sipkaVlevo: SipkaVlevoS,
 	sipkaVpravo: SipkaVpravoS,
 	sloupcovyGraf: SloupcovyGrafS,

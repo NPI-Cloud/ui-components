@@ -50,12 +50,18 @@ export interface DateTimePickerProps {
 	className?: string
 	/** Force the popover open. Useful for stories / tests. */
 	defaultOpen?: boolean
+	/** Month grids shown side by side in the calendar. Defaults to 2 for `date-range`, 1 otherwise. */
+	visibleMonths?: 1 | 2
 }
 
 const monthNamesCs = ['Leden', 'Únor', 'Březen', 'Duben', 'Květen', 'Červen', 'Červenec', 'Srpen', 'Září', 'Říjen', 'Listopad', 'Prosinec']
 const weekdayNamesCs = ['Po', 'Út', 'St', 'Čt', 'Pá', 'So', 'Ne']
-const HOUR_OPTIONS = Array.from({ length: 24 }, (_, h) => h)
-const MINUTE_OPTIONS = [0, 15, 30, 45]
+// Every 15-minute slot of the day: 00:00, 00:15, … 23:45.
+const TIME_OPTIONS = Array.from({ length: 24 * 4 }, (_, i) => {
+	const hour = Math.floor(i / 4)
+	const minute = (i % 4) * 15
+	return { hour, minute, label: `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}` }
+})
 
 function formatDate(date: Date): string {
 	return `${date.getDate()}. ${date.getMonth() + 1}. ${date.getFullYear()}`
@@ -132,6 +138,7 @@ export const DateTimePicker = forwardRef<HTMLButtonElement, DateTimePickerProps>
 		id: idProp,
 		className,
 		defaultOpen = false,
+		visibleMonths,
 	} = props
 
 	const reactId = useId()
@@ -146,6 +153,8 @@ export const DateTimePicker = forwardRef<HTMLButtonElement, DateTimePickerProps>
 	const value = isControlled ? controlledValue : uncontrolledValue
 
 	const [open, setOpen] = useState(defaultOpen)
+	// Two months don't fit on mobile — force a single-month calendar below the tablet breakpoint.
+	const [forceSingleMonth, setForceSingleMonth] = useState(false)
 	const wrapperRef = useRef<HTMLDivElement | null>(null)
 	const triggerRef = useRef<HTMLButtonElement | null>(null)
 
@@ -174,13 +183,20 @@ export const DateTimePicker = forwardRef<HTMLButtonElement, DateTimePickerProps>
 	}, [value])
 	const [visibleMonth, setVisibleMonth] = useState<Date>(initialMonthAnchor)
 
+	// Anchor the visible month to the value only on the open transition — not on every value change,
+	// otherwise selecting a day (which now keeps the popover open) would snap the calendar back.
+	const wasOpenRef = useRef(false)
 	useEffect(() => {
-		if (open) setVisibleMonth(initialMonthAnchor)
+		if (open && !wasOpenRef.current) setVisibleMonth(initialMonthAnchor)
+		wasOpenRef.current = open
 	}, [open, initialMonthAnchor])
 
-	// Close on outside click / Escape.
+	// Close on outside click / Escape. Bind to the document that owns our DOM (`ownerDocument`) rather than the
+	// global `document` — when the component is mounted inside an iframe/portal, the global `document` belongs to
+	// a different window and never receives these events.
 	useEffect(() => {
 		if (!open) return
+		const doc = wrapperRef.current?.ownerDocument ?? document
 		const onDocClick = (event: MouseEvent) => {
 			const target = event.target as Node
 			if (wrapperRef.current && !wrapperRef.current.contains(target)) setOpen(false)
@@ -191,13 +207,28 @@ export const DateTimePicker = forwardRef<HTMLButtonElement, DateTimePickerProps>
 				triggerRef.current?.focus()
 			}
 		}
-		document.addEventListener('mousedown', onDocClick)
-		document.addEventListener('keydown', onKey)
+		doc.addEventListener('mousedown', onDocClick)
+		doc.addEventListener('keydown', onKey)
 		return () => {
-			document.removeEventListener('mousedown', onDocClick)
-			document.removeEventListener('keydown', onKey)
+			doc.removeEventListener('mousedown', onDocClick)
+			doc.removeEventListener('keydown', onKey)
 		}
 	}, [open])
+
+	// Track the tablet breakpoint on the component's OWN window (`ownerDocument.defaultView`) so it follows the
+	// showcase iframe / a portaled context, not the top window.
+	useEffect(() => {
+		const win = wrapperRef.current?.ownerDocument?.defaultView
+		if (!win) return
+		const mq = win.matchMedia('(max-width: 767.98px)')
+		const update = () => setForceSingleMonth(mq.matches)
+		update()
+		mq.addEventListener('change', update)
+		return () => mq.removeEventListener('change', update)
+	}, [])
+
+	// Range selection defaults to a two-month view (Figma); single date shows one. Mobile is always one month.
+	const monthsShown: 1 | 2 = forceSingleMonth ? 1 : (visibleMonths ?? (mode === 'date-range' ? 2 : 1))
 
 	const hasError = error != null && error !== ''
 	const effectivePlaceholder = placeholder ?? (mode === 'time' ? 'Vyberte' : mode === 'date-range' ? 'Vyplňte období' : 'Zadejte datum')
@@ -210,7 +241,8 @@ export const DateTimePicker = forwardRef<HTMLButtonElement, DateTimePickerProps>
 	})()
 	const showPlaceholder = triggerLabel === ''
 
-	const triggerIcon: 'kalendar' | 'sipkaDolu' = mode === 'time' ? 'sipkaDolu' : 'kalendar'
+	// Time uses the solid filled caret ("Šipka plná dolů"); date/range use the calendar glyph.
+	const triggerIcon: 'kalendar' | 'sipkaPlnaDolu' = mode === 'time' ? 'sipkaPlnaDolu' : 'kalendar'
 
 	// Width per mode — matches Figma symbol widths (160 / 240 / 300). 240 and 300 fall outside the npi spacing scale (capped at 200=`npi-50`); flagged in token_gaps.
 	const widthClass = mode === 'time' ? 'w-npi-40' : mode === 'date' ? 'w-[240px]' : 'w-[300px]'
@@ -225,11 +257,11 @@ export const DateTimePicker = forwardRef<HTMLButtonElement, DateTimePickerProps>
 		})
 	}
 
+	// Selecting keeps the popover open so the choice is visible in the calendar; it closes on
+	// outside click / Escape (handled by the effect above).
 	const handleDayClick = (day: Date) => {
 		if (mode === 'date') {
 			commit(day)
-			setOpen(false)
-			triggerRef.current?.focus()
 			return
 		}
 		if (mode === 'date-range') {
@@ -244,8 +276,6 @@ export const DateTimePicker = forwardRef<HTMLButtonElement, DateTimePickerProps>
 			} else {
 				commit({ start: range.start, end: day })
 			}
-			setOpen(false)
-			triggerRef.current?.focus()
 		}
 	}
 
@@ -268,12 +298,11 @@ export const DateTimePicker = forwardRef<HTMLButtonElement, DateTimePickerProps>
 	})()
 
 	// ---- Time handlers
+	// Stay open so hour and minute can both be picked; closes on outside click / Escape.
 	const handlePickTime = (hour: number, minute: number) => {
 		const base = isDateValue(value) ? new Date(value) : new Date()
 		base.setHours(hour, minute, 0, 0)
 		commit(base)
-		setOpen(false)
-		triggerRef.current?.focus()
 	}
 
 	const currentHour = isDateValue(value) ? value.getHours() : null
@@ -332,7 +361,10 @@ export const DateTimePicker = forwardRef<HTMLButtonElement, DateTimePickerProps>
 				onClick={() => !disabled && setOpen(o => !o)}
 				className={clsx(
 					'flex h-npi-12 w-full items-center gap-npi-3 rounded-npi-xxs border bg-npi-bg-white px-npi-4 text-left transition-colors',
-					'focus-visible:outline-4 focus-visible:outline-npi-blue-light',
+					// Focus replaces the border with a 4px npi-blue-light frame (Figma). Plain `focus:` (not
+					// `focus-visible:`) so it also shows when the field is opened by mouse click. border-box keeps
+					// the 48px outer height — the thicker border eats inward instead of shifting layout.
+					'focus:border-4 focus:border-npi-blue-light focus:outline-none',
 					hasError
 						? 'border-npi-status-error'
 						: disabled
@@ -352,7 +384,7 @@ export const DateTimePicker = forwardRef<HTMLButtonElement, DateTimePickerProps>
 				</span>
 				<span
 					aria-hidden
-					className={clsx('inline-flex shrink-0 items-center justify-center', disabled ? 'text-npi-text-secondary' : 'text-npi-blue-dark')}
+					className={clsx('inline-flex shrink-0 items-center justify-center', disabled ? 'text-npi-text-secondary' : 'text-npi-blue')}
 				>
 					<Icon name={triggerIcon} size="m" className="size-6" />
 				</span>
@@ -368,7 +400,7 @@ export const DateTimePicker = forwardRef<HTMLButtonElement, DateTimePickerProps>
 				>
 					{mode === 'time'
 						? (
-							<TimeScroller
+							<TimeList
 								hour={currentHour}
 								minute={currentMinute}
 								onPick={handlePickTime}
@@ -385,6 +417,7 @@ export const DateTimePicker = forwardRef<HTMLButtonElement, DateTimePickerProps>
 								mode={mode}
 								today={today}
 								isDayDisabled={isDayDisabled}
+								monthsShown={monthsShown}
 							/>
 						)}
 				</div>
@@ -411,37 +444,96 @@ interface CalendarProps {
 	mode: DateTimePickerMode
 	today: Date
 	isDayDisabled: (day: Date) => boolean
+	/** How many month grids to render side by side (2 for range selection per Figma). */
+	monthsShown: 1 | 2
 }
 
 function Calendar(props: CalendarProps) {
-	const { visibleMonth, onPrevMonth, onNextMonth, onDayClick, selectedDate, range, mode, today, isDayDisabled } = props
+	const { visibleMonth, onPrevMonth, onNextMonth, monthsShown, range, mode, ...rest } = props
+	const [hoveredDay, setHoveredDay] = useState<Date | null>(null)
+
+	// While picking a range (start chosen, end not yet), preview the range live up to the hovered day so the
+	// highlight band follows the cursor. The hovered day acts as a tentative endpoint.
+	const isPickingEnd = mode === 'date-range' && range.start != null && range.end == null
+	const effectiveRange: DateRange = isPickingEnd && hoveredDay
+		? hoveredDay.getTime() < range.start!.getTime()
+			? { start: hoveredDay, end: range.start }
+			: { start: range.start, end: hoveredDay }
+		: range
+
+	const shared = { ...rest, mode, range: effectiveRange, onDayHover: setHoveredDay }
+
+	// Range selection shows two consecutive months side by side (Figma); the right grid carries the nav that
+	// moves the whole pair. onMouseLeave on the wrapper clears the hover preview when the cursor leaves.
+	if (monthsShown === 2) {
+		const secondMonth = new Date(visibleMonth.getFullYear(), visibleMonth.getMonth() + 1, 1)
+		return (
+			<div className="flex gap-npi-6" onMouseLeave={() => setHoveredDay(null)}>
+				<MonthGrid month={visibleMonth} showNav={false} {...shared} />
+				<MonthGrid month={secondMonth} showNav onPrevMonth={onPrevMonth} onNextMonth={onNextMonth} {...shared} />
+			</div>
+		)
+	}
+
+	return (
+		<div onMouseLeave={() => setHoveredDay(null)}>
+			<MonthGrid month={visibleMonth} showNav onPrevMonth={onPrevMonth} onNextMonth={onNextMonth} {...shared} />
+		</div>
+	)
+}
+
+interface MonthGridProps {
+	month: Date
+	/** Render the prev/next nav chevrons (single-month + the right grid of a two-month view). */
+	showNav: boolean
+	onPrevMonth?: () => void
+	onNextMonth?: () => void
+	onDayClick: (day: Date) => void
+	/** Sets the hovered day to drive the range-selection preview. */
+	onDayHover: (day: Date | null) => void
+	selectedDate: Date | null
+	range: DateRange
+	mode: DateTimePickerMode
+	today: Date
+	isDayDisabled: (day: Date) => boolean
+}
+
+function MonthGrid(props: MonthGridProps) {
+	const { month: visibleMonth, showNav, onPrevMonth, onNextMonth, onDayClick, onDayHover, selectedDate, range, mode, today, isDayDisabled } = props
 	const year = visibleMonth.getFullYear()
 	const month = visibleMonth.getMonth()
 	const weeks = useMemo(() => getMonthGrid(year, month), [year, month])
+	// True when the range covers more than one day — drives the half-cell band that connects the endpoints.
+	const rangeSpans = Boolean(range.start && range.end && !isSameDay(range.start, range.end))
 
 	return (
 		<div className="flex w-[280px] flex-col">
-			{/* Header with month/year + navigation */}
-			<div className="flex items-center justify-between pb-npi-2">
-				<button
-					type="button"
-					aria-label="Předchozí měsíc"
-					onClick={onPrevMonth}
-					className="inline-flex size-npi-10 items-center justify-center rounded-npi-xxs text-npi-blue-dark transition-colors hover:bg-npi-bg-light focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-npi-blue-light"
-				>
-					<Icon name="sipkaVlevo" size="m" className="size-6" />
-				</button>
-				<div className="font-npi-sans text-[1rem] font-bold leading-[1.5] text-npi-text-primary">
+			{/* Header (Figma): month/year on the left, prev/next chevrons on the right. Fixed 40px height so a
+			    nav-less grid (the left month in a two-month range) lines up with the grid that carries the nav. */}
+			<div className="mb-npi-2 flex h-npi-10 items-center justify-between">
+				<span className="font-npi-sans text-[1rem] font-bold leading-[1.5] text-npi-text-primary">
 					{monthNamesCs[month]} {year}
-				</div>
-				<button
-					type="button"
-					aria-label="Další měsíc"
-					onClick={onNextMonth}
-					className="inline-flex size-npi-10 items-center justify-center rounded-npi-xxs text-npi-blue-dark transition-colors hover:bg-npi-bg-light focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-npi-blue-light"
-				>
-					<Icon name="sipkaVpravo" size="m" className="size-6" />
-				</button>
+				</span>
+				{showNav && (
+					<div className="flex items-center">
+						<button
+							type="button"
+							aria-label="Předchozí měsíc"
+							onClick={onPrevMonth}
+							className="inline-flex size-npi-10 items-center justify-center rounded-npi-xxs text-npi-blue transition-colors hover:bg-npi-bg-light focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-npi-blue-light"
+						>
+							<Icon name="arrowVlevo" size="m" className="size-4" />
+						</button>
+						<button
+							type="button"
+							aria-label="Další měsíc"
+							onClick={onNextMonth}
+							className="inline-flex size-npi-10 items-center justify-center rounded-npi-xxs text-npi-blue transition-colors hover:bg-npi-bg-light focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-npi-blue-light"
+						>
+							<Icon name="arrowVpravo" size="m" className="size-4" />
+						</button>
+					</div>
+				)}
 			</div>
 			{/* Weekday labels */}
 			<div className="flex">
@@ -468,9 +560,12 @@ function Calendar(props: CalendarProps) {
 								isRangeStart={range.start ? isSameDay(day, range.start) : false}
 								isRangeEnd={range.end ? isSameDay(day, range.end) : false}
 								isInRange={range.start && range.end ? isInRange(day, range.start, range.end) : false}
+								connectRight={rangeSpans && range.start ? isSameDay(day, range.start) : false}
+								connectLeft={rangeSpans && range.end ? isSameDay(day, range.end) : false}
 								disabled={isDayDisabled(day)}
 								mode={mode}
 								onClick={() => onDayClick(day)}
+								onHover={() => onDayHover(day)}
 							/>
 						))}
 					</div>
@@ -488,13 +583,18 @@ interface DayCellProps {
 	isRangeStart: boolean
 	isRangeEnd: boolean
 	isInRange: boolean
+	/** Extend the range band under the right half of this cell (range start, so it connects to the band on its right). */
+	connectRight: boolean
+	/** Extend the range band under the left half of this cell (range end, so it connects to the band on its left). */
+	connectLeft: boolean
 	disabled: boolean
 	mode: DateTimePickerMode
 	onClick: () => void
+	onHover: () => void
 }
 
 function DayCell(props: DayCellProps) {
-	const { day, inCurrentMonth, isToday, isSelected, isRangeStart, isRangeEnd, isInRange, disabled, mode, onClick } = props
+	const { day, inCurrentMonth, isToday, isSelected, isRangeStart, isRangeEnd, isInRange, connectRight, connectLeft, disabled, mode, onClick, onHover } = props
 	const isRangeEndpoint = isRangeStart || isRangeEnd
 	const showRangeBackground = mode === 'date-range' && isInRange && !isRangeEndpoint
 	const showSelectedDot = isSelected || isRangeEndpoint
@@ -504,6 +604,7 @@ function DayCell(props: DayCellProps) {
 			type="button"
 			disabled={disabled}
 			onClick={onClick}
+			onMouseEnter={onHover}
 			aria-pressed={showSelectedDot || undefined}
 			aria-current={isToday ? 'date' : undefined}
 			className={clsx(
@@ -514,10 +615,16 @@ function DayCell(props: DayCellProps) {
 					: !inCurrentMonth
 					? 'cursor-pointer text-npi-gray-400 hover:text-npi-text-primary'
 					: 'cursor-pointer text-npi-text-primary',
-				!disabled && inCurrentMonth && !showSelectedDot && !showRangeBackground && 'hover:bg-npi-bg-light',
+				// Hover (Figma): a 1px navy ring outline (rounded-full), not a grey fill. `ring-inset` keeps the
+				// 40px cell size — no layout shift — and matches the today-ring look.
+				!disabled && inCurrentMonth && !showSelectedDot && !showRangeBackground
+					&& 'hover:rounded-full hover:ring-1 hover:ring-inset hover:ring-npi-blue-dark',
 				showRangeBackground && 'bg-npi-blue-lighter',
 			)}
 		>
+			{/* Half-cell band under an endpoint so the light-blue range connects seamlessly into the solid circle. */}
+			{connectRight && <span aria-hidden className="pointer-events-none absolute inset-y-0 right-0 w-1/2 bg-npi-blue-lighter" />}
+			{connectLeft && <span aria-hidden className="pointer-events-none absolute inset-y-0 left-0 w-1/2 bg-npi-blue-lighter" />}
 			{showSelectedDot && (
 				<span
 					aria-hidden
@@ -537,60 +644,44 @@ function DayCell(props: DayCellProps) {
 	)
 }
 
-// ---------- Time scroller (simple list of hours + minutes)
+// ---------- Time list (single scrollable list of 15-minute slots)
 
-interface TimeScrollerProps {
+interface TimeListProps {
 	hour: number | null
 	minute: number | null
 	onPick: (hour: number, minute: number) => void
 }
 
-function TimeScroller(props: TimeScrollerProps) {
+function TimeList(props: TimeListProps) {
 	const { hour, minute, onPick } = props
-	const selectedHour = hour ?? 10
-	const selectedMinute = minute ?? 0
-	return (
-		<div className="flex w-npi-40 gap-npi-2" role="group" aria-label="Vyberte čas">
-			<TimeColumn
-				values={HOUR_OPTIONS}
-				selected={selectedHour}
-				onSelect={h => onPick(h, selectedMinute)}
-				ariaLabel="Hodiny"
-			/>
-			<TimeColumn
-				values={MINUTE_OPTIONS}
-				selected={selectedMinute}
-				onSelect={m => onPick(selectedHour, m)}
-				ariaLabel="Minuty"
-			/>
-		</div>
-	)
-}
+	const containerRef = useRef<HTMLDivElement | null>(null)
+	const selectedRef = useRef<HTMLButtonElement | null>(null)
 
-interface TimeColumnProps {
-	values: number[]
-	selected: number
-	onSelect: (value: number) => void
-	ariaLabel: string
-}
+	// On open, center the current value in the scroll viewport (or leave at top when there's no value).
+	useEffect(() => {
+		const container = containerRef.current
+		const selected = selectedRef.current
+		if (!container || !selected) return
+		container.scrollTop = selected.offsetTop - container.clientHeight / 2 + selected.clientHeight / 2
+	}, [])
 
-function TimeColumn(props: TimeColumnProps) {
-	const { values, selected, onSelect, ariaLabel } = props
 	return (
 		<div
+			ref={containerRef}
 			role="listbox"
-			aria-label={ariaLabel}
-			className="flex max-h-[200px] flex-1 flex-col overflow-y-auto"
+			aria-label="Vyberte čas"
+			className="relative flex max-h-[280px] w-npi-40 flex-col overflow-y-auto"
 		>
-			{values.map(v => {
-				const isSelected = v === selected
+			{TIME_OPTIONS.map(opt => {
+				const isSelected = opt.hour === hour && opt.minute === minute
 				return (
 					<button
-						key={v}
+						key={opt.label}
+						ref={isSelected ? selectedRef : undefined}
 						type="button"
 						role="option"
 						aria-selected={isSelected}
-						onClick={() => onSelect(v)}
+						onClick={() => onPick(opt.hour, opt.minute)}
 						className={clsx(
 							'flex h-npi-10 shrink-0 items-center justify-center rounded-npi-xxs font-npi-sans text-[1rem] leading-[1.5] transition-colors',
 							'focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-npi-blue-light',
@@ -599,7 +690,7 @@ function TimeColumn(props: TimeColumnProps) {
 								: 'text-npi-text-primary hover:bg-npi-bg-light',
 						)}
 					>
-						{v.toString().padStart(2, '0')}
+						{opt.label}
 					</button>
 				)
 			})}
