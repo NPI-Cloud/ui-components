@@ -59,6 +59,8 @@ export interface AccordionItemProps {
 	description?: React.ReactNode
 	/** Optional leading slot rendered before the title — icon, number, switch, etc. */
 	leading?: React.ReactNode
+	/** Profile/medallion slot — a 56px avatar grouped tightly (16px gap) with the title+description and vertically centered. Takes precedence over `leading`. */
+	avatar?: React.ReactNode
 	/** Initially expanded (uncontrolled) */
 	defaultOpen?: boolean
 	/** Force expanded state (controlled). When set, use `onToggle` to react to user intent. */
@@ -79,6 +81,7 @@ export const AccordionItem = forwardRef<HTMLDivElement, AccordionItemProps>(
 			title,
 			description,
 			leading,
+			avatar,
 			defaultOpen,
 			open,
 			disabled,
@@ -89,7 +92,31 @@ export const AccordionItem = forwardRef<HTMLDivElement, AccordionItemProps>(
 		ref,
 	) => {
 		const { variant, size } = useContext(AccordionContext)
-		const hasLeading = Boolean(leading)
+		const isMedallion = Boolean(avatar)
+		const hasLeading = !isMedallion && Boolean(leading)
+
+		const summary = (
+			<span className="flex min-w-0 flex-1 flex-col gap-npi-1 text-start">
+				<span
+					className={clsx(
+						'font-npi-serif leading-[1.2]',
+						size === 'm' ? 'text-[1.25rem] font-medium' : 'text-[1rem] font-bold',
+					)}
+				>
+					{title}
+				</span>
+				{description && (
+					<span
+						className={clsx(
+							'font-npi-sans font-normal text-npi-text-primary',
+							size === 'm' ? 'text-[1rem] leading-[1.5]' : 'text-[0.875rem] leading-[1.3]',
+						)}
+					>
+						{description}
+					</span>
+				)}
+			</span>
+		)
 
 		const rootValueProps = open !== undefined
 			? { value: open ? ITEM_VALUE : '', onValueChange: (v: string) => onToggle?.(v === ITEM_VALUE) }
@@ -116,7 +143,8 @@ export const AccordionItem = forwardRef<HTMLDivElement, AccordionItemProps>(
 					<RadixAccordion.Header className="flex">
 						<RadixAccordion.Trigger
 							className={clsx(
-								'group flex flex-1 select-none items-start gap-npi-6 py-npi-6 outline-none',
+								'group flex flex-1 select-none gap-npi-6 py-npi-6 outline-none',
+								isMedallion ? 'items-center' : 'items-start',
 								'focus-visible:outline-4 focus-visible:outline-offset-0 focus-visible:outline-npi-blue-light',
 								'transition-colors',
 								disabled
@@ -124,27 +152,19 @@ export const AccordionItem = forwardRef<HTMLDivElement, AccordionItemProps>(
 									: 'cursor-pointer text-npi-blue hover:text-npi-blue-hover active:text-npi-blue-hover',
 							)}
 						>
-							{hasLeading && <span className="flex shrink-0 items-center">{leading}</span>}
-							<span className="flex min-w-0 flex-1 flex-col gap-npi-1 text-start">
-								<span
-									className={clsx(
-										'font-npi-serif leading-[1.2]',
-										size === 'm' ? 'text-[1.25rem] font-medium' : 'text-[1rem] font-bold',
-									)}
-								>
-									{title}
-								</span>
-								{description && (
-									<span
-										className={clsx(
-											'font-npi-sans font-normal text-npi-text-primary',
-											size === 'm' ? 'text-[1rem] leading-[1.5]' : 'text-[0.875rem] leading-[1.3]',
-										)}
-									>
-										{description}
+							{isMedallion
+								? (
+									<span className="flex min-w-0 flex-1 items-center gap-npi-4">
+										<span className="flex shrink-0 items-center">{avatar}</span>
+										{summary}
 									</span>
+								)
+								: (
+									<>
+										{hasLeading && <span className="flex shrink-0 items-center">{leading}</span>}
+										{summary}
+									</>
 								)}
-							</span>
 							<Icon
 								name="arrowDolu"
 								className="size-6 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-180"
@@ -160,14 +180,29 @@ export const AccordionItem = forwardRef<HTMLDivElement, AccordionItemProps>(
 						)}
 					>
 						<div className="flex gap-npi-6 pb-npi-6">
-							{hasLeading && (
-								<span aria-hidden className="invisible shrink-0">
-									{leading}
-								</span>
-							)}
-							<div className="min-w-0 flex-1 font-npi-sans text-[1rem] leading-[1.5] text-npi-text-primary">
-								{children}
-							</div>
+							{isMedallion
+								? (
+									<span className="flex min-w-0 flex-1 items-start gap-npi-4">
+										<span aria-hidden className="invisible shrink-0">
+											{avatar}
+										</span>
+										<div className="min-w-0 flex-1 font-npi-sans text-[1rem] leading-[1.5] text-npi-text-primary">
+											{children}
+										</div>
+									</span>
+								)
+								: (
+									<>
+										{hasLeading && (
+											<span aria-hidden className="invisible shrink-0">
+												{leading}
+											</span>
+										)}
+										<div className="min-w-0 flex-1 font-npi-sans text-[1rem] leading-[1.5] text-npi-text-primary">
+											{children}
+										</div>
+									</>
+								)}
 							<span aria-hidden className="invisible size-6 shrink-0" />
 						</div>
 					</RadixAccordion.Content>
