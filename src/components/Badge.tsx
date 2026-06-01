@@ -15,7 +15,7 @@ export const Badge = uic('span', {
 			info: 'border-2 border-npi-purple text-npi-purple',
 			informative: 'border-2 border-npi-gray-blue text-npi-blue-dark',
 			neutral: 'border-2 border-npi-gray-400 text-npi-gray-700',
-			'neutral-solid': 'bg-npi-gray-200 text-npi-gray-700',
+			'neutral-solid': 'border-2 border-npi-gray-200 bg-npi-gray-200 text-npi-gray-700',
 		},
 	},
 	defaultVariants: {
