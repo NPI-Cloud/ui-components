@@ -2,7 +2,7 @@
 
 import * as RadixAccordion from '@radix-ui/react-accordion'
 import { clsx } from 'clsx'
-import { forwardRef, type ReactNode, useId } from 'react'
+import { forwardRef, type ReactNode, useId, useState } from 'react'
 import { twMerge } from 'tailwind-merge'
 import { Icon } from '../icons'
 import { Button } from './Button'
@@ -23,12 +23,16 @@ export interface CookieCategory {
 }
 
 export interface CookieBannerProps extends Omit<React.HTMLAttributes<HTMLElement>, 'title'> {
-	/** Layout — `banner` is the compact first-visit lišta, `settings` is the detailed preferences panel with category toggles */
+	/** Controlled view — `banner` is the compact first-visit lišta, `settings` is the detailed preferences panel. When omitted the component manages the view itself (banner → settings on "Přizpůsobit", back on the close icon). */
 	mode?: CookieBannerMode
+	/** Initial view when uncontrolled (`mode` omitted). Defaults to `banner`. */
+	defaultMode?: CookieBannerMode
 	/** Card heading. Defaults to `Používáme cookies!` for banner, `Nastavení cookies` for settings. */
 	title?: ReactNode
-	/** Body copy explaining cookie usage. In `settings` mode this is the intro paragraph under the title. */
+	/** Banner body copy explaining cookie usage. */
 	description: ReactNode
+	/** Settings-view intro paragraph under the title. Falls back to `description` when omitted. */
+	settingsDescription?: ReactNode
 	/** "Allow all" CTA — primary action in both modes */
 	onAcceptAll?: () => void
 	/** "Allow only required / necessary" CTA */
@@ -59,9 +63,12 @@ export interface CookieBannerProps extends Omit<React.HTMLAttributes<HTMLElement
 	closeLabel?: string
 }
 
-// Card chrome — white surface, 16px radius (`npi-s`), 40px padding (`npi-10`), drop-shadow `Shadow M` (#F0F0F0, 0 20 45 0).
+// Card chrome — white surface, 16px radius (`npi-s`), drop-shadow `Shadow M` (#F0F0F0, 0 20 45 0).
 // `drop-shadow-[...]` lets the shadow follow the rounded corners cleanly.
-const cardClass = 'w-full bg-npi-white rounded-npi-s p-npi-10 drop-shadow-[0px_20px_22.5px_#F0F0F0]'
+// Caps at the Figma 800px width and centers itself (`mx-auto`) so it sits in the middle of larger screens;
+// full-width below that. Padding steps from 24px (mobile) to 40px (`npi-10`) at the tablet breakpoint.
+// 800px isn't on the npi spacing scale (tops out at 200) — arbitrary value is the genuine design width.
+const cardClass = 'mx-auto w-full max-w-[800px] bg-npi-white rounded-npi-s p-npi-6 npi-tablet:p-npi-10 drop-shadow-[0px_20px_22.5px_#F0F0F0]'
 
 // Bitter Bold 18px / 1.2 — matches the Mobil/H7 token used for both card titles in Figma.
 const cardTitleClass = 'font-npi-serif font-bold text-[1.125rem] leading-[1.2] text-npi-text-primary'
@@ -89,16 +96,16 @@ function CookieBannerCompact({
 	'title' | 'description' | 'onAcceptAll' | 'onAcceptRequired' | 'onCustomize' | 'acceptAllLabel' | 'acceptRequiredLabel' | 'customizeLabel'
 >) {
 	return (
-		<div className="flex items-start gap-npi-10">
+		<div className="flex flex-col gap-npi-6 npi-tablet:flex-row npi-tablet:items-start npi-tablet:gap-npi-10">
 			<div className="flex min-w-0 flex-1 flex-col gap-npi-3">
 				<h2 className={cardTitleClass}>{title ?? 'Používáme cookies!'}</h2>
 				<div className={bodyClass}>{description}</div>
 			</div>
 			{
-				/* Action stack — fixed 197px column to match Figma's CTA frame.
-			    `whitespace-nowrap` keeps "Povolit nezbytné" on a single line — the column is sized for its full text width. */
+				/* Action stack — full-width below the copy on mobile, fixed 197px column from the tablet
+			    breakpoint up to match Figma's CTA frame. `whitespace-nowrap` keeps "Povolit nezbytné" on one line. */
 			}
-			<div className="flex w-[197px] shrink-0 flex-col gap-npi-3">
+			<div className="flex w-full shrink-0 flex-col gap-npi-3 npi-tablet:w-[197px]">
 				<Button
 					label={acceptAllLabel ?? 'Souhlasím'}
 					onClick={onAcceptAll}
@@ -133,7 +140,7 @@ function CategoryItem({ category, value, checked, onCheckedChange }: CategoryIte
 	const isExpandable = Boolean(category.description)
 
 	const trigger = (
-		<div className="flex h-[72px] items-center gap-npi-6 py-npi-6">
+		<div className="flex min-h-[72px] items-center gap-npi-6 py-npi-6">
 			<div className="flex min-w-0 flex-1 items-center gap-npi-4">
 				{/* Switch sits outside the accordion trigger so toggling it does not expand the row */}
 				<Switch
@@ -220,6 +227,7 @@ function CategoryItem({ category, value, checked, onCheckedChange }: CategoryIte
 
 function CookieBannerSettings({
 	title,
+	settingsDescription,
 	description,
 	categories = [],
 	accepted = [],
@@ -236,6 +244,7 @@ function CookieBannerSettings({
 }: Pick<
 	CookieBannerProps,
 	| 'title'
+	| 'settingsDescription'
 	| 'description'
 	| 'categories'
 	| 'accepted'
@@ -264,8 +273,8 @@ function CookieBannerSettings({
 
 	return (
 		<div className="flex flex-col gap-npi-10">
-			{/* Header row: title + close button. 24px gap, fixed 24px height to match the icon. */}
-			<div className="flex h-6 items-start gap-npi-6">
+			{/* Header row: title + close button. 24px gap; min 24px height (matches the icon) but grows if the title wraps. */}
+			<div className="flex min-h-6 items-start gap-npi-6">
 				<h2 className={clsx(cardTitleClass, 'flex flex-1 items-center')}>
 					{title ?? 'Nastavení cookies'}
 				</h2>
@@ -284,7 +293,7 @@ function CookieBannerSettings({
 			{/* Intro block: bold sub-heading + body. 4px gap matches Figma. */}
 			<div className="flex flex-col gap-npi-1">
 				<p className={clsx(bodyClass, 'font-bold')}>Použití cookies</p>
-				<div className={bodyClass}>{description}</div>
+				<div className={bodyClass}>{settingsDescription ?? description}</div>
 			</div>
 
 			{categories.length > 0 && (
@@ -309,9 +318,11 @@ function CookieBannerSettings({
 				</div>
 			)}
 
-			{/* Footer actions: left group (allow all + allow required) + right (save). 16px inner gap, justify-between. */}
-			<div className="flex items-center justify-between gap-npi-4">
-				<div className="flex items-center gap-npi-4">
+			{/* Footer actions: left group (allow all + allow required) + right (save). On mobile everything stacks
+			    full-width; from the tablet breakpoint the left group sits inline and save floats right (justify-between).
+			    Buttons are `w-full md:w-auto` by default, so they fill the width when stacked and shrink when inline. */}
+			<div className="flex flex-col gap-npi-4 npi-tablet:flex-row npi-tablet:items-center npi-tablet:justify-between">
+				<div className="flex flex-col gap-npi-4 npi-tablet:flex-row npi-tablet:items-center">
 					<Button label={acceptAllLabel ?? 'Povolit vše'} onClick={onAcceptAll} />
 					<Button variant="secondary" label={acceptRequiredLabel ?? 'Povolit nezbytné'} onClick={onAcceptRequired} />
 				</div>
@@ -322,9 +333,11 @@ function CookieBannerSettings({
 }
 
 export const CookieBanner = forwardRef<HTMLElement, CookieBannerProps>(({
-	mode = 'banner',
+	mode: modeProp,
+	defaultMode = 'banner',
 	title,
 	description,
+	settingsDescription,
 	onAcceptAll,
 	onAcceptRequired,
 	onCustomize,
@@ -342,6 +355,22 @@ export const CookieBanner = forwardRef<HTMLElement, CookieBannerProps>(({
 	className,
 	...props
 }, ref) => {
+	// Self-managed view when `mode` is not supplied; `mode` overrides for controlled usage.
+	const [internalMode, setInternalMode] = useState<CookieBannerMode>(defaultMode)
+	const isControlled = modeProp !== undefined
+	const mode = isControlled ? modeProp : internalMode
+
+	// "Přizpůsobit" reveals the settings view in-place; the close icon returns to the banner.
+	// Consumer callbacks still fire so controlled usage can drive the transition itself.
+	const handleCustomize = () => {
+		if (!isControlled) setInternalMode('settings')
+		onCustomize?.()
+	}
+	const handleClose = () => {
+		if (!isControlled) setInternalMode('banner')
+		onClose?.()
+	}
+
 	return (
 		<aside
 			ref={ref}
@@ -357,7 +386,7 @@ export const CookieBanner = forwardRef<HTMLElement, CookieBannerProps>(({
 						description={description}
 						onAcceptAll={onAcceptAll}
 						onAcceptRequired={onAcceptRequired}
-						onCustomize={onCustomize}
+						onCustomize={handleCustomize}
 						acceptAllLabel={acceptAllLabel}
 						acceptRequiredLabel={acceptRequiredLabel}
 						customizeLabel={customizeLabel}
@@ -366,6 +395,7 @@ export const CookieBanner = forwardRef<HTMLElement, CookieBannerProps>(({
 				: (
 					<CookieBannerSettings
 						title={title}
+						settingsDescription={settingsDescription}
 						description={description}
 						categories={categories}
 						accepted={accepted}
@@ -373,7 +403,7 @@ export const CookieBanner = forwardRef<HTMLElement, CookieBannerProps>(({
 						onAcceptAll={onAcceptAll}
 						onAcceptRequired={onAcceptRequired}
 						onSaveSettings={onSaveSettings}
-						onClose={onClose}
+						onClose={!isControlled || onClose ? handleClose : undefined}
 						footer={footer}
 						acceptAllLabel={acceptAllLabel}
 						acceptRequiredLabel={acceptRequiredLabel}
