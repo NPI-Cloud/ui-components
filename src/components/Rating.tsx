@@ -1,7 +1,7 @@
 'use client'
 
 import { clsx } from 'clsx'
-import { forwardRef, type HTMLAttributes, type KeyboardEvent, useCallback, useRef } from 'react'
+import { forwardRef, type HTMLAttributes, type KeyboardEvent, useCallback, useRef, useState } from 'react'
 import { twMerge } from 'tailwind-merge'
 import { Icon } from '../icons'
 
@@ -34,6 +34,7 @@ export const Rating = forwardRef<HTMLDivElement, RatingProps>((props, ref) => {
 
 	const interactive = typeof onChange === 'function'
 	const buttonsRef = useRef<Array<HTMLButtonElement | null>>([])
+	const [hoverValue, setHoverValue] = useState<number | null>(null)
 
 	const focusStar = useCallback((index: number) => {
 		const target = buttonsRef.current[index]
@@ -92,13 +93,17 @@ export const Rating = forwardRef<HTMLDivElement, RatingProps>((props, ref) => {
 		<div
 			ref={ref}
 			className={twMerge(clsx('inline-flex items-center gap-npi-1 font-npi-sans', className))}
+			onMouseLeave={interactive && !disabled ? () => setHoverValue(null) : undefined}
 			{...ariaProps}
 			{...rest}
 		>
 			{Array.from({ length: max }, (_, i) => {
 				const starIndex = i + 1
 				const isFilled = starIndex <= value
-				const colorClass = isFilled ? 'text-npi-blue' : 'text-npi-gray-200'
+				// While hovering, preview the hovered count; otherwise reflect the committed value.
+				const displayValue = interactive && !disabled && hoverValue !== null ? hoverValue : value
+				const isDisplayFilled = starIndex <= displayValue
+				const colorClass = isDisplayFilled ? 'text-npi-blue' : 'text-npi-gray-200'
 
 				if (!interactive) {
 					return (
@@ -125,13 +130,13 @@ export const Rating = forwardRef<HTMLDivElement, RatingProps>((props, ref) => {
 						disabled={disabled}
 						tabIndex={interactive && !disabled ? (starIndex === Math.max(1, value) ? 0 : -1) : -1}
 						onClick={() => onChange?.(starIndex)}
+						onMouseEnter={!disabled ? () => setHoverValue(starIndex) : undefined}
 						onKeyDown={event => handleKeyDown(event, i)}
 						className={clsx(
-							'inline-flex size-npi-6 shrink-0 cursor-pointer items-center justify-center bg-transparent p-0 transition-colors',
+							'inline-flex size-npi-6 shrink-0 items-center justify-center bg-transparent p-0 transition-colors',
 							colorClass,
-							!disabled && (isFilled ? 'hover:text-npi-blue-hover' : 'hover:text-npi-gray-300'),
 							'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-npi-blue-light',
-							disabled && 'cursor-not-allowed',
+							disabled ? 'cursor-not-allowed' : 'cursor-pointer',
 						)}
 					>
 						<Icon name="hvezdaFill" size="m" className="size-npi-6" aria-hidden />
