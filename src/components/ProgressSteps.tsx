@@ -42,7 +42,8 @@ const indicatorByStatus: Record<ProgressStepStatus, string> = {
 	upcoming: 'bg-npi-gray-400',
 }
 
-const labelBase = 'font-npi-sans font-normal text-[1rem] leading-[1.5] whitespace-nowrap'
+// Labels wrap freely in the vertical (mobile) rail; only the horizontal desktop layout keeps them on one line.
+const labelBase = 'font-npi-sans font-normal text-[1rem] leading-[1.5] @npi-tablet:whitespace-nowrap'
 
 const labelByStatus: Record<ProgressStepStatus, string> = {
 	completed: 'text-npi-text-primary',
@@ -50,7 +51,15 @@ const labelByStatus: Record<ProgressStepStatus, string> = {
 	upcoming: 'text-npi-text-secondary',
 }
 
-const connectorClasses = 'h-px w-npi-20 shrink-0 bg-npi-gray-300'
+// The connector flips orientation with the container width (see the @container note on the root).
+// - Mobile-first base: a 1px vertical rail, centred under the 40px (size-npi-10) indicator via the 20px offset.
+// - @npi-tablet (≥768px container): the original horizontal 80px line. A 4-step row wants ~976px, so
+//   between 768px and that ideal the line shrinks (floored at npi-2) to absorb the deficit rather than
+//   overflow; once the container is wide enough it settles at the full 80px Figma width.
+const connectorClasses = clsx(
+	'h-npi-6 w-px ms-[20px] my-npi-1 bg-npi-gray-300',
+	'@npi-tablet:h-px @npi-tablet:w-npi-20 @npi-tablet:min-w-npi-2 @npi-tablet:ms-0 @npi-tablet:my-0',
+)
 
 function deriveStatus(index: number, currentStep: number): ProgressStepStatus {
 	const oneBased = index + 1
@@ -62,35 +71,45 @@ function deriveStatus(index: number, currentStep: number): ProgressStepStatus {
 export const ProgressSteps = forwardRef<HTMLOListElement, ProgressStepsProps>((props, ref) => {
 	const { steps, currentStep, getStepStatus, className, ...rest } = props
 
+	// `@container` lives on the wrapper, not the <ol>, because CSS container queries can't self-reference.
+	// Base layout is a vertical rail (mobile-friendly for any step count / label length); at @npi-tablet
+	// (≥768px container) it flips back to the original horizontal stepper.
 	return (
-		<ol
-			ref={ref}
-			className={twMerge(clsx('inline-flex items-center gap-npi-4', className))}
-			{...rest}
-		>
-			{steps.map((step, index) => {
-				const status = getStepStatus?.(index) ?? deriveStatus(index, currentStep)
-				const isLast = index === steps.length - 1
+		<div className="@container w-full">
+			<ol
+				ref={ref}
+				className={twMerge(clsx('flex w-full flex-col @npi-tablet:flex-row @npi-tablet:items-center @npi-tablet:gap-npi-4', className))}
+				{...rest}
+			>
+				{steps.map((step, index) => {
+					const status = getStepStatus?.(index) ?? deriveStatus(index, currentStep)
+					const isLast = index === steps.length - 1
 
-				return (
-					<li
-						key={index}
-						aria-current={status === 'current' ? 'step' : undefined}
-						className="inline-flex items-center gap-npi-4"
-					>
-						<div className="inline-flex w-npi-40 items-center gap-npi-4">
-							<span className={clsx(indicatorBase, indicatorByStatus[status])} aria-hidden="true">
-								{status === 'completed'
-									? <Icon name="check" size="m" className="size-npi-6" />
-									: <span>{index + 1}</span>}
-							</span>
-							<span className={clsx(labelBase, labelByStatus[status])}>{step.label}</span>
-						</div>
-						{!isLast && <span aria-hidden="true" className={connectorClasses} />}
-					</li>
-				)
-			})}
-		</ol>
+					return (
+						<li
+							key={index}
+							aria-current={status === 'current' ? 'step' : undefined}
+							className={clsx(
+								'flex w-full flex-col @npi-tablet:w-auto @npi-tablet:min-w-0 @npi-tablet:flex-row @npi-tablet:items-center @npi-tablet:gap-npi-4',
+								// Only the connector absorbs horizontal shrink; the last step has none, so it must not shrink
+								// (otherwise its fixed-width indicator+label would overflow the row).
+								isLast && '@npi-tablet:shrink-0',
+							)}
+						>
+							<div className="flex w-auto items-center gap-npi-4 @npi-tablet:w-npi-40 @npi-tablet:shrink-0">
+								<span className={clsx(indicatorBase, indicatorByStatus[status])} aria-hidden="true">
+									{status === 'completed'
+										? <Icon name="check" size="m" className="size-npi-6" />
+										: <span>{index + 1}</span>}
+								</span>
+								<span className={clsx(labelBase, labelByStatus[status])}>{step.label}</span>
+							</div>
+							{!isLast && <span aria-hidden="true" className={connectorClasses} />}
+						</li>
+					)
+				})}
+			</ol>
+		</div>
 	)
 })
 ProgressSteps.displayName = 'ProgressSteps'
