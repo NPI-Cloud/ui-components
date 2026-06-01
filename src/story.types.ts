@@ -23,4 +23,5 @@ export interface Story<C extends ComponentType<any> = ComponentType<any>> {
 	name?: string
 	args: Partial<ComponentProps<C>>
 	order?: number
+	hiddenInDocs?: boolean
 }
