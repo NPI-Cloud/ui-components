@@ -26,27 +26,30 @@ export interface ModalProps extends Omit<React.DialogHTMLAttributes<HTMLDialogEl
 	closeLabel?: string
 }
 
-// Card chrome — white surface, 24px radius (`npi-l`), Shadow M (`#F0F0F0` 0 20 45 0).
-// `drop-shadow-[…]` follows the rounded corners cleanly. `m-auto` centers the dialog inside
-// the native top-layer viewport — the `<dialog>` is positioned by the user agent.
-const dialogClass = 'm-auto w-[880px] max-w-[calc(100vw-32px)] bg-npi-white rounded-npi-m '
-	+ 'p-0 drop-shadow-[0px_20px_22.5px_#F0F0F0] '
+// Card chrome — white surface, 24px radius (`npi-l`), no shadow (just the 80% black overlay). `m-auto`
+// centers the dialog inside the native top-layer viewport — the `<dialog>` is positioned by the user
+// agent. `@container` makes the inner layout respond to the dialog's own width, so the modal scales
+// from a comfortable phone layout up to the Figma desktop spec without depending on the viewport.
+const dialogClass = '@container m-auto w-[880px] max-w-[calc(100vw-32px)] bg-npi-white rounded-npi-m '
+	+ 'p-0 '
 	// Native <dialog>::backdrop — translucent black overlay matching the Figma 80% black overlay.
 	+ 'backdrop:bg-[rgba(0,0,0,0.8)] '
 	+ 'open:flex open:flex-col '
 	+ 'focus:outline-none'
 
-// Internal padding uses the Figma 92px×72px spec. 92 has no exact npi step (88/100 are the
-// neighbors, 4px off). Kept as arbitrary value and flagged as a token gap.
-const innerClass = 'flex flex-col items-center gap-npi-6 px-[92px] py-npi-18'
+// Padding scales up to the Figma 92px×72px desktop spec at @npi-tablet; on narrow dialogs it relaxes to
+// 24px×40px so the content isn't crushed. (92 has no exact npi step — 88/100 are 4px off — kept arbitrary.)
+const innerClass = 'flex flex-col items-center gap-npi-6 px-npi-6 py-npi-10 @npi-tablet:px-[92px] @npi-tablet:py-npi-18'
 
-const titleClass = 'min-w-full text-center font-npi-serif text-[2rem] leading-[1.2] font-normal text-npi-text-primary'
+const titleClass = 'min-w-full text-center font-npi-serif text-[1.5rem] leading-[1.2] font-normal text-npi-text-primary @npi-tablet:text-[2rem]'
 
 const bodyClass = 'min-w-full text-center font-npi-sans text-[1rem] leading-[1.5] font-normal text-npi-text-primary'
 
-const actionsClass = 'flex items-start gap-npi-3'
+// Buttons stack full-width on a narrow dialog, then sit in a centered row from @npi-tablet up.
+const actionsClass = 'flex w-full flex-col items-stretch gap-npi-3 @npi-tablet:w-auto @npi-tablet:flex-row @npi-tablet:items-start'
 
-const closeButtonClass = 'absolute right-npi-10 top-npi-10 inline-flex size-6 cursor-pointer items-center justify-center text-npi-blue '
+const closeButtonClass = 'absolute right-npi-6 top-npi-6 inline-flex size-6 cursor-pointer items-center justify-center text-npi-blue '
+	+ '@npi-tablet:right-npi-10 @npi-tablet:top-npi-10 '
 	+ 'outline-none transition-colors hover:text-npi-blue-hover '
 	+ 'focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-npi-blue-light'
 
