@@ -24,7 +24,7 @@ export interface UploadDropzoneProps
 	accept?: string
 	/** Allow selecting more than one file at a time. Defaults to `true`. */
 	multiple?: boolean
-	/** Maximum size per file in bytes. Files exceeding this are dropped with an error. */
+	/** Maximum size per file in bytes. Files exceeding this are dropped. `0`, negative, or unset means no limit. */
 	maxSize?: number
 	/** Disables interaction and dims the dropzone. */
 	disabled?: boolean
@@ -98,7 +98,8 @@ export const UploadDropzone = forwardRef<HTMLDivElement, UploadDropzoneProps>((p
 			if (!fileList || fileList.length === 0) return
 			const files = Array.from(fileList).filter(file => {
 				if (!isFileAccepted(file, accept)) return false
-				if (maxSize != null && file.size > maxSize) return false
+				// `maxSize` of 0/negative/NaN means "no limit" — only a positive cap rejects files.
+				if (maxSize != null && maxSize > 0 && file.size > maxSize) return false
 				return true
 			})
 			if (files.length === 0) return
