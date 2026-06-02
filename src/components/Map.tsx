@@ -1,7 +1,6 @@
 'use client'
 
-import { clsx } from 'clsx'
-import { forwardRef, type ReactNode, type SVGAttributes, useCallback, useState } from 'react'
+import { forwardRef, type ReactNode, type SVGAttributes, useCallback, useLayoutEffect, useRef, useState } from 'react'
 import { twMerge } from 'tailwind-merge'
 
 /** All 14 Czech kraje (regions) in a stable, layered order. Render order matches Figma — Praha last so its small shape isn't overlapped. */
@@ -38,6 +37,8 @@ export interface MapRegionDef {
 	height: number
 	/** Local viewBox of the region's path (origin always 0 0). */
 	viewBox: string
+	/** Optional explicit badge anchor (numbered variant), in the 880×503 space. Use where the bbox centre is a poor spot — e.g. Středočeský, which rings Praha, so its bbox centre collides with Praha's badge. Falls back to the bbox centre. */
+	badge?: { x: number; y: number }
 	/** Region path `d` attribute, copied verbatim from Figma. */
 	d: string
 }
@@ -161,6 +162,8 @@ export const mapRegions: Record<MapRegionCode, MapRegionDef> = {
 		width: 280.0,
 		height: 227.0,
 		viewBox: '0 0 279.027 226.481',
+		// Praha is an enclave at the centre of Středočeský, so the bbox centre lands on Praha's badge — anchor this one south of Praha.
+		badge: { x: 262, y: 268 },
 		d:
 			'M278.402 139.081C277.6 137.431 275.791 136.37 275.791 136.37L277.557 134.838C277.557 134.838 278.969 133.187 278.145 132.244C277.322 131.301 270.366 127.883 269.895 125.514C269.424 123.146 269.071 122.567 265.893 122.449C262.715 122.331 255.759 118.677 255.877 116.909C255.995 115.141 261.056 115.966 261.762 114.905C262.469 113.844 259.644 113.019 259.644 113.019C261.645 112.783 263.175 110.307 263.175 110.307C263.175 110.307 261.762 108.657 261.527 108.304C261.292 107.95 264.117 107.478 264.513 106.771C264.908 106.064 261.762 106.182 260.703 104.885C260.403 104.521 260.628 104.038 261.067 103.492C262.212 102.077 264.898 100.234 264.47 98.873C264.298 98.3265 263.496 97.8656 262.437 97.4799C259.847 96.5261 255.748 96.0438 255.748 96.0438C255.748 96.0438 255.042 95.3366 255.866 93.8041C256.69 92.2716 253.865 92.0359 253.865 92.0359C253.865 92.0359 258.809 87.0849 260.221 84.245C261.634 81.4158 257.279 80.9443 255.866 79.6476C254.454 78.3509 256.926 68.0845 255.866 66.3163C254.807 64.5481 250.922 66.5521 249.028 67.8488C247.145 69.1455 244.32 66.3163 241.484 66.0805C238.659 65.8448 235.128 67.1415 233.812 65.9626C232.495 64.7838 235.481 61.8368 235.481 61.8368C235.481 61.8368 232.774 57.9467 230.773 56.65C228.771 55.3533 224.887 55.707 224.534 54.0566C224.181 52.4063 221.591 49.4593 221.591 49.4593C221.591 49.4593 223.004 48.9877 224.769 47.691C226.535 46.3943 225.24 44.0367 225.711 43.6831C226.182 43.3294 228.654 40.1466 226.77 37.1889C224.887 34.2418 224.298 33.1809 225.24 30.7054C226.182 28.2299 222.768 25.9901 221.709 24.0933C220.649 22.2072 224.181 21.0284 224.181 21.0284C224.181 21.0284 222.651 19.7317 221.003 18.0814C219.355 16.431 218.178 13.1303 218.178 13.1303C218.178 13.1303 216.412 12.5409 213.94 12.0694C211.468 11.5979 208.525 4.04276 206.984 3.33547C205.454 2.62818 204.983 4.63217 203.924 5.6931C202.865 6.75404 199.451 0.270554 196.968 0.506317C194.496 0.74208 196.615 4.16064 195.438 7.23627C194.261 10.3012 186.952 8.88661 187.776 10.4191C188.6 11.9515 187.659 16.5489 185.658 17.5027C183.656 18.4457 177.643 12.7874 175.641 13.7305C173.64 14.6735 176.819 19.8603 176.583 20.8141C176.348 21.7571 173.052 20.8141 173.052 20.8141C173.052 20.8141 172.699 22.9359 172.463 24.2326C172.228 25.5293 169.05 25.7651 169.05 25.7651C169.05 25.7651 169.05 28.2406 165.283 28.2406C161.516 28.2406 158.563 30.4803 156.091 30.0088C153.619 29.5373 154.561 22.5716 153.619 22.6895C152.677 22.8073 149.381 25.7544 148.44 24.4577C147.498 23.161 147.027 24.2219 143.967 25.8723C140.906 27.5226 139.43 24.8649 138.285 26.901C137.14 28.9372 141.195 34.9491 140.318 36.1922C139.43 37.4354 135.545 34.2418 134.486 34.9491C133.426 35.6564 135.278 40.436 133.951 41.7648C132.624 43.0937 130.323 39.2036 130.323 39.2036C130.323 39.2036 125.026 36.7281 126.086 39.8251C127.145 42.9222 129.713 54.6032 127.145 55.5784C124.587 56.5536 120.692 54.8711 116.808 55.0426C112.923 55.2247 112.923 60.1757 111.511 59.9078C110.098 59.6399 104.887 56.7143 104.887 56.7143C104.887 56.7143 105.069 58.8469 100.2 60.3579C95.3418 61.8582 86.2354 55.3105 80.4034 56.9929C74.5714 58.6754 79.344 63.5407 78.8089 64.9553C78.2739 66.3699 75.6307 64.1623 75.0101 64.248C74.3894 64.3337 74.7426 65.5769 74.1219 67.0772C73.5013 68.5775 64.5767 71.6745 63.4317 72.3818C62.2867 73.0891 61.7517 78.0401 60.2535 78.3938C58.7554 78.7474 57.161 73.3463 55.3953 73.3463C53.6297 73.3463 44.6195 82.1981 41.1738 82.2839C37.7281 82.3696 37.4606 78.5653 36.5831 78.9189C35.7057 79.2725 31.0187 85.8203 28.0973 87.6743C25.1867 89.5282 19.4403 87.1384 15.7271 89.3568C12.0138 91.5751 14.4858 99.1838 12.0138 99.7946C9.54194 100.416 11.222 101.391 10.5157 103.953C9.80947 106.514 9.37072 103.953 6.01063 103.953C2.65055 103.953 2.53284 109.386 2.53284 109.386C2.95017 109.472 3.44242 109.568 3.92396 109.675C5.37928 109.986 6.81321 110.436 6.08555 111.529C5.83943 111.894 5.5505 112.279 5.25088 112.665C4.3627 113.769 3.3354 114.798 2.89667 114.969C2.30812 115.205 1.23804 117.455 1.23804 117.455C1.23804 117.455 -1.24459 120.177 2.89667 119.824C7.03792 119.47 9.28511 119.47 9.88436 119.116C10.4836 118.763 16.7436 118.045 16.7436 118.045C16.7436 118.045 21.8373 116.973 21.3557 118.516C20.8742 120.06 17.5676 120.767 17.5676 120.767C17.5676 120.767 14.7319 121.356 14.6142 121.71C14.4965 122.063 12.7201 123.371 14.9673 123.489C17.2145 123.607 20.5318 124.914 20.5318 124.914L26.214 127.047C26.214 127.047 26.0963 127.518 28.2257 127.165C30.3552 126.811 32.0139 127.047 32.9555 126.221C33.8972 125.396 35.2027 125.986 35.4381 126.575C35.6736 127.165 38.6377 130.84 38.6377 130.84C38.6377 130.84 38.7554 132.855 40.4141 133.091C42.0727 133.327 44.3199 132.973 44.3199 132.973C44.3199 132.973 46.8025 131.901 46.6848 133.798C46.5671 135.695 46.4494 138.417 46.4494 138.417C46.4494 138.417 45.7431 140.314 48.3434 140.432C50.9438 140.549 55.085 140.667 55.085 140.667C55.085 140.667 57.5676 140.078 57.4499 141.61C57.3322 143.154 56.2621 143.979 56.1444 144.332C56.0267 144.686 55.6736 145.275 55.7913 146.111C55.909 146.947 56.4975 148.715 56.4975 148.715L57.0861 151.202C57.0861 151.202 57.3215 152.273 55.5452 152.863C53.7688 153.452 52.3456 155.467 52.2279 155.82C52.1102 156.174 51.9924 161.629 51.9924 161.629L50.8046 172.538L51.2755 174.081C51.2755 174.081 55.299 173.846 55.5344 175.153C55.7699 176.46 51.0401 176.696 51.0401 176.696C51.0401 176.696 50.0984 176.814 50.0984 178.239C50.0984 179.665 49.6276 181.797 49.6276 181.797C49.6276 181.797 48.0866 183.34 47.3804 182.504C46.6741 181.679 47.1449 180.372 46.0748 180.254C45.0048 180.136 42.2867 180.372 42.2867 180.372L39.0871 182.033L36.1337 188.431C36.1337 188.431 34.8282 190.445 36.1337 190.799C37.4392 191.153 39.0871 191.271 39.0871 191.271L39.6757 193.285C39.6757 193.285 43.1107 194.946 42.993 196.007C42.8753 197.079 41.3343 196.95 40.3927 196.95C39.451 196.95 35.6629 196.125 36.1337 197.186C36.6045 198.258 40.0395 199.201 40.0395 199.201L45.9571 200.744C45.9571 200.744 49.039 203.112 48.7929 205.481C48.5467 207.849 46.3103 211.525 46.3103 211.525C46.3103 211.525 45.3686 212.232 45.2402 213.539C45.1225 214.847 44.0524 216.508 45.0048 217.097C45.4114 217.344 46.0855 217.365 46.749 217.387C47.6479 217.408 48.536 217.44 48.6752 218.051C48.9106 219.123 48.9106 221.727 48.9106 221.727C48.9106 221.727 48.7394 222.648 48.8785 223.581C48.8892 223.656 48.8999 223.731 48.9106 223.806C48.9106 223.806 51.3183 222.413 53.4371 221.17C55.5559 219.926 55.3846 224.706 56.7116 225.156C58.0385 225.596 61.3986 221.877 63.0679 221.877C64.7372 221.877 66.8667 225.949 66.8667 225.949C66.8667 225.949 69.5205 225.681 71.7249 223.999C73.9293 222.316 78.3488 223.024 78.3488 223.024C78.3488 223.024 78.4344 219.659 79.237 216.744C80.0288 213.829 85.9571 212.318 86.5671 214.793C87.1877 217.269 89.6596 220.634 94.9566 221.341C100.254 222.048 106.353 219.391 107.498 217.451C108.643 215.501 110.323 212.854 113.148 213.111C115.973 213.379 114.743 216.294 117.129 217.097C119.515 217.89 120.756 220.548 122.608 222.231C124.459 223.913 127.552 219.401 128.087 219.048C128.622 218.694 130.644 219.584 131.714 218.255C132.774 216.926 133.127 215.243 133.127 215.243C133.127 215.243 138.424 219.487 138.52 220.109C138.606 220.73 139.494 218.962 141.966 217.901C144.438 216.84 150.805 220.377 150.805 220.377L156.455 216.84L154.25 221.084C154.25 221.084 158.317 222.584 161.056 222.681C163.796 222.766 164.331 224.888 164.331 224.888C164.331 224.888 164.416 222.852 165.122 220.548C165.829 218.244 172.988 218.34 173.255 218.34C173.523 218.34 175.995 216.133 176.166 214C176.348 211.878 174.315 209.135 174.315 209.135L177.054 206.392C177.054 206.392 177.236 202.319 180.147 201.88C183.057 201.441 190.045 212.061 190.045 212.061C190.045 212.061 192.956 209.317 194.197 209.939C195.438 210.56 193.576 215.597 196.498 216.669C199.408 217.73 201.441 217.44 201.441 217.44L201.559 210.003H207.915L207.209 208.117C207.209 208.117 206.267 205.759 207.68 204.934C209.092 204.109 211.211 205.406 211.211 205.406C211.211 205.406 215.053 206.22 217.707 206.584C218.402 206.681 219.012 206.745 219.462 206.756C221.58 206.799 224.405 203.766 225.936 203.766C227.466 203.766 230.644 207.185 231.821 206.713C232.998 206.242 232.41 202.587 232.41 202.587C232.41 202.587 240.778 202.116 242.426 200.112C244.074 198.108 241.366 192.792 241.366 192.792C241.366 192.792 235.599 192.203 233.812 191.378C232.025 190.553 232.881 187.134 232.881 187.134C232.881 187.134 234.293 183.48 236.53 181.358C238.766 179.236 237.707 176.053 239.002 173.803C240.296 171.563 242.062 172.86 242.062 172.86C242.062 172.86 242.886 174.51 244.181 175.099C245.476 175.689 248.301 170.974 248.301 170.974H254.186C257.482 170.974 258.424 168.97 258.424 168.97C258.424 168.97 258.188 166.14 259.13 165.294C260.072 164.447 264.662 166.612 264.662 166.612C264.662 166.612 266.781 165.315 266.781 164.254C266.781 163.193 263.132 160.836 264.309 157.889C265.486 154.942 273.854 152.82 273.854 152.82C273.854 152.82 272.795 146.69 273.854 145.618C274.914 144.557 279.151 140.785 278.349 139.124L278.402 139.081Z',
 	},
@@ -210,7 +213,7 @@ export interface MapProps extends Omit<SVGAttributes<SVGSVGElement>, 'onChange'>
 	 * Leave undefined for an uncontrolled, read-only display.
 	 */
 	value?: MapValue
-	/** Called when the user clicks (or activates via keyboard) a region. Receives the new selection. */
+	/** Called when the user clicks (or activates via keyboard) a selectable region. Receives the new selection. Regions that resolve a link via `getRegionHref` navigate instead of calling this. */
 	onChange?: (value: MapValue) => void
 	/** Multi-select mode. When `true`, `value` and `onChange` work with `MapRegionCode[]`. Defaults to `false`. */
 	multiple?: boolean
@@ -219,18 +222,32 @@ export interface MapProps extends Omit<SVGAttributes<SVGSVGElement>, 'onChange'>
 	/** Override the default Czech label for a region (used as `aria-label` and as the in-SVG `<title>`). Falls back to `mapRegions[code].label`. */
 	getRegionLabel?: (code: MapRegionCode) => string
 	/**
-	 * Optional render function for a rich HTML tooltip shown next to the cursor on hover/focus.
-	 * Returning `null`/`undefined` suppresses the tooltip for that region. The tooltip is rendered
-	 * inside the SVG via `<foreignObject>`, so the component stays a single SVG root and the
-	 * forwarded ref still points at the `<svg>` element.
+	 * Tooltip variant — content for the currently **selected** region. When provided and a single region is
+	 * selected, a card is rendered anchored above that region with a downward arrow pointing at it.
+	 * Returning `null`/`undefined` suppresses the tooltip. Ignored in multi-select mode.
 	 */
 	renderTooltip?: (code: MapRegionCode) => ReactNode
+	/**
+	 * Numbered variant — the badge value drawn on top of a region (e.g. a count). When it returns a value,
+	 * a circular blue badge with the number is centred on that region. Returning `undefined` omits the badge.
+	 */
+	getRegionNumber?: (code: MapRegionCode) => number | string | undefined
+	/**
+	 * Numbered variant — per-region link target. When it returns a URL, the region becomes a link and clicking
+	 * it navigates there instead of toggling selection. Returning `undefined` leaves the region non-navigable.
+	 */
+	getRegionHref?: (code: MapRegionCode) => string | undefined
 }
 
-// Base styles applied to every interactive region.
-const REGION_BASE = 'stroke-npi-white transition-colors duration-150 ease-out cursor-pointer outline-none'
-// Idle: light gray fill (Figma #E0E0E0), dark blue on hover/focus (Figma #02216E).
-const REGION_IDLE = 'fill-npi-gray-200 hover:fill-npi-blue-dark focus-visible:fill-npi-blue-dark'
+// Base styles applied to every region.
+const REGION_BASE = 'stroke-npi-white transition-colors duration-150 ease-out outline-none'
+// Added when a region reacts to clicks (selectable or link).
+const REGION_INTERACTIVE = 'cursor-pointer'
+// Idle fill: light gray (Figma #E0E0E0).
+const REGION_IDLE = 'fill-npi-gray-200'
+// Idle + interactive: dark blue on hover, and on keyboard focus of the parent group (Figma #02216E).
+// Driven by `group-focus-visible` so the highlight comes from the focusable <g>/<a>, not a square outline.
+const REGION_IDLE_HOVER = 'hover:fill-npi-blue-dark group-focus-visible:fill-npi-blue-dark'
 // Selected: blue fill (Figma #3566FC). Stays blue on hover.
 const REGION_SELECTED = 'fill-npi-blue'
 // Disabled: muted gray, no pointer events, no hover transitions.
@@ -241,12 +258,15 @@ interface RegionPathProps {
 	def: MapRegionDef
 	selected: boolean
 	disabledRegion: boolean
+	/** Link target — when set, the region renders as an `<a>` and clicking navigates (numbered variant). */
+	href: string | undefined
+	/** Whether clicking toggles selection (selection variant). Mutually exclusive with `href` in practice. */
+	selectable: boolean
 	label: string
 	onActivate: (code: MapRegionCode) => void
-	onHover: (code: MapRegionCode | null) => void
 }
 
-function RegionPath({ code, def, selected, disabledRegion, label, onActivate, onHover }: RegionPathProps) {
+function RegionPath({ code, def, selected, disabledRegion, href, selectable, label, onActivate }: RegionPathProps) {
 	// Each region's path coordinates are local to its own viewBox.
 	// Translate + scale into the parent map (880x503) coordinate space.
 	const [vbX, vbY, vbW, vbH] = def.viewBox.split(' ').map(Number) as [number, number, number, number]
@@ -254,14 +274,36 @@ function RegionPath({ code, def, selected, disabledRegion, label, onActivate, on
 	const sy = def.height / vbH
 	const transform = `translate(${def.x - vbX * sx} ${def.y - vbY * sy}) scale(${sx} ${sy})`
 
+	const isLink = href !== undefined && !disabledRegion
+	const interactive = isLink || selectable
+
 	const stateClass = disabledRegion
 		? REGION_DISABLED
 		: selected
-		? `${REGION_BASE} ${REGION_SELECTED}`
+		? `${REGION_BASE} ${REGION_INTERACTIVE} ${REGION_SELECTED}`
+		: interactive
+		? `${REGION_BASE} ${REGION_INTERACTIVE} ${REGION_IDLE} ${REGION_IDLE_HOVER}`
 		: `${REGION_BASE} ${REGION_IDLE}`
 
+	// The transform lives on an inner <g> so the shape can sit inside either an interactive <g>
+	// (selection) or an <a> (navigation) without passing SVG-only props to the typed anchor element.
+	const shape = (
+		<g transform={transform}>
+			<title>{label}</title>
+			<path d={def.d} className={stateClass} vectorEffect="non-scaling-stroke" />
+		</g>
+	)
+
+	if (isLink) {
+		return (
+			<a href={href} aria-label={label} data-region={code} className="group outline-none">
+				{shape}
+			</a>
+		)
+	}
+
 	const handleKeyDown = (event: React.KeyboardEvent<SVGGElement>) => {
-		if (disabledRegion) return
+		if (!selectable) return
 		if (event.key === 'Enter' || event.key === ' ') {
 			event.preventDefault()
 			onActivate(code)
@@ -270,49 +312,58 @@ function RegionPath({ code, def, selected, disabledRegion, label, onActivate, on
 
 	return (
 		<g
-			transform={transform}
-			role="button"
+			role={selectable ? 'button' : 'img'}
 			aria-label={label}
-			aria-pressed={selected || undefined}
+			aria-pressed={selectable ? selected || undefined : undefined}
 			aria-disabled={disabledRegion || undefined}
-			tabIndex={disabledRegion ? -1 : 0}
+			tabIndex={selectable ? 0 : undefined}
+			className={selectable ? 'group outline-none' : undefined}
 			data-region={code}
 			data-selected={selected || undefined}
 			data-disabled={disabledRegion || undefined}
-			onClick={() => !disabledRegion && onActivate(code)}
-			onKeyDown={handleKeyDown}
-			onMouseEnter={() => !disabledRegion && onHover(code)}
-			onMouseLeave={() => onHover(null)}
-			onFocus={() => !disabledRegion && onHover(code)}
-			onBlur={() => onHover(null)}
+			onClick={selectable ? () => onActivate(code) : undefined}
+			onKeyDown={selectable ? handleKeyDown : undefined}
 		>
-			<title>{label}</title>
-			<path d={def.d} className={stateClass} vectorEffect="non-scaling-stroke" />
+			{shape}
 		</g>
 	)
 }
 
-export const Map = forwardRef<SVGSVGElement, MapProps>((props, ref) => {
-	const {
-		value,
-		onChange,
-		multiple = false,
-		disabled,
-		getRegionLabel,
-		renderTooltip,
-		className,
-		onMouseMove,
-		...rest
-	} = props
+/** Numbered-variant badge: a blue disc with a centred white number, sized in the parent 880×503 space. */
+function RegionBadge({ def, value, radius, fontSize }: { def: MapRegionDef; value: number | string; radius: number; fontSize: number }) {
+	const cx = def.badge ? def.badge.x : def.x + def.width / 2
+	const cy = def.badge ? def.badge.y : def.y + def.height / 2
+	return (
+		<g className="pointer-events-none" aria-hidden="true">
+			<circle cx={cx} cy={cy} r={radius} className="fill-npi-blue" />
+			<text x={cx} y={cy} textAnchor="middle" dominantBaseline="central" fontSize={fontSize} className="fill-npi-white font-npi-sans font-bold">
+				{value}
+			</text>
+		</g>
+	)
+}
 
-	const [hovered, setHovered] = useState<MapRegionCode | null>(null)
-	const [pointer, setPointer] = useState<{ x: number; y: number } | null>(null)
+/** Width of the anchored tooltip card, in the map's 880×503 coordinate space. The card scales with the map. */
+const TOOLTIP_WIDTH = 328
+
+/** Downward/upward arrow connecting the tooltip card to its region. Rendered in foreignObject (CSS px == map units). */
+function TooltipArrow({ direction, offset }: { direction: 'up' | 'down'; offset: number }) {
+	const d = direction === 'down' ? 'M16 18L0 0H32L16 18Z' : 'M16 0L0 18H32L16 0Z'
+	return (
+		<svg width={32} height={18} viewBox="0 0 32 18" aria-hidden="true" className="block" style={{ marginLeft: offset - 16 }}>
+			<path d={d} className="fill-npi-white" />
+		</svg>
+	)
+}
+
+export const Map = forwardRef<SVGSVGElement, MapProps>((props, ref) => {
+	const { value, onChange, multiple = false, disabled, getRegionLabel, renderTooltip, getRegionNumber, getRegionHref, className, ...rest } = props
 
 	const handleActivate = useCallback(
 		(code: MapRegionCode) => {
 			if (!onChange) return
 			if (multiple) {
-				const current = Array.isArray(value) ? value : value ? [value as MapRegionCode] : []
+				const current = Array.isArray(value) ? value : value ? [value] : []
 				const next = current.includes(code) ? current.filter(c => c !== code) : [...current, code]
 				onChange(next)
 			} else {
@@ -322,68 +373,120 @@ export const Map = forwardRef<SVGSVGElement, MapProps>((props, ref) => {
 		[onChange, multiple, value],
 	)
 
-	const handleMouseMove = useCallback(
-		(event: React.MouseEvent<SVGSVGElement>) => {
-			if (renderTooltip) {
-				const svg = event.currentTarget
-				const point = svg.createSVGPoint()
-				point.x = event.clientX
-				point.y = event.clientY
-				const ctm = svg.getScreenCTM()
-				if (ctm) {
-					const local = point.matrixTransform(ctm.inverse())
-					setPointer({ x: local.x, y: local.y })
-				}
-			}
-			onMouseMove?.(event)
-		},
-		[renderTooltip, onMouseMove],
-	)
+	// Tooltip is anchored to the single selected region (selection variant). Ignored while multi-selecting.
+	const selectedCode = !multiple && typeof value === 'string' ? value : null
+	const tooltipContent = selectedCode && renderTooltip ? renderTooltip(selectedCode) : null
+	const tooltipAnchor = selectedCode ? mapRegions[selectedCode] : null
 
-	const tooltipContent = hovered && renderTooltip ? renderTooltip(hovered) : null
+	// On tablet+ the tooltip is an anchored card inside a <foreignObject> (its CSS pixels == map units, so
+	// it scales with the map). We measure its height to flip above/below the region and clamp it inside the
+	// 880×503 box so it never leaves the frame. A ResizeObserver keeps the height fresh across container
+	// resizes / show-hide (the card is hidden on mobile, where a full-width panel is rendered below instead).
+	const tipRef = useRef<HTMLDivElement>(null)
+	const [tipHeight, setTipHeight] = useState(0)
+	useLayoutEffect(() => {
+		const el = tipRef.current
+		if (!el) return
+		const measure = () => setTipHeight(el.offsetHeight)
+		measure()
+		const observer = new ResizeObserver(measure)
+		observer.observe(el)
+		return () => observer.disconnect()
+	}, [selectedCode, tooltipContent])
+
+	// Number badges live in the SVG, so they scale with the map — which makes them tiny on small maps.
+	// Measure the rendered width and grow the discs/text past a floor instead of shrinking them linearly.
+	const wrapperRef = useRef<HTMLDivElement>(null)
+	const [mapWidth, setMapWidth] = useState(0)
+	useLayoutEffect(() => {
+		const el = wrapperRef.current
+		if (!el) return
+		const measure = () => setMapWidth(el.clientWidth)
+		measure()
+		const observer = new ResizeObserver(measure)
+		observer.observe(el)
+		return () => observer.disconnect()
+	}, [])
+	// At native scale the badge is 40px (r=20) / 16px text; on small maps we floor it to ~24px / ~10px rendered.
+	const pxPerUnit = mapWidth > 0 ? mapWidth / MAP_VIEWBOX_WIDTH : 1
+	const badgeRadius = Math.max(20, 12 / pxPerUnit)
+	const badgeFontSize = Math.max(16, 10 / pxPerUnit)
+
+	let tooltipLayout: { left: number; top: number; placeBelow: boolean; arrowOffset: number } | null = null
+	if (tooltipAnchor) {
+		const cx = tooltipAnchor.x + tooltipAnchor.width / 2
+		const regionTop = tooltipAnchor.y
+		const regionBottom = tooltipAnchor.y + tooltipAnchor.height
+		// Open toward whichever side has more room so the card points back at the region.
+		const placeBelow = MAP_VIEWBOX_HEIGHT - regionBottom >= regionTop
+		const rawTop = placeBelow ? regionBottom : regionTop - tipHeight
+		const top = Math.max(0, Math.min(rawTop, MAP_VIEWBOX_HEIGHT - tipHeight))
+		const left = Math.min(Math.max(cx - TOOLTIP_WIDTH / 2, 0), MAP_VIEWBOX_WIDTH - TOOLTIP_WIDTH)
+		tooltipLayout = { left, top, placeBelow, arrowOffset: cx - left }
+	}
 
 	return (
-		<svg
-			ref={ref}
-			xmlns="http://www.w3.org/2000/svg"
-			viewBox={`0 0 ${MAP_VIEWBOX_WIDTH} ${MAP_VIEWBOX_HEIGHT}`}
-			preserveAspectRatio="xMidYMid meet"
-			role="group"
-			aria-label="Mapa krajů České republiky"
-			className={twMerge(clsx('block h-auto w-full max-w-full select-none', className))}
-			onMouseMove={handleMouseMove}
-			{...rest}
-		>
-			{mapRegionCodes.map(code => {
-				const def = mapRegions[code]
-				const label = getRegionLabel ? getRegionLabel(code) : def.label
-				return (
-					<RegionPath
-						key={code}
-						code={code}
-						def={def}
-						selected={isSelected(value, code)}
-						disabledRegion={isDisabled(disabled, code)}
-						label={label}
-						onActivate={handleActivate}
-						onHover={setHovered}
-					/>
-				)
-			})}
-			{tooltipContent && pointer && (
-				<foreignObject
-					x={Math.min(pointer.x + 12, MAP_VIEWBOX_WIDTH - 200)}
-					y={Math.min(pointer.y + 12, MAP_VIEWBOX_HEIGHT - 80)}
-					width={MAP_VIEWBOX_WIDTH}
-					height={MAP_VIEWBOX_HEIGHT}
-					style={{ overflow: 'visible', pointerEvents: 'none' }}
-				>
-					<div role="tooltip" className="pointer-events-none inline-block">
-						{tooltipContent}
-					</div>
-				</foreignObject>
+		<div ref={wrapperRef} className={twMerge('@container relative w-full', className)}>
+			<svg
+				ref={ref}
+				xmlns="http://www.w3.org/2000/svg"
+				viewBox={`0 0 ${MAP_VIEWBOX_WIDTH} ${MAP_VIEWBOX_HEIGHT}`}
+				preserveAspectRatio="xMidYMid meet"
+				role="group"
+				aria-label="Mapa krajů České republiky"
+				className="block h-auto w-full max-w-full select-none"
+				{...rest}
+			>
+				{mapRegionCodes.map(code => {
+					const def = mapRegions[code]
+					const label = getRegionLabel ? getRegionLabel(code) : def.label
+					const disabledRegion = isDisabled(disabled, code)
+					const href = getRegionHref?.(code)
+					const selectable = !disabledRegion && href === undefined && !!onChange
+					return (
+						<RegionPath
+							key={code}
+							code={code}
+							def={def}
+							selected={isSelected(value, code)}
+							disabledRegion={disabledRegion}
+							href={href}
+							selectable={selectable}
+							label={label}
+							onActivate={handleActivate}
+						/>
+					)
+				})}
+				{getRegionNumber &&
+					mapRegionCodes.map(code => {
+						const num = getRegionNumber(code)
+						return num === undefined ? null : (
+							<RegionBadge key={`badge-${code}`} def={mapRegions[code]} value={num} radius={badgeRadius} fontSize={badgeFontSize} />
+						)
+					})}
+				{/* Tablet+ : floating card anchored to the selected region (hidden on mobile — see panel below). */}
+				{tooltipContent && tooltipLayout && (
+					<foreignObject x={0} y={0} width={MAP_VIEWBOX_WIDTH} height={MAP_VIEWBOX_HEIGHT} style={{ overflow: 'visible', pointerEvents: 'none' }}>
+						<div
+							ref={tipRef}
+							role="tooltip"
+							className="absolute hidden flex-col @npi-tablet:flex"
+							style={{ left: tooltipLayout.left, top: tooltipLayout.top, width: TOOLTIP_WIDTH }}
+						>
+							{tooltipLayout.placeBelow && <TooltipArrow direction="up" offset={tooltipLayout.arrowOffset} />}
+							<div className="pointer-events-auto">{tooltipContent}</div>
+							{!tooltipLayout.placeBelow && <TooltipArrow direction="down" offset={tooltipLayout.arrowOffset} />}
+						</div>
+					</foreignObject>
+				)}
+			</svg>
+			{/* Mobile : the same content as a full-width, legible panel below the map (hidden on tablet+). */}
+			{tooltipContent && (
+				<div role="tooltip" className="mt-npi-4 @npi-tablet:hidden">
+					{tooltipContent}
+				</div>
 			)}
-		</svg>
+		</div>
 	)
 })
 Map.displayName = 'Map'
