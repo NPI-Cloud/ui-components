@@ -82,7 +82,7 @@ export function MediaBlock(
 
 		if (imageUrl) {
 			return (
-				<div className={clsx('relative w-full overflow-hidden rounded-npi-xxs bg-npi-blue-lighter', aspectClasses[frameAspect])}>
+				<div className={clsx('relative w-full overflow-hidden rounded-npi-xxs', aspectClasses[frameAspect])}>
 					<img
 						src={imageUrl}
 						alt={imageAlt ?? ''}
