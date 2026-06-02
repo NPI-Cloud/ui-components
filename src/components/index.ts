@@ -172,6 +172,7 @@ export {
 	type TabVariant,
 	tabVariants,
 } from './Tab'
+export { DataTable, type DataTableColumn, type DataTableProps } from './DataTable'
 export {
 	Table,
 	type TableAlign,
