@@ -5,9 +5,6 @@ import { forwardRef, type ReactNode } from 'react'
 import { twMerge } from 'tailwind-merge'
 import { Icon } from '../icons'
 
-export const mapAddressOrientations = ['horizontal', 'vertical'] as const
-export type MapAddressOrientation = (typeof mapAddressOrientations)[number]
-
 export interface MapAddressLocation {
 	/** Street and house number, e.g. "Senovážné náměstí 25". */
 	street: string
@@ -52,12 +49,6 @@ export interface MapAddressProps extends Omit<React.HTMLAttributes<HTMLElement>,
 	 * such as "Get directions" or "Copy address".
 	 */
 	actions?: ReactNode
-	/**
-	 * Layout orientation.
-	 * - `horizontal` (default) — address card overlays the left side of the map (Figma 368:9459 desktop layout).
-	 * - `vertical` — address card stacks below the map (consumer-side responsive escape hatch).
-	 */
-	orientation?: MapAddressOrientation
 	/** Class applied to the outer `<section>` wrapper. */
 	className?: string
 	/** Class applied to the map container (the box that holds the image / slot). */
@@ -66,8 +57,9 @@ export interface MapAddressProps extends Omit<React.HTMLAttributes<HTMLElement>,
 	cardClassName?: string
 }
 
-// Pin marker — npi-blue droplet with a hollow white circle (Figma 368:9478 "Pin").
-// The original SVG path has the point at the top — rotate the group 180° so the point hangs down.
+// Pin marker — npi-blue teardrop with a hollow white circle in the bulb (Figma 7295:3234 "Pin").
+// Geometry copied verbatim from Figma: path3 (teardrop, 7295:3231) is flipped vertically so the point
+// hangs down, and path4 (white hole, 7295:3232) is a r=8.63 circle centred in the upper bulb at (14.75, 14.75).
 // Rendered absolutely inside the map container with the tip at the visual anchor (use `-translate-y-full`).
 function MapPin({ className }: { className?: string }): React.ReactElement {
 	return (
@@ -80,34 +72,25 @@ function MapPin({ className }: { className?: string }): React.ReactElement {
 			xmlns="http://www.w3.org/2000/svg"
 			className={className}
 		>
-			<g transform="rotate(180 14.7536 20)">
-				<path
-					d="M25.8012 14.264C23.0442 10.189 14.7536 0 14.7536 0C14.7536 0 6.46299 10.189 3.70609 14.264C-1.72364 22.2896 -0.988334 30.1982 4.61257 35.7992C7.41305 38.5999 11.0833 40 14.7536 40C18.4239 40 22.0942 38.5999 24.8946 35.7992C30.4956 30.1982 31.2309 22.2896 25.8012 14.264Z"
-					fill="currentColor"
-				/>
-				<circle cx="14.7536" cy="14.4076" r="5.4533" fill="white" />
-			</g>
+			<path
+				transform="matrix(1 0 0 -1 0 40)"
+				d="M25.8012 14.264C23.0442 10.189 14.7536 0 14.7536 0C14.7536 0 6.46299 10.189 3.70609 14.264C-1.72364 22.2896 -0.988334 30.1982 4.61257 35.7992C7.41305 38.5999 11.0833 40 14.7536 40C18.4239 40 22.0942 38.5999 24.8946 35.7992C30.4956 30.1982 31.2309 22.2896 25.8012 14.264Z"
+				fill="currentColor"
+			/>
+			<circle cx="14.7536" cy="14.7531" r="8.6305" fill="white" />
 		</svg>
 	)
 }
 
-const orientationWrapperClass: Record<MapAddressOrientation, string> = {
-	// Card overlays the left edge of the map, vertically centered.
-	horizontal: 'relative w-full',
-	// Card sits below the map, stacked.
-	vertical: 'flex w-full flex-col items-stretch gap-npi-6',
-}
-
-const orientationMapClass: Record<MapAddressOrientation, string> = {
-	horizontal: 'relative w-full overflow-hidden rounded-npi-s bg-npi-bg-light',
-	vertical: 'relative w-full overflow-hidden rounded-npi-s bg-npi-bg-light',
-}
-
-const orientationCardClass: Record<MapAddressOrientation, string> = {
-	// 24px inset from the map's top-left corner (Figma 368:9467 left:144,top:443 vs map left:120,top:419).
-	horizontal: 'absolute left-npi-6 top-npi-6 z-10 max-w-[calc(100%-48px)]',
-	vertical: 'relative w-full',
-}
+// Layout switches on the component's own width (it owns the `@container` below): the card is stacked
+// below the map on narrow containers and overlaid on the map's left edge from the `@npi-tablet` (768px)
+// container breakpoint up. No manual orientation — it adapts to the space it's given.
+const wrapperClass = 'relative flex w-full flex-col items-stretch gap-npi-6 @npi-tablet:block'
+const mapClass = 'relative w-full overflow-hidden rounded-npi-s bg-npi-bg-light'
+// Full-width in flow below the map when narrow; from @npi-tablet up it becomes an absolute overlay
+// inset 24px from the map's top-left (Figma 7292:748 — 302px card), shrunk to its content so it stays
+// left-aligned and never spans the map. The max-w cap is a safety net for very long content.
+const cardClass = 'relative w-full @npi-tablet:absolute @npi-tablet:left-npi-6 @npi-tablet:top-npi-6 @npi-tablet:z-10 @npi-tablet:w-auto @npi-tablet:max-w-[calc(100%-48px)]'
 
 export const MapAddress = forwardRef<HTMLElement, MapAddressProps>((props, ref) => {
 	const {
@@ -119,7 +102,6 @@ export const MapAddress = forwardRef<HTMLElement, MapAddressProps>((props, ref) 
 		mapAlt = '',
 		mapSlot,
 		actions,
-		orientation = 'horizontal',
 		className,
 		mapClassName,
 		cardClassName,
@@ -142,91 +124,93 @@ export const MapAddress = forwardRef<HTMLElement, MapAddressProps>((props, ref) 
 		: null)
 
 	return (
-		<section
-			ref={ref}
-			className={twMerge(clsx(orientationWrapperClass[orientation], className))}
-			{...rest}
-		>
-			<div
-				className={twMerge(
-					clsx(
-						orientationMapClass[orientation],
-						// 696×400 in the Figma exemplar; consumers can override via mapClassName.
-						'aspect-[696/400] min-h-[240px]',
-						mapClassName,
-					),
-				)}
+		<div className="@container w-full">
+			<section
+				ref={ref}
+				className={twMerge(clsx(wrapperClass, className))}
+				{...rest}
 			>
-				{mapNode}
-				{/* Pin overlay — centered on the map. Hidden when a custom mapSlot owns the visual. */}
-				{!mapSlot && <MapPin className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-full text-npi-blue" />}
-			</div>
-
-			<article
-				className={twMerge(
-					clsx(
-						'flex flex-col items-start gap-npi-4 rounded-npi-s bg-npi-white p-npi-10 shadow-npi-m',
-						orientationCardClass[orientation],
-						cardClassName,
-					),
-				)}
-			>
-				{name && (
-					<p className="font-npi-serif font-bold text-[1rem] leading-[1.2] text-npi-blue-dark">
-						{name}
-					</p>
-				)}
-
-				<address className="font-npi-sans font-normal text-[1rem] not-italic leading-[1.5] text-npi-blue-dark whitespace-pre-line">
-					{address.street}
-					{'\n'}
-					{cityLine}
-					{address.country && (
-						<>
-							{'\n'}
-							{address.country}
-						</>
+				<div
+					className={twMerge(
+						clsx(
+							mapClass,
+							// 696×400 in the Figma exemplar; consumers can override via mapClassName.
+							'aspect-[696/400] min-h-[240px]',
+							mapClassName,
+						),
 					)}
-				</address>
+				>
+					{mapNode}
+					{/* Pin overlay — centered on the map. Hidden when a custom mapSlot owns the visual. */}
+					{!mapSlot && <MapPin className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-full text-npi-blue" />}
+				</div>
 
-				{email && (
-					<div className="flex items-start gap-npi-2">
-						<Icon name="dopis" size="m" className="size-npi-6 shrink-0 text-npi-blue" aria-hidden />
-						<a
-							href={`mailto:${email}`}
-							className="font-npi-sans font-normal text-[1rem] leading-[1.5] text-npi-blue no-underline hover:underline focus-visible:rounded-npi-xxs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-npi-blue-light"
-						>
-							{email}
-						</a>
-					</div>
-				)}
+				<article
+					className={twMerge(
+						clsx(
+							'flex flex-col items-start gap-npi-4 rounded-npi-s bg-npi-white p-npi-10 shadow-npi-m',
+							cardClass,
+							cardClassName,
+						),
+					)}
+				>
+					{name && (
+						<p className="font-npi-serif font-bold text-[1rem] leading-[1.2] text-npi-blue-dark">
+							{name}
+						</p>
+					)}
 
-				{phoneObj && (
-					<div className="flex items-start gap-npi-2">
-						<Icon name="telefon" size="m" className="size-npi-6 shrink-0 text-npi-blue" aria-hidden />
-						<div className="flex flex-col items-start">
+					<address className="font-npi-sans font-normal text-[1rem] not-italic leading-[1.5] text-npi-blue-dark whitespace-pre-line">
+						{address.street}
+						{'\n'}
+						{cityLine}
+						{address.country && (
+							<>
+								{'\n'}
+								{address.country}
+							</>
+						)}
+					</address>
+
+					{email && (
+						<div className="flex items-start gap-npi-2">
+							<Icon name="dopis" size="m" className="size-npi-6 shrink-0 text-npi-blue" aria-hidden />
 							<a
-								href={`tel:${phoneObj.number.replace(/\s+/g, '')}`}
+								href={`mailto:${email}`}
 								className="font-npi-sans font-normal text-[1rem] leading-[1.5] text-npi-blue no-underline hover:underline focus-visible:rounded-npi-xxs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-npi-blue-light"
 							>
-								{phoneObj.number}
+								{email}
 							</a>
-							{phoneObj.note && (
-								<span className="font-npi-sans font-normal text-[0.75rem] leading-[1.3] text-npi-gray-700">
-									{phoneObj.note}
-								</span>
-							)}
 						</div>
-					</div>
-				)}
+					)}
 
-				{actions && (
-					<div className="mt-npi-2 flex flex-wrap items-center gap-npi-3">
-						{actions}
-					</div>
-				)}
-			</article>
-		</section>
+					{phoneObj && (
+						<div className="flex items-start gap-npi-2">
+							<Icon name="telefon" size="m" className="size-npi-6 shrink-0 text-npi-blue" aria-hidden />
+							<div className="flex flex-col items-start">
+								<a
+									href={`tel:${phoneObj.number.replace(/\s+/g, '')}`}
+									className="font-npi-sans font-normal text-[1rem] leading-[1.5] text-npi-blue no-underline hover:underline focus-visible:rounded-npi-xxs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-npi-blue-light"
+								>
+									{phoneObj.number}
+								</a>
+								{phoneObj.note && (
+									<span className="font-npi-sans font-normal text-[0.75rem] leading-[1.3] text-npi-gray-700">
+										{phoneObj.note}
+									</span>
+								)}
+							</div>
+						</div>
+					)}
+
+					{actions && (
+						<div className="mt-npi-2 flex flex-wrap items-center gap-npi-3">
+							{actions}
+						</div>
+					)}
+				</article>
+			</section>
+		</div>
 	)
 })
 MapAddress.displayName = 'MapAddress'

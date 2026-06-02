@@ -74,8 +74,6 @@ export {
 export {
 	MapAddress,
 	type MapAddressLocation,
-	type MapAddressOrientation,
-	mapAddressOrientations,
 	type MapAddressPhone,
 	type MapAddressProps,
 } from './MapAddress'
