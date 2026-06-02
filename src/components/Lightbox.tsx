@@ -10,8 +10,6 @@ export interface LightboxImage {
 	src: string
 	/** Alt text for assistive technology. */
 	alt: string
-	/** Optional caption rendered below the image. */
-	caption?: string
 }
 
 export interface LightboxProps extends Omit<React.DialogHTMLAttributes<HTMLDialogElement>, 'open'> {
@@ -37,73 +35,62 @@ export interface LightboxProps extends Omit<React.DialogHTMLAttributes<HTMLDialo
 
 // `<dialog>` lives in the top layer. We make it span the full viewport so the backdrop covers
 // everything and the inner content can center freely. `bg-transparent` so only `::backdrop` paints
-// the dim overlay — matching Figma's 80% black overlay (#000000 at 0.8 alpha).
-//
-// Backdrop value (`rgba(0,0,0,0.8)`) has no matching `npi-*` token — flagged in the audit response.
-const dialogClass = 'm-0 size-full max-h-screen max-w-full bg-transparent p-0 '
-	+ 'backdrop:bg-[rgba(0,0,0,0.8)] '
+// the dim overlay — Figma's "Overlay 80% černá #000000" maps to `npi-black/80` (= rgba(0,0,0,0.8)).
+// `overflow-hidden`: the dialog itself must never scroll. The image is clamped by `object-contain`
+// + `max-h-full`, so content always fits the viewport; without this a vertical scrollbar appears on
+// tall content and steals ~15px of width, shrinking the 1064px stack and pushing the close button
+// off its 40px right offset.
+const dialogClass = 'm-0 size-full max-h-screen max-w-full overflow-hidden bg-transparent p-0 '
+	+ 'backdrop:bg-npi-black/80 '
 	+ 'open:flex open:items-center open:justify-center '
 	+ 'focus:outline-none'
 
-// Outer chevron-anchor layer: full viewport width, vertically centers its child. The prev/next
-// chevrons are absolutely positioned against this layer so they can sit in the gutter outside
-// the 1064px content stack on wide viewports while clamping to the screen edge on narrow ones.
+// Positioning layer: fills the dialog and centers its child. The close button and the bottom nav
+// pill are absolutely positioned against this layer.
 const stageClass = 'relative flex h-full w-full items-center justify-center'
 
 // Inner content stack: capped at the global NPI layout max (`max-w-npi-layout` = 1064px) per
 // "Šířka je maximální stejně jako layout - 1 064 px". No horizontal padding so the image can
-// actually reach 1064px wide. 64px (`py-npi-16`) top/bottom padding so portrait photos breathe
-// per the Figma annotation "horní i spodní odsazení 64 px".
-const contentStackClass = 'flex max-h-full w-full max-w-npi-layout flex-col items-center justify-center py-npi-16'
+// actually reach 1064px wide. `h-full` (a *definite* height, unlike `max-h-full`) is what lets the
+// image's percentage `max-height` resolve — without it a portrait photo keeps its natural height and
+// gets clipped by the dialog. 64px top safe-area per Figma ("horní i spodní odsazení 64 px"); the
+// bottom uses 100px so a full-height portrait clears the nav pill (which floats 40px off the bottom).
+const contentStackClass = 'flex h-full w-full max-w-npi-layout flex-col items-center justify-center pt-npi-16 pb-npi-25'
 
-// The image fills the available content-stack space while preserving aspect ratio.
-// `object-contain` keeps portrait photos within the 64px top/bottom safe-area; landscape photos
-// fill width up to the 1064px cap.
+// The image fills the available content-stack space while preserving aspect ratio. `object-contain`
+// keeps the whole photo visible (letterboxed, never cropped); the definite-height parent above makes
+// `max-h-full` actually clamp portrait photos to the viewport.
 const imageClass = 'block max-h-full max-w-full object-contain'
 
-// Close: top-right, 40px right and 64px from the dialog top per the Figma annotations.
-// `right-npi-10` = 40px, `top-npi-16` = 64px. White circular icon button using the existing
-// inverted icon Button variant — no need to invent a new chrome here.
-const closeButtonClass = 'absolute right-npi-10 top-npi-16 z-10'
+// Overlay chrome follows the Figma icon-button style: white surfaces carrying blue glyphs. A soft
+// shadow lifts the white chrome off the photo so it stays legible on bright images. The shared focus
+// ring stays brand blue.
+const chromeFocusRing = 'focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-npi-blue-light'
 
-// Prev/next chevrons sit 40px outside the 1064px content stack on wide viewports (so the chevron
-// centre is in the gutter, matching the Figma annotation "40 px" between image edge and chevron
-// centre). On narrower viewports we clamp them to a 16px screen edge minimum so they remain
-// visible. Calc: half-viewport − half-stack (532px) − chevron-gap (40px) − chevron-half (20px) =
-// `calc(50% - 532px - 60px)`. `max(<calc>, 16px)` keeps a 16px screen edge on narrow viewports.
-const navButtonBaseClass = 'absolute top-1/2 -translate-y-1/2 z-10'
-const prevButtonClass = `${navButtonBaseClass} left-[max(calc(50%-532px-60px),16px)]`
-const nextButtonClass = `${navButtonBaseClass} right-[max(calc(50%-532px-60px),16px)]`
+// Close: pinned top-right per Figma ("CTA zavřít drží pozici v pravém horním rohu", 64px top / 40px
+// right). White circle + blue X.
+const closeButtonClass = 'absolute right-npi-10 top-npi-16 z-10 inline-flex size-10 cursor-pointer items-center '
+	+ 'justify-center rounded-full bg-npi-white text-npi-blue shadow-npi-m '
+	+ 'transition-colors hover:text-npi-blue-hover '
+	+ chromeFocusRing
 
-// Caption: white sans, centered, sits below the image. Mirrors the muted secondary tone
-// used on inverted overlays elsewhere in the system.
-const captionClass = 'mt-npi-4 text-center font-npi-sans text-[1rem] leading-[1.5] text-npi-white'
+// Navigation: prev / position-counter / next grouped into one bottom-centered white pill, 40px off
+// the bottom edge. This replaces the scattered gutter chevrons + lone corner X with a single cohesive
+// unit that also answers "where am I in the set?" — and lands in the thumb zone on mobile.
+// `select-none` so rapid/double clicks on the chevrons don't text-select the counter between them.
+const navBarClass = 'absolute bottom-npi-10 left-1/2 z-10 flex -translate-x-1/2 select-none items-center gap-npi-1 '
+	+ 'rounded-full bg-npi-white px-npi-2 py-npi-1 shadow-npi-m'
 
-const NavButton = ({
-	direction,
-	onClick,
-	label,
-	className,
-}: {
-	direction: 'prev' | 'next'
-	onClick: () => void
-	label: string
-	className: string
-}) => (
-	<button
-		type="button"
-		onClick={onClick}
-		aria-label={label}
-		className={clsx(
-			className,
-			'inline-flex size-10 cursor-pointer items-center justify-center rounded-full bg-npi-white text-npi-blue '
-				+ 'transition-colors hover:text-npi-blue-hover '
-				+ 'focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-npi-blue-light',
-		)}
-	>
-		<Icon name={direction === 'prev' ? 'sipkaVlevo' : 'sipkaVpravo'} className="size-6" aria-hidden="true" />
-	</button>
-)
+// Ghost icon buttons inside the white pill — the pill is the surface, so each button is borderless
+// with just a subtle hover disc. Blue chevron glyphs (the `arrow*` icon family = a tail-less chevron).
+const navIconButtonClass = 'inline-flex size-10 cursor-pointer items-center justify-center rounded-full '
+	+ 'text-npi-blue transition-colors hover:bg-npi-blue/10 hover:text-npi-blue-hover '
+	+ chromeFocusRing
+
+// Position indicator — dark neutral text (not blue, so it reads as a label, not an action) with
+// tabular figures so the pill width doesn't jitter as the index changes.
+const navCounterClass = 'min-w-[3rem] px-npi-1 text-center font-npi-sans text-[0.875rem] '
+	+ 'leading-none text-npi-text-primary tabular-nums'
 
 export const Lightbox = forwardRef<HTMLDialogElement, LightboxProps>((props, ref) => {
 	const {
@@ -123,6 +110,9 @@ export const Lightbox = forwardRef<HTMLDialogElement, LightboxProps>((props, ref
 	const internalRef = useRef<HTMLDialogElement | null>(null)
 	useImperativeHandle(ref, () => internalRef.current as HTMLDialogElement, [])
 
+	// Start point of an in-progress touch gesture, used for swipe-to-navigate on mobile.
+	const touchStartRef = useRef<{ x: number; y: number } | null>(null)
+
 	// Drive the native dialog's open state via the `<dialog>` API.
 	// `showModal()` puts the element in the top layer with focus trapping and inert background.
 	useEffect(() => {
@@ -132,6 +122,21 @@ export const Lightbox = forwardRef<HTMLDialogElement, LightboxProps>((props, ref
 			node.showModal()
 		} else if (!open && node.open) {
 			node.close()
+		}
+	}, [open])
+
+	// Block background scroll while open ("Blokuje scroll pozadí"). `showModal()` makes the backdrop
+	// inert but does not stop the underlying document from scrolling — wheel/touch still reach the
+	// body on most engines — so we pin the owning document's body. `ownerDocument` keeps this correct
+	// inside the showcase iframe (component JS runs in the parent window, DOM lives in the iframe).
+	useEffect(() => {
+		if (!open) return
+		const body = internalRef.current?.ownerDocument.body
+		if (!body) return
+		const previousOverflow = body.style.overflow
+		body.style.overflow = 'hidden'
+		return () => {
+			body.style.overflow = previousOverflow
 		}
 	}, [open])
 
@@ -199,6 +204,29 @@ export const Lightbox = forwardRef<HTMLDialogElement, LightboxProps>((props, ref
 		[goNext, goPrev, hasMultiple, images.length, onIndexChange],
 	)
 
+	// Swipe-to-navigate on mobile ("swipe na mobilu"): a horizontal drag moves through a gallery,
+	// complementing the chevrons for the natural touch gesture on a phone.
+	const handleTouchStart = useCallback((event: React.TouchEvent) => {
+		const touch = event.touches[0]
+		touchStartRef.current = { x: touch.clientX, y: touch.clientY }
+	}, [])
+
+	const handleTouchEnd = useCallback(
+		(event: React.TouchEvent) => {
+			const start = touchStartRef.current
+			touchStartRef.current = null
+			if (!start || !hasMultiple) return
+			const touch = event.changedTouches[0]
+			const dx = touch.clientX - start.x
+			const dy = touch.clientY - start.y
+			// Only act on a clearly horizontal swipe — ignore short drags and mostly-vertical gestures.
+			if (Math.abs(dx) < 50 || Math.abs(dx) <= Math.abs(dy)) return
+			if (dx < 0) goNext()
+			else goPrev()
+		},
+		[goNext, goPrev, hasMultiple],
+	)
+
 	return (
 		<dialog
 			ref={internalRef}
@@ -219,29 +247,33 @@ export const Lightbox = forwardRef<HTMLDialogElement, LightboxProps>((props, ref
 					<div
 						className={contentStackClass}
 						onClick={(event) => event.stopPropagation()}
+						onTouchStart={handleTouchStart}
+						onTouchEnd={handleTouchEnd}
 					>
+						{/* TODO: zoom is listed as a Figma capability ("Umožňuje … zoom") but is not
+						    designed in detail and was deferred — the image renders without zoom/pan for now. */}
 						<img src={current.src} alt={current.alt} className={imageClass} />
-						{current.caption && <p className={captionClass}>{current.caption}</p>}
 					</div>
 
 					{hasMultiple && (
-						<>
-							<NavButton direction="prev" onClick={goPrev} label={prevLabel} className={prevButtonClass} />
-							<NavButton direction="next" onClick={goNext} label={nextLabel} className={nextButtonClass} />
-						</>
+						<div className={navBarClass}>
+							<button type="button" onClick={goPrev} aria-label={prevLabel} className={navIconButtonClass}>
+								<Icon name="arrowVlevo" className="size-6" aria-hidden="true" />
+							</button>
+							<span
+								className={navCounterClass}
+								aria-live="polite"
+								aria-label={`Obrázek ${safeIndex + 1} z ${images.length}`}
+							>
+								{safeIndex + 1} / {images.length}
+							</span>
+							<button type="button" onClick={goNext} aria-label={nextLabel} className={navIconButtonClass}>
+								<Icon name="arrowVpravo" className="size-6" aria-hidden="true" />
+							</button>
+						</div>
 					)}
 
-					<button
-						type="button"
-						onClick={onClose}
-						aria-label={closeLabel}
-						className={clsx(
-							closeButtonClass,
-							'inline-flex size-10 cursor-pointer items-center justify-center rounded-full bg-npi-white text-npi-blue '
-								+ 'transition-colors hover:text-npi-blue-hover '
-								+ 'focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-npi-blue-light',
-						)}
-					>
+					<button type="button" onClick={onClose} aria-label={closeLabel} className={closeButtonClass}>
 						<Icon name="zavrit" className="size-6" aria-hidden="true" />
 					</button>
 				</div>
