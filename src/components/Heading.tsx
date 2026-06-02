@@ -4,6 +4,7 @@ import { cva } from 'class-variance-authority'
 import { clsx } from 'clsx'
 import { forwardRef } from 'react'
 import { twMerge } from 'tailwind-merge'
+import { useInverted } from '../utils/inverted-context'
 
 export const headingLevels = [1, 2, 3, 4, 5, 6, 7] as const
 export type HeadingLevel = (typeof headingLevels)[number]
@@ -67,7 +68,8 @@ const tagMap: Record<HeadingLevel, 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'> = {
 }
 
 export const Heading = forwardRef<HTMLHeadingElement, HeadingProps>(({ level, inverted, className, ...props }, ref) => {
+	const resolvedInverted = useInverted(inverted)
 	const Tag = tagMap[level]
-	return <Tag ref={ref} className={twMerge(clsx(headingCva({ level, inverted }), className))} {...props} />
+	return <Tag ref={ref} className={twMerge(clsx(headingCva({ level, inverted: resolvedInverted }), className))} {...props} />
 })
 Heading.displayName = 'Heading'

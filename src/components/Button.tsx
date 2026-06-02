@@ -2,6 +2,7 @@
 
 import { forwardRef } from 'react'
 import { Icon, type IconName } from '../icons'
+import { useInverted } from '../utils/inverted-context'
 import { uic } from '../utils/uic'
 
 export const buttonVariants = [
@@ -84,7 +85,8 @@ export type ButtonProps =
 	}
 
 export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonProps>(
-	({ label, iconBefore, iconAfter, className, variant, href, ...props }, ref) => {
+	({ label, iconBefore, iconAfter, className, variant, href, inverted, ...props }, ref) => {
+		const resolvedInverted = useInverted(inverted)
 		const isIcon = variant === 'icon'
 		const isSmall = variant === 'tertiary-s'
 		const iconSize = isSmall ? ('s' as const) : ('m' as const)
@@ -117,7 +119,7 @@ export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPr
 
 		if (href) {
 			return (
-				<ButtonRoot asChild variant={variant} className={mergedClassName}>
+				<ButtonRoot asChild variant={variant} inverted={resolvedInverted} className={mergedClassName}>
 					<a ref={ref as React.Ref<HTMLAnchorElement>} href={href} {...(props as React.AnchorHTMLAttributes<HTMLAnchorElement>)}>
 						{inner}
 					</a>
@@ -129,6 +131,7 @@ export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPr
 			<ButtonRoot
 				ref={ref as React.Ref<HTMLButtonElement>}
 				variant={variant}
+				inverted={resolvedInverted}
 				className={mergedClassName}
 				{...props}
 			>

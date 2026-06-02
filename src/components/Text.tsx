@@ -1,5 +1,7 @@
 'use client'
 
+import { forwardRef } from 'react'
+import { useInverted } from '../utils/inverted-context'
 import { uic } from '../utils/uic'
 
 export const textVariants = ['xl', 'l', 'm', 's', 'xs', 'label'] as const
@@ -39,7 +41,7 @@ const variantClasses: Record<TextSize, string> = {
 	label: 'text-[0.8125rem] leading-[1.3] font-npi-serif font-bold uppercase tracking-[0.18em]',
 }
 
-export const Text = uic('p', {
+const TextRoot = uic('p', {
 	baseClass: 'font-npi-sans',
 	variants: {
 		variant: variantClasses,
@@ -68,7 +70,15 @@ export const Text = uic('p', {
 		{ variant: 'label', weight: 'bold', className: 'font-bold' },
 		{ secondary: false, inverted: false, className: 'text-npi-text-primary' },
 	],
-	displayName: 'Text',
+	displayName: 'TextRoot',
 })
 
-export type TextProps = React.ComponentProps<typeof Text>
+export type TextProps = React.ComponentProps<typeof TextRoot>
+
+// Thin wrapper so a `Text` inside an inverted surface (e.g. StickyBar) inherits white text without
+// every caller passing `inverted`. An explicit `inverted` prop still wins; see `useInverted`.
+export const Text = forwardRef<HTMLParagraphElement, TextProps>(({ inverted, ...props }, ref) => {
+	const resolvedInverted = useInverted(inverted)
+	return <TextRoot ref={ref} inverted={resolvedInverted} {...props} />
+})
+Text.displayName = 'Text'
