@@ -14,7 +14,17 @@ export interface SelectOption {
 	disabled?: boolean
 }
 
+export const selectVariants = ['outlined', 'borderless'] as const
+export type SelectVariant = (typeof selectVariants)[number]
+
+export const selectSizes = ['m', 's'] as const
+export type SelectSize = (typeof selectSizes)[number]
+
 export interface SelectProps {
+	/** Visual style. `outlined` is the bordered form-field trigger; `borderless` is a bare blue-text + chevron trigger for use outside complex forms (sorting, filtering). */
+	variant?: SelectVariant
+	/** Trigger size for the `borderless` variant — `m` is 16px bold blue, `s` is 14px regular navy. Ignored for `outlined`. */
+	size?: SelectSize
 	/** Label rendered above the trigger. */
 	label?: ReactNode
 	/** Renders a red asterisk after the label (purely visual; pair with `aria-required` if needed for semantics). */
@@ -47,6 +57,8 @@ export interface SelectProps {
 
 export const Select = forwardRef<HTMLButtonElement, SelectProps>((props, ref) => {
 	const {
+		variant = 'outlined',
+		size = 'm',
 		label,
 		required = false,
 		helperText,
@@ -232,7 +244,10 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>((props, ref) =>
 	const arrowColorClass = disabled ? 'text-npi-gray-700' : 'text-npi-blue'
 
 	return (
-		<div ref={wrapperRef} className={twMerge(clsx('relative flex w-full flex-col gap-npi-2 font-npi-sans', className))}>
+		<div
+			ref={wrapperRef}
+			className={twMerge(clsx('relative flex flex-col gap-npi-2 font-npi-sans', variant === 'borderless' ? 'w-fit' : 'w-full', className))}
+		>
 			{label && (
 				<label
 					htmlFor={id}
@@ -268,29 +283,63 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>((props, ref) =>
 				aria-invalid={hasError || undefined}
 				onClick={() => !disabled && setOpen(o => !o)}
 				onKeyDown={onTriggerKeyDown}
-				className={clsx(
-					'group flex h-npi-12 w-full items-center gap-npi-3 rounded-npi-xxs border bg-npi-bg-white px-npi-4 text-left transition-colors',
-					'focus-visible:outline-4 focus-visible:outline-npi-blue-light',
-					hasError
-						? 'border-npi-status-error'
-						: disabled
-						? 'border-npi-gray-300 bg-npi-gray-50 cursor-not-allowed'
-						: 'border-npi-gray-300 hover:border-npi-blue cursor-pointer',
-				)}
+				className={
+					variant === 'borderless'
+						? clsx(
+								'group inline-flex items-center gap-npi-2 text-left transition-colors focus-visible:outline-none',
+								disabled ? 'cursor-not-allowed' : 'cursor-pointer',
+						  )
+						: clsx(
+								'group flex h-npi-12 w-full items-center gap-npi-3 rounded-npi-xxs border bg-npi-bg-white px-npi-4 text-left transition-colors',
+								'focus-visible:outline-4 focus-visible:outline-npi-blue-light',
+								hasError
+									? 'border-npi-status-error'
+									: disabled
+									? 'border-npi-gray-300 bg-npi-gray-50 cursor-not-allowed'
+									: 'border-npi-gray-300 hover:border-npi-blue cursor-pointer',
+						  )
+				}
 			>
-				<span
-					className={clsx(
-						'min-w-0 flex-1 truncate text-[1rem] leading-[1.3]',
-						showPlaceholder
-							? clsx('font-normal italic', disabled ? 'text-npi-text-secondary' : 'text-npi-text-secondary')
-							: clsx('font-normal', disabled ? 'text-npi-text-secondary' : 'text-npi-text-primary'),
-					)}
-				>
-					{showPlaceholder ? placeholder : triggerLabel}
-				</span>
+				{variant === 'borderless' ? (
+					<span
+						className={clsx(
+							'truncate border-b-[3px] border-transparent transition-colors',
+							size === 's' ? 'text-[0.875rem] font-normal leading-[1.3]' : 'text-[1rem] font-bold leading-[1.5]',
+							disabled
+								? 'text-npi-text-secondary'
+								: clsx(
+										size === 's' ? 'text-npi-text-primary' : open ? 'text-npi-blue-hover' : 'text-npi-blue group-hover:text-npi-blue-hover',
+										'group-focus-visible:border-npi-blue-light',
+								  ),
+						)}
+					>
+						{showPlaceholder ? placeholder : triggerLabel}
+					</span>
+				) : (
+					<span
+						className={clsx(
+							'min-w-0 flex-1 truncate text-[1rem] leading-[1.3]',
+							showPlaceholder
+								? clsx('font-normal italic', disabled ? 'text-npi-text-secondary' : 'text-npi-text-secondary')
+								: clsx('font-normal', disabled ? 'text-npi-text-secondary' : 'text-npi-text-primary'),
+						)}
+					>
+						{showPlaceholder ? placeholder : triggerLabel}
+					</span>
+				)}
 				<span
 					aria-hidden
-					className={clsx('inline-flex shrink-0 items-center justify-center transition-transform', arrowColorClass, open && 'rotate-180')}
+					className={clsx(
+						'inline-flex shrink-0 items-center justify-center transition-transform',
+						variant === 'borderless'
+							? disabled
+								? 'text-npi-text-secondary'
+								: open
+								? 'text-npi-blue-hover'
+								: 'text-npi-blue group-hover:text-npi-blue-hover'
+							: arrowColorClass,
+						open && 'rotate-180',
+					)}
 				>
 					<ChevronDown />
 				</span>
@@ -311,7 +360,8 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>((props, ref) =>
 					tabIndex={-1}
 					onKeyDown={onListKeyDown}
 					className={clsx(
-						'absolute left-0 right-0 top-full z-50 mt-npi-1 flex flex-col overflow-hidden rounded-npi-xs bg-npi-bg-white py-npi-2 shadow-npi-m',
+						'absolute top-full z-50 mt-npi-1 flex flex-col overflow-hidden rounded-npi-xs bg-npi-bg-white py-npi-2 shadow-npi-m',
+						variant === 'borderless' ? 'left-0 w-max min-w-full' : 'left-0 right-0',
 					)}
 				>
 					{options.map((option, index) => {
