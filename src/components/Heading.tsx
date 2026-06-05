@@ -28,6 +28,9 @@ export const headingSpecs: Record<HeadingLevel, HeadingSpec> = {
 
 export interface HeadingProps extends React.HTMLAttributes<HTMLHeadingElement> {
 	level: HeadingLevel
+	// Visual style override — `level` keeps driving the HTML tag, `visualLevel` drives size/weight.
+	// Defaults to `level` (semantics and visuals stay coupled unless explicitly split).
+	visualLevel?: HeadingLevel
 	inverted?: boolean
 }
 
@@ -67,9 +70,9 @@ const tagMap: Record<HeadingLevel, 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'> = {
 	7: 'h6',
 }
 
-export const Heading = forwardRef<HTMLHeadingElement, HeadingProps>(({ level, inverted, className, ...props }, ref) => {
+export const Heading = forwardRef<HTMLHeadingElement, HeadingProps>(({ level, visualLevel, inverted, className, ...props }, ref) => {
 	const resolvedInverted = useInverted(inverted)
 	const Tag = tagMap[level]
-	return <Tag ref={ref} className={twMerge(clsx(headingCva({ level, inverted: resolvedInverted }), className))} {...props} />
+	return <Tag ref={ref} className={twMerge(clsx(headingCva({ level: visualLevel ?? level, inverted: resolvedInverted }), className))} {...props} />
 })
 Heading.displayName = 'Heading'
