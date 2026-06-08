@@ -3,7 +3,7 @@ export { BannerBlock, type BannerBlockIndicator, type BannerBlockProps, type Ban
 export { BigNumberBlock, type BigNumberBlockProps, type BigNumberBlockSize } from './BigNumberBlock'
 export { BlockColumns, type BlockColumnsMode, type BlockColumnsProps, type BlockColumnsRatio, blockColumnsRatios } from './BlockColumns'
 export { ButtonBlock, type ButtonBlockProps, type ButtonBlockVariant } from './ButtonBlock'
-export { CardBlock, type CardBlockProps } from './CardBlock'
+export { CardBlock, type CardBlockAspect, cardBlockAspects, type CardBlockProps } from './CardBlock'
 export { ColumnBlock } from './ColumnBlock'
 export { ContactCardBlock, type ContactCardBlockProps } from './ContactCardBlock'
 export {
