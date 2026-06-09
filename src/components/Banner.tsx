@@ -82,11 +82,11 @@ const actionBaseClass =
 const actionVariantClass = {
 	primary: {
 		default: 'bg-npi-blue text-npi-white hover:bg-npi-blue-hover active:bg-npi-blue-hover',
-		inverted: 'bg-npi-white text-npi-blue hover:bg-npi-gray-50 active:bg-npi-gray-50',
+		inverted: 'bg-npi-white text-npi-blue hover:text-npi-blue-dark active:text-npi-blue-dark',
 	},
 	secondary: {
 		default: 'bg-transparent border border-npi-blue text-npi-blue hover:border-npi-blue-hover hover:text-npi-blue-hover',
-		inverted: 'bg-transparent border border-npi-white text-npi-white hover:border-npi-gray-200 hover:text-npi-gray-200',
+		inverted: 'bg-transparent border border-npi-white text-npi-white hover:border-npi-blue-light hover:text-npi-blue-light',
 	},
 } as const
 
