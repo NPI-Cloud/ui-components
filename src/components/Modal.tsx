@@ -43,7 +43,9 @@ const innerClass = 'flex flex-col items-center gap-npi-6 px-npi-6 py-npi-10 @npi
 
 const titleClass = 'min-w-full text-center font-npi-serif text-[1.5rem] leading-[1.2] font-normal text-npi-text-primary @npi-tablet:text-[2rem]'
 
-const bodyClass = 'min-w-full text-center font-npi-sans text-[1rem] leading-[1.5] font-normal text-npi-text-primary'
+// `flex flex-col items-center` centers block-level children (e.g. a form input) — `text-center` alone
+// only centers inline/text content, leaving block elements pinned to the left.
+const bodyClass = 'flex min-w-full flex-col items-center text-center font-npi-sans text-[1rem] leading-[1.5] font-normal text-npi-text-primary'
 
 // Buttons stack full-width on a narrow dialog, then sit in a centered row from @npi-tablet up.
 const actionsClass = 'flex w-full flex-col items-stretch gap-npi-3 @npi-tablet:w-auto @npi-tablet:flex-row @npi-tablet:items-start'
