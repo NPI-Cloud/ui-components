@@ -60,9 +60,13 @@ export function HeroBlock({
 	const hasCta = ctaLabel || secondaryCtaLabel
 	const config = sizeConfig[heroSize ?? 'homepage11']
 	const imageUrl = image?.url
+	// Without a visual the text would otherwise keep the (often 50/50) split dictated by `heroSize`,
+	// leaving it cramped. A hero with no visual is always laid out 2:1 (text fills two thirds) so the
+	// copy gets a wider, more readable column.
+	const gridCols = hideVisual ? '@npi-tablet:grid-cols-[2fr_1fr]' : config.gridCols
 
 	return (
-		<section className={clsx('grid grid-cols-1 items-center gap-npi-8 @npi-tablet:gap-npi-10', config.gridCols)}>
+		<section className={clsx('grid grid-cols-1 items-center gap-npi-8 @npi-tablet:gap-npi-10', gridCols)}>
 			<div className="flex flex-col items-start gap-npi-6">
 				{heading && <Heading level={1}>{heading}</Heading>}
 				{subtitle && <Text variant="l">{subtitle}</Text>}
