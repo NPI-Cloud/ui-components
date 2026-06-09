@@ -38,8 +38,10 @@ const dialogClass = '@container m-auto w-[880px] max-w-[calc(100vw-32px)] bg-npi
 	+ 'focus:outline-none'
 
 // Padding scales up to the Figma 92px×72px desktop spec at @npi-tablet; on narrow dialogs it relaxes to
-// 24px×40px so the content isn't crushed. (92 has no exact npi step — 88/100 are 4px off — kept arbitrary.)
-const innerClass = 'flex flex-col items-center gap-npi-6 px-npi-6 py-npi-10 @npi-tablet:px-[92px] @npi-tablet:py-npi-18'
+// 24px horizontal so the content isn't crushed. (92 has no exact npi step — 88/100 are 4px off — kept arbitrary.)
+// Mobile top padding is 56px (not 40px) so the centered full-width title clears the close button — which
+// sits at 24px inset + 24px tall = 48px bottom — by at least 8px. Tablet's 72px top already clears its 64px button.
+const innerClass = 'flex flex-col items-center gap-npi-6 px-npi-6 pt-npi-14 pb-npi-10 @npi-tablet:px-[92px] @npi-tablet:py-npi-18'
 
 const titleClass = 'min-w-full text-center font-npi-serif text-[1.5rem] leading-[1.2] font-normal text-npi-text-primary @npi-tablet:text-[2rem]'
 
