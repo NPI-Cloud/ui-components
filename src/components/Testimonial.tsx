@@ -143,11 +143,14 @@ export const Testimonial = forwardRef<HTMLElement, TestimonialProps>((props, ref
 	)
 
 	// Inner column shared between the icon-leading layout and the plain layout.
+	// Icon variant: stack the quote-mark above the text on narrow widths (so the text spans the
+	// full box) and place it to the left from @md (448px) up — the point below which a side-by-side
+	// icon crushes the quote into an unreadably narrow column (e.g. the boxed variant on mobile).
 	const column = withQuoteIcon
 		? (
-			<div className="flex w-full items-start gap-npi-8">
+			<div className="flex w-full flex-col items-start gap-npi-6 @md:flex-row @md:gap-npi-8">
 				<QuoteMark className="size-auto h-[40px] w-[51px] shrink-0 text-npi-blue" />
-				<div className="flex min-w-0 flex-1 flex-col items-start gap-npi-6">
+				<div className="flex w-full min-w-0 flex-col items-start gap-npi-6 @md:w-auto @md:flex-1">
 					{inner}
 				</div>
 			</div>
@@ -163,7 +166,8 @@ export const Testimonial = forwardRef<HTMLElement, TestimonialProps>((props, ref
 			ref={ref}
 			className={twMerge(
 				clsx(
-					'm-0 flex w-full',
+					// `@container` makes the icon-variant layout respond to the testimonial's own width.
+					'@container m-0 flex w-full',
 					// Figma 368:8269 — boxed+icon variant uses 40px symmetric padding; plain boxed uses 48/40.
 					// We emit a single padding utility per branch because twMerge cannot resolve arbitrary
 					// `px-npi-12` vs `px-npi-10` token classes (last-wins is unreliable across versions).
