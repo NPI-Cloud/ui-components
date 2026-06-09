@@ -16,8 +16,17 @@ export interface StickyBarProps extends HTMLAttributes<HTMLElement> {
 	tone?: StickyBarTone
 	/** Edge to pin against — `bottom` (default) or `top`. The bar uses `position: sticky`, so the parent must be a scroll container. */
 	position?: StickyBarPosition
-	/** Bar content — consumers compose `Heading`, `Text`, `Button`, etc. inside the bar. The default inner layout is a single horizontal row centered at `max-w-npi-layout` with `gap-npi-6`. */
-	children: ReactNode
+	/**
+	 * Contextual content — consumers compose `Heading`, `Text`, `StatusIndicator`, etc. (e.g. product
+	 * title and price). Shown inline on desktop; **hidden below `@npi-tablet`** so the bar collapses to
+	 * just the `action` on mobile and doesn't eat the viewport.
+	 */
+	children?: ReactNode
+	/**
+	 * Persistent primary action (typically a `Button`). Always rendered — on mobile it is the *only*
+	 * visible element (full-width); on desktop it sits at the end of the row next to `children`.
+	 */
+	action?: ReactNode
 }
 
 // Bar background spans the full viewport width and sticks to one edge of the scroll parent.
@@ -38,15 +47,23 @@ const positionClass: Record<StickyBarPosition, string> = {
 }
 
 // Inner layout is centered at the NPI 1064px layout width to match the website's content column.
-// On narrow widths the children stack so a full-width primary button (Button is `w-full` on mobile)
-// lands at the bottom and never clips; from `@npi-tablet` up it collapses to the single centered row.
-const innerClass = 'flex w-full max-w-npi-layout flex-col items-stretch gap-npi-4 @npi-tablet:flex-row @npi-tablet:items-center @npi-tablet:justify-center @npi-tablet:gap-npi-6'
+// From `@npi-tablet` up it is a single centered row; below that only the `action` shows (the context
+// `children` are hidden), so the mobile bar is just a full-width button and stays compact.
+const innerClass = 'flex w-full max-w-npi-layout items-center gap-npi-4 @npi-tablet:gap-npi-6'
+
+// Context column (title, price, status, …): hidden on mobile, an inline row that grows on desktop.
+const contextClass = 'hidden min-w-0 flex-1 items-center gap-npi-6 @npi-tablet:flex'
+
+// Action (CTA): full-width on mobile where it is the sole element, intrinsic width on desktop.
+// `flex flex-col` (default `items-stretch`) stretches the child button to the bar width on mobile.
+const actionClass = 'flex w-full flex-col @npi-tablet:w-auto'
 
 export const StickyBar = forwardRef<HTMLElement, StickyBarProps>(({
 	tone = 'light',
 	position = 'bottom',
 	className,
 	children,
+	action,
 	...props
 }, ref) => {
 	return (
@@ -59,7 +76,8 @@ export const StickyBar = forwardRef<HTMLElement, StickyBarProps>(({
 			    it to render on a dark background, so callers don't thread `inverted` onto every child. */}
 			<InvertedContext.Provider value={tone === 'inverted'}>
 				<div className={innerClass}>
-					{children}
+					{children != null && <div className={contextClass}>{children}</div>}
+					{action != null && <div className={actionClass}>{action}</div>}
 				</div>
 			</InvertedContext.Provider>
 		</aside>
