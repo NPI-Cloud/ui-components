@@ -360,7 +360,7 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>((props, ref) =>
 					tabIndex={-1}
 					onKeyDown={onListKeyDown}
 					className={clsx(
-						'absolute top-full z-50 mt-npi-1 flex flex-col overflow-hidden rounded-npi-xs bg-npi-bg-white py-npi-2 shadow-npi-m',
+						'absolute top-full z-50 mt-npi-1 flex max-h-80 flex-col overflow-y-auto rounded-npi-xs bg-npi-bg-white py-npi-2 shadow-npi-m',
 						variant === 'borderless' ? 'left-0 w-max min-w-full' : 'left-0 right-0',
 					)}
 				>
