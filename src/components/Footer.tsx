@@ -174,14 +174,22 @@ FooterSocial.displayName = 'FooterSocial'
 export interface FooterLogosProps extends HTMLAttributes<HTMLDivElement> {}
 
 /**
- * Row of partner / funder logos. Children (usually `<img>`) are laid out horizontally
- * with 48px spacing on desktop (32px on mobile), wrapping to multiple rows when needed.
+ * Row of partner / funder logos. On mobile the logos sit in a two-column grid so the wide funder
+ * lock-ups don't each take a full row; from `npi-tablet` up they flow as a horizontal wrapping row
+ * (32px spacing, 48px on desktop).
  */
 export const FooterLogos = forwardRef<HTMLDivElement, FooterLogosProps>(
 	({ className, children, ...props }, ref) => (
 		<div
 			ref={ref}
-			className={twMerge(clsx('flex flex-wrap items-center gap-npi-8 npi-desktop:gap-npi-12', className))}
+			className={twMerge(
+				clsx(
+					// Mobile: 2 columns, 32px column gap / 40px row gap (Figma "Loga" frame).
+					'grid grid-cols-2 items-center gap-x-npi-8 gap-y-npi-10',
+					'npi-tablet:flex npi-tablet:flex-wrap npi-tablet:gap-npi-8 npi-desktop:gap-npi-12',
+					className,
+				),
+			)}
 			{...props}
 		>
 			{children}
