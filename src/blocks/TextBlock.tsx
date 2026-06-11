@@ -42,23 +42,25 @@ const FALLBACK_PARAGRAPH: TextBlockRichParagraph = {
 }
 
 export function TextBlock({ variant, content, boxed }: TextBlockProps) {
-	const paragraphs = normalizeContent(content)
+	const paragraphs = normalizeRichContent(content) ?? [FALLBACK_PARAGRAPH]
 	return (
 		<div className={clsx('flex flex-col gap-npi-6', boxed && 'rounded-npi-m bg-npi-bg-light px-npi-12 py-npi-10')}>
 			{paragraphs.map((paragraph, index) => (
 				<Text key={index} variant={variant ?? 'l'}>
-					{renderInlines(paragraph.children)}
+					{renderRichInlines(paragraph.children)}
 				</Text>
 			))}
 		</div>
 	)
 }
 
-function normalizeContent(content: TextBlockProps['content']): TextBlockRichParagraph[] {
-	if (content === null || content === undefined || content === '') return [FALLBACK_PARAGRAPH]
+// Shared by every block that stores Slate rich text on `content.data` (Text, AccordionItem body).
+// Returns null for empty/unusable content so each consumer picks its own fallback.
+export function normalizeRichContent(content: TextBlockProps['content']): TextBlockRichParagraph[] | null {
+	if (content === null || content === undefined || content === '') return null
 	if (typeof content === 'string') return [{ type: 'paragraph', children: [{ text: content }] }]
-	if (typeof content !== 'object' || !Array.isArray(content.children) || content.children.length === 0) return [FALLBACK_PARAGRAPH]
-	if (isEffectivelyEmpty(content)) return [FALLBACK_PARAGRAPH]
+	if (typeof content !== 'object' || !Array.isArray(content.children) || content.children.length === 0) return null
+	if (isEffectivelyEmpty(content)) return null
 	return content.children
 }
 
@@ -75,7 +77,7 @@ function isEffectivelyEmpty(content: TextBlockRichContent): boolean {
 	return true
 }
 
-function renderInlines(children: TextBlockRichInline[]): ReactNode {
+export function renderRichInlines(children: TextBlockRichInline[]): ReactNode {
 	return children.map((node, index) => {
 		if ('type' in node && node.type === 'anchor') {
 			return (

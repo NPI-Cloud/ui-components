@@ -1,3 +1,11 @@
+export {
+	AccordionBlock,
+	type AccordionBlockProps,
+	type AccordionBlockSize,
+	AccordionItemBlock,
+	type AccordionItemBlockProps,
+	AccordionStartBlock,
+} from './AccordionBlock'
 export { ArticleTemplate, type ArticleTemplateProps } from './ArticleTemplate'
 export { BannerBlock, type BannerBlockIndicator, type BannerBlockProps, type BannerBlockTone } from './BannerBlock'
 export { BigNumberBlock, type BigNumberBlockProps, type BigNumberBlockSize } from './BigNumberBlock'
