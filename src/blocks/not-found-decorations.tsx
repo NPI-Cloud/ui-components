@@ -16,14 +16,20 @@ import rightZapojmeVsechny from '../illustrations/not-found/right-zapojme-vsechn
  * a browser/SVG reproduction, so we ship the exact Figma raster — one transparent 236×236 PNG per theme.
  * Picking by theme also keeps the per-theme accent colors exactly as the designer set them.
  */
-const leftByTheme: Record<NotFoundPageTheme, string> = {
+// Vite consumers resolve raster imports to URL strings; Next consumers (which compile this
+// file through `transpilePackages`) resolve them to StaticImageData-like objects. Accept both.
+type RasterImport = string | { src: string }
+
+const toUrl = (image: RasterImport): string => (typeof image === 'string' ? image : image.src)
+
+const leftByTheme: Record<NotFoundPageTheme, RasterImport> = {
 	'vedeme-skolu': leftVedemeSkolu,
 	'zapojme-vsechny': leftZapojmeVsechny,
 	'digitalizace': leftDigitalizace,
 	'revize-rvp': leftRevizeRvp,
 }
 
-const rightByTheme: Record<NotFoundPageTheme, string> = {
+const rightByTheme: Record<NotFoundPageTheme, RasterImport> = {
 	'vedeme-skolu': rightVedemeSkolu,
 	'zapojme-vsechny': rightZapojmeVsechny,
 	'digitalizace': rightDigitalizace,
@@ -32,10 +38,10 @@ const rightByTheme: Record<NotFoundPageTheme, string> = {
 
 /** Left decoration cluster — big blue blob, themed accent blob, and the blue dot field. */
 export function LeftDecoration({ theme }: { theme: NotFoundPageTheme }) {
-	return <img src={leftByTheme[theme]} alt="" aria-hidden="true" width={236} height={236} className="block size-[236px] shrink-0" />
+	return <img src={toUrl(leftByTheme[theme])} alt="" aria-hidden="true" width={236} height={236} className="block size-[236px] shrink-0" />
 }
 
 /** Right decoration cluster — graph-paper grid, themed triangle, and the blue arch. */
 export function RightDecoration({ theme }: { theme: NotFoundPageTheme }) {
-	return <img src={rightByTheme[theme]} alt="" aria-hidden="true" width={236} height={236} className="block size-[236px] shrink-0" />
+	return <img src={toUrl(rightByTheme[theme])} alt="" aria-hidden="true" width={236} height={236} className="block size-[236px] shrink-0" />
 }
