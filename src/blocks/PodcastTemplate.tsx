@@ -37,11 +37,11 @@ export function PodcastTemplate(
 	return (
 		<ContentTemplateShell className={className}>
 			<ContentTemplateHeader breadcrumbs={breadcrumbs} title={title} coverSlot={coverSlot} />
-			{/* Meta + platforms + body sit tight together — design has no padding below the author/date row. */}
+			{/* Body sits tight under the meta; the platforms row gets its own breathing room below the author/date. */}
 			<div className="flex flex-col">
 				<ContentTemplateMeta author={author} date={date} />
 				{hasPlatforms && (
-					<div className="flex flex-col gap-npi-4">
+					<div className="mt-npi-8 flex flex-col gap-npi-4">
 						<Text variant="l">Přehrajte si podcast na platformách</Text>
 						<div className="flex flex-wrap items-center gap-npi-6">
 							{platforms.map(platform => (
