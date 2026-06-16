@@ -12,6 +12,7 @@ export { BigNumberBlock, type BigNumberBlockProps, type BigNumberBlockSize } fro
 export { BlockColumns, type BlockColumnsMode, type BlockColumnsProps, type BlockColumnsRatio, blockColumnsRatios } from './BlockColumns'
 export { ButtonBlock, type ButtonBlockProps, type ButtonBlockVariant } from './ButtonBlock'
 export { CardBlock, type CardBlockAspect, cardBlockAspects, type CardBlockProps } from './CardBlock'
+export { CardOfferBlock, type CardOfferBlockDisplay, type CardOfferBlockMetaItem, type CardOfferBlockProps } from './CardOfferBlock'
 export { ColumnBlock } from './ColumnBlock'
 export { ContactCardBlock, type ContactCardBlockProps } from './ContactCardBlock'
 export {
