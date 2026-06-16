@@ -86,6 +86,7 @@ export {
 	type MapAddressProps,
 } from './MapAddress'
 export { Modal, type ModalProps } from './Modal'
+export { NavCard, type NavCardProps, type NavCardSize, navCardSizes } from './NavCard'
 export {
 	Navigation,
 	type NavigationBrand,
