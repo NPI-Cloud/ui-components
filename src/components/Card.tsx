@@ -191,7 +191,7 @@ export const Card = forwardRef<HTMLElement, CardProps>(({
 							</div>
 						)
 				)}
-				<div className="flex w-full flex-col items-start gap-npi-4 px-npi-6 pt-npi-6 pb-npi-8 @md:flex-1 @md:p-0">
+				<div className="flex w-full min-w-0 flex-col items-start gap-npi-4 px-npi-6 pt-npi-6 pb-npi-8 @md:flex-1 @md:p-0">
 					{label && <Text variant="label">{label}</Text>}
 					<Heading level={5} className={clsx(titleClass, href && titleHoverClass)}>
 						{href
@@ -206,11 +206,14 @@ export const Card = forwardRef<HTMLElement, CardProps>(({
 							: title}
 					</Heading>
 					{meta && meta.length > 0 && (
-						<div className="flex w-full items-center gap-2.5">
+						// Inline with bullet separators when there's room. In the cramped horizontal band
+						// (@md puts a 200px visual beside a still-narrow card) the row stacks vertically with
+						// no dangling separator, then re-inlines once the text column is wide enough again (@2xl).
+						<div className="flex w-full min-w-0 flex-row items-center gap-x-2.5 gap-y-1 @md:flex-col @md:items-start @2xl:flex-row @2xl:items-center">
 							{meta.map((item, i) => (
 								<Fragment key={i}>
-									{i > 0 && <span aria-hidden className="block size-1.5 shrink-0 rounded-full bg-npi-gray-300" />}
-									<Text variant="l" secondary className="whitespace-nowrap">
+									{i > 0 && <span aria-hidden className="block size-1.5 shrink-0 rounded-full bg-npi-gray-300 @md:hidden @2xl:block" />}
+									<Text variant="l" secondary className="whitespace-nowrap @md:whitespace-normal @2xl:whitespace-nowrap">
 										{item}
 									</Text>
 								</Fragment>
