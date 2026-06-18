@@ -1176,7 +1176,10 @@ export const Navigation = forwardRef<HTMLElement, NavigationProps>((props, ref) 
 				)}
 				<NavigationMenuMobileToggle />
 			</NavigationMenuBar>
-			<NavigationMenuItems>{itemNodes}</NavigationMenuItems>
+			{/* Skip the menu bars entirely when there are no items — otherwise the desktop
+			    `NavigationMenuItems` row renders as an empty 32px (pt-npi-2 + pb-npi-6) strip below
+			    the brand bar, which reads as an unexplained gap above the page content. */}
+			{itemNodes.length > 0 && <NavigationMenuItems>{itemNodes}</NavigationMenuItems>}
 			<NavigationMenuDrawer>
 				{search && (
 					<NavigationMenuSearch
@@ -1186,7 +1189,7 @@ export const Navigation = forwardRef<HTMLElement, NavigationProps>((props, ref) 
 						onSubmit={search.onSubmit}
 					/>
 				)}
-				<NavigationMenuItems>{itemNodes}</NavigationMenuItems>
+				{itemNodes.length > 0 && <NavigationMenuItems>{itemNodes}</NavigationMenuItems>}
 				{cta && <NavigationMenuItem label={cta.label} href={cta.href ?? '#'} onClick={cta.onClick} />}
 			</NavigationMenuDrawer>
 		</NavigationMenu>
