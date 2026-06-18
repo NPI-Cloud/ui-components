@@ -1,7 +1,9 @@
 'use client'
 
 import { clsx } from 'clsx'
+import { useState } from 'react'
 import { Text } from '../components/Text'
+import { Lightbox } from '../components/Lightbox'
 import { toEmbedUrl } from '../components/Video'
 
 export const mediaBlockAspects = ['16:9', '4:3', '1:1', '3:2', 'auto'] as const
@@ -31,6 +33,16 @@ export interface MediaBlockProps {
 	 * inside. Ignored when `aspect` is `auto` (no frame).
 	 */
 	fit?: MediaBlockFit
+	/**
+	 * When set, the image becomes a link to this URL (whole-image click-through). Takes precedence
+	 * over `zoomable`. Ignored for video/placeholder.
+	 */
+	href?: string | null
+	/**
+	 * When `true` (and no `href`), clicking the image opens a fullscreen Lightbox preview.
+	 * Ignored for video/placeholder.
+	 */
+	zoomable?: boolean
 }
 
 // Hardcoded so Tailwind's source scanner can see the literal arbitrary values.
@@ -49,9 +61,10 @@ const aspectClasses: Record<Exclude<MediaBlockAspect, 'auto'>, string> = {
  * `<figcaption>`. Frame ratio and image fit are configurable via `aspect` / `fit`.
  */
 export function MediaBlock(
-	{ imageUrl, imageAlt, videoUrl, caption, placeholderLabel = 'Vizuál, foto, video', aspect = '16:9', fit = 'cover' }: MediaBlockProps,
+	{ imageUrl, imageAlt, videoUrl, caption, placeholderLabel = 'Vizuál, foto, video', aspect = '16:9', fit = 'cover', href, zoomable }: MediaBlockProps,
 ) {
 	const embedUrl = videoUrl ? toEmbedUrl(videoUrl) : null
+	const [zoomOpen, setZoomOpen] = useState(false)
 
 	const media = (() => {
 		if (embedUrl) {
@@ -68,28 +81,43 @@ export function MediaBlock(
 			)
 		}
 
-		if (imageUrl && aspect === 'auto') {
-			return (
-				<img
-					src={imageUrl}
-					alt={imageAlt ?? ''}
-					className="h-auto w-full rounded-npi-xxs"
-				/>
-			)
-		}
-
 		const frameAspect = aspect === 'auto' ? '16:9' : aspect
 
 		if (imageUrl) {
-			return (
-				<div className={clsx('relative w-full overflow-hidden rounded-npi-xxs', aspectClasses[frameAspect])}>
+			const imageEl = aspect === 'auto'
+				? (
 					<img
 						src={imageUrl}
 						alt={imageAlt ?? ''}
-						className={clsx('size-full', fit === 'contain' ? 'object-contain' : 'object-cover')}
+						className="h-auto w-full rounded-npi-xxs"
 					/>
-				</div>
-			)
+				)
+				: (
+					<div className={clsx('relative w-full overflow-hidden rounded-npi-xxs', aspectClasses[frameAspect])}>
+						<img
+							src={imageUrl}
+							alt={imageAlt ?? ''}
+							className={clsx('size-full', fit === 'contain' ? 'object-contain' : 'object-cover')}
+						/>
+					</div>
+				)
+
+			if (href) {
+				return <a href={href} className="block">{imageEl}</a>
+			}
+			if (zoomable) {
+				return (
+					<button
+						type="button"
+						onClick={() => setZoomOpen(true)}
+						className="block w-full cursor-zoom-in appearance-none bg-transparent p-0 text-left"
+						aria-label="Zvětšit obrázek"
+					>
+						{imageEl}
+					</button>
+				)
+			}
+			return imageEl
 		}
 
 		return (
@@ -104,14 +132,32 @@ export function MediaBlock(
 		)
 	})()
 
-	if (!caption) return media
+	// Lightbox dialog — only meaningful for a zoomable still image (no href, not video).
+	const lightbox = zoomable && imageUrl && !embedUrl && !href
+		? (
+			<Lightbox
+				open={zoomOpen}
+				onClose={() => setZoomOpen(false)}
+				images={[{ src: imageUrl, alt: imageAlt ?? '' }]}
+				index={0}
+				onIndexChange={() => {}}
+			/>
+		)
+		: null
+
+	if (!caption) {
+		return <>{media}{lightbox}</>
+	}
 
 	return (
-		<figure className="flex flex-col items-start gap-npi-2">
-			{media}
-			<figcaption>
-				<Text variant="l">{caption}</Text>
-			</figcaption>
-		</figure>
+		<>
+			<figure className="flex flex-col items-start gap-npi-2">
+				{media}
+				<figcaption>
+					<Text variant="l">{caption}</Text>
+				</figcaption>
+			</figure>
+			{lightbox}
+		</>
 	)
 }
