@@ -1085,7 +1085,14 @@ export const NavigationPromo = forwardRef<HTMLAnchorElement, NavigationPromoProp
 				<Text asChild variant="m" secondary>
 					<span>{title}</span>
 				</Text>
-				{coverSrc && <Image src={coverSrc} alt="" className="aspect-video w-full rounded-npi-xs object-cover" />}
+				{coverSrc && (
+					// Positioned aspect-video frame + `fill` so the host can optimize the promo cover
+					// (resize/WebP) and reserve space — a bare `<Image src>` with no dims/`fill` falls back
+					// to an unoptimized full-resolution `<img>`.
+					<div className="relative aspect-video w-full overflow-hidden rounded-npi-xs">
+						<Image src={coverSrc} alt="" fill sizes="(min-width: 1024px) 400px, 100vw" className="size-full object-cover" />
+					</div>
+				)}
 			</Link>
 		)
 	},
