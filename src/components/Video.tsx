@@ -28,6 +28,7 @@ export const Video = forwardRef<HTMLDivElement, VideoProps>(({ url, title, aspec
 					<iframe
 						src={embedUrl}
 						title={title ?? 'Video'}
+						loading="lazy"
 						allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
 						allowFullScreen
 						className="absolute inset-0 size-full border-0"

@@ -242,7 +242,11 @@ export const Lightbox = forwardRef<HTMLDialogElement, LightboxProps>((props, ref
 			className={twMerge(clsx(dialogClass, className))}
 			{...rest}
 		>
-			{current && (
+			{/* Mount the contents only while open. A closed `<dialog>` is `display:none`, but the browser
+			    still fetches `<img>`s in a display:none subtree — so rendering the full-resolution source
+			    unconditionally would eagerly download every zoomable image's original on page load, never
+			    seen until the user zooms. Gating on `open` defers that fetch to the moment it's needed. */}
+			{open && current && (
 				<div className={stageClass}>
 					{
 						/* Inner content stack — capped at 1064px so the image can reach the Figma max

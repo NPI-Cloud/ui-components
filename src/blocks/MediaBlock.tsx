@@ -83,6 +83,7 @@ export function MediaBlock(
 					<iframe
 						src={embedUrl}
 						title={imageAlt ?? caption ?? 'Video'}
+						loading="lazy"
 						allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
 						allowFullScreen
 						className="size-full border-0"
