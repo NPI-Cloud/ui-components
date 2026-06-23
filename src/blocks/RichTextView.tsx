@@ -83,12 +83,16 @@ function renderNode(node: SlateNode, key: number, references: RichTextReferences
 			return <ol key={key} className="list-decimal pl-5 my-npi-4 space-y-npi-1">{children}</ol>
 		case 'listItem':
 			return <li key={key}>{children}</li>
-		case 'anchor':
+		case 'anchor': {
+			// An anchor with no href would render a dead `#` link, so fall back to plain text.
+			const href = node.href as string | undefined
+			if (!href) return <Fragment key={key}>{children}</Fragment>
 			return (
-				<Link key={key} href={(node.href as string | undefined) ?? '#'} className="text-npi-blue underline">
+				<Link key={key} href={href} className="text-npi-blue underline">
 					{children}
 				</Link>
 			)
+		}
 		case 'calloutBox':
 			// "Kam dál"-style tinted box: children are ordinary rich-text blocks, the box only paints
 			// the surface — 40px padding, 24px radius per design. First/last child margins are zeroed

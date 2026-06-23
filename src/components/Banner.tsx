@@ -51,6 +51,13 @@ const indicatorIconMap: Record<BannerIndicator, IconName> = {
 	gallery: 'galery',
 }
 
+// The indicator icon is decorative (aria-hidden), so the media type needs a text equivalent for AT.
+const indicatorLabelMap: Record<BannerIndicator, string> = {
+	video: 'Video',
+	podcast: 'Podcast',
+	gallery: 'Galerie',
+}
+
 const toneRootClass: Record<BannerTone, string> = {
 	light: 'bg-npi-bg-light',
 	white: 'bg-npi-white',
@@ -132,21 +139,22 @@ export const Banner = forwardRef<HTMLElement, BannerProps>(({
 	const inverted = tone === 'dark'
 	const hasActions = !!(primaryAction || secondaryAction)
 	const asLink = !!href && !hasActions
-	const Root = asLink ? 'a' : 'article'
 
 	return (
 		<div className="@container w-full">
-			<Root
-				ref={ref as React.Ref<HTMLElement & HTMLAnchorElement>}
+			{/* When the whole banner links, the title carries an overlay anchor (`before:inset-0`) that
+			    stretches over the card. This keeps the accessible name to the title alone — wrapping the
+			    whole subtree in one <a> would fold the label, description and visual into the link name. */}
+			<article
+				ref={ref}
 				className={twMerge(
 					clsx(
 						rootClass,
 						toneRootClass[tone],
-						asLink && 'cursor-pointer no-underline transition-shadow hover:shadow-npi-m',
+						asLink && 'relative cursor-pointer transition-shadow hover:shadow-npi-m',
 						className,
 					),
 				)}
-				{...(asLink ? { href } : {})}
 				{...props}
 			>
 				<div className="flex min-w-0 flex-1 flex-col gap-npi-6">
@@ -157,7 +165,16 @@ export const Banner = forwardRef<HTMLElement, BannerProps>(({
 							</Text>
 						)}
 						<h3 className={clsx(titleClass, inverted ? 'text-white' : 'text-npi-text-primary')}>
-							{title}
+							{asLink
+								? (
+									<Link
+										href={href}
+										className='text-inherit no-underline outline-none focus-visible:ring-4 focus-visible:ring-npi-blue-light rounded-npi-xxs before:absolute before:inset-0 before:content-[""]'
+									>
+										{title}
+									</Link>
+								)
+								: title}
 						</h3>
 						{description && (
 							<Text variant="l" inverted={inverted}>
@@ -178,11 +195,12 @@ export const Banner = forwardRef<HTMLElement, BannerProps>(({
 						{indicator && (
 							<span className="absolute bottom-npi-2 right-npi-2 flex size-10 shrink-0 items-center justify-center rounded-full bg-npi-white p-npi-1 text-npi-blue">
 								<Icon name={indicatorIconMap[indicator]} className="size-6" />
+								<span className="sr-only">{indicatorLabelMap[indicator]}</span>
 							</span>
 						)}
 					</div>
 				)}
-			</Root>
+			</article>
 		</div>
 	)
 })

@@ -40,8 +40,8 @@ const titleClasses: Record<NavCardSize, string> = {
 export const NavCard = forwardRef<HTMLElement, NavCardProps>(({ title, icon, size = 'M', href, className, ...props }, ref) => {
 	const rootClass = twMerge(
 		clsx(
-			'group flex cursor-pointer bg-npi-bg-light',
-			href && 'no-underline outline-none focus-visible:ring-4 focus-visible:ring-npi-blue-light',
+			'group flex bg-npi-bg-light',
+			href && 'cursor-pointer no-underline outline-none focus-visible:ring-4 focus-visible:ring-npi-blue-light',
 			sizeClasses[size],
 			className,
 		),

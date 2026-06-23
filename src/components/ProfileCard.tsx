@@ -228,7 +228,7 @@ export const ProfileCard = forwardRef<HTMLElement, ProfileCardProps>(({
 					</Link>
 				)}
 				{phone && (
-					<Link href={`tel:${phone.replace(/\s+/g, '')}`} className={contactLinkClass}>
+					<Link href={`tel:${phone.replace(/[^\d+]/g, '')}`} className={contactLinkClass}>
 						{phone}
 					</Link>
 				)}
@@ -249,7 +249,7 @@ export interface ContactCardProps extends Omit<React.HTMLAttributes<HTMLElement>
 	name: string
 	/** Position / affiliation shown below the name. */
 	role?: string
-	/** Phone number — rendered in the primary text color (no link styling per Figma). */
+	/** Phone number — rendered as a `tel:` link styled like plain text (underline only on hover/focus). */
 	phone?: string
 	/** Email address — rendered as a `mailto:` link in the link color. */
 	email?: string
@@ -283,9 +283,12 @@ export const ContactCard = forwardRef<HTMLElement, ContactCardProps>(({
 				</p>
 			)}
 			{phone && (
-				<p className="font-npi-sans font-normal text-[0.75rem] leading-[1.3] text-npi-blue-dark">
+				<Link
+					href={`tel:${phone.replace(/[^\d+]/g, '')}`}
+					className="font-npi-sans font-normal text-[0.75rem] leading-[1.3] text-npi-blue-dark no-underline hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-npi-blue-light rounded-npi-xxs"
+				>
 					{phone}
-				</p>
+				</Link>
 			)}
 			{email && (
 				<Link

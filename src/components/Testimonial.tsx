@@ -129,7 +129,7 @@ export const Testimonial = forwardRef<HTMLElement, TestimonialProps>((props, ref
 				{authorAvatarSrc && (
 					<Image
 						src={authorAvatarSrc}
-						alt={authorAvatarAlt ?? authorName}
+						alt={authorAvatarAlt ?? ''}
 						width={avatarPx}
 						height={avatarPx}
 						className={clsx('shrink-0 rounded-full object-cover', avatarSizeClass[profileSize])}

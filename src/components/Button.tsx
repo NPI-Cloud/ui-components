@@ -121,7 +121,9 @@ export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPr
 
 		const mergedClassName = paddingOverride ? `${paddingOverride} ${className ?? ''}` : className
 
-		if (href) {
+		// `disabled` has no effect on an <a>, so a disabled link would still be focusable and
+		// navigable. Render the disabled state as a real <button disabled> (no navigation) instead.
+		if (href && !props.disabled) {
 			return (
 				<ButtonRoot asChild variant={variant} inverted={resolvedInverted} className={mergedClassName}>
 					<Link ref={ref as React.Ref<HTMLAnchorElement>} href={href} {...(props as React.AnchorHTMLAttributes<HTMLAnchorElement>)} aria-label={resolvedAriaLabel}>

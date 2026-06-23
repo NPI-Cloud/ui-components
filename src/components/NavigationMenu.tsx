@@ -85,22 +85,50 @@ export const NavigationMenu = forwardRef<HTMLElement, NavigationMenuProps>(
 		// Lock body scroll while the mobile drawer covers the viewport so the page behind it
 		// doesn't move when the user scrolls inside the drawer. Use the document where the
 		// header is actually mounted so this works inside iframes (portaled previews) as well as
-		// in the host document.
+		// in the host document. While open, focus is trapped within the header (which holds the
+		// brand, the close toggle and the drawer) so keyboard users can't tab onto the page hidden
+		// behind the overlay; on close, focus returns to whatever opened the drawer (the toggle).
 		useEffect(() => {
 			if (!open) return
-			const doc = headerRef.current?.ownerDocument
-			if (!doc) return
-			const previous = doc.body.style.overflow
+			const header = headerRef.current
+			const doc = header?.ownerDocument
+			if (!header || !doc) return
+			const previousOverflow = doc.body.style.overflow
 			doc.body.style.overflow = 'hidden'
-			// Escape closes the drawer, matching the dialog convention. Listen on the header's own
-			// document so it also works inside the showcase iframe.
+			const previouslyFocused = doc.activeElement as HTMLElement | null
+
+			const focusSelector = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+			// Only currently-visible controls are trappable — the hidden desktop nav/site-switcher
+			// share the header DOM but collapse to zero size at mobile.
+			const visibleFocusables = () =>
+				Array.from(header.querySelectorAll<HTMLElement>(focusSelector)).filter(
+					el => el.offsetWidth > 0 || el.offsetHeight > 0 || el === doc.activeElement,
+				)
+
 			const onKey = (event: KeyboardEvent) => {
-				if (event.key === 'Escape') setOpen(false)
+				// Escape closes the drawer, matching the dialog convention.
+				if (event.key === 'Escape') {
+					setOpen(false)
+					return
+				}
+				if (event.key !== 'Tab') return
+				const items = visibleFocusables()
+				if (items.length === 0) return
+				const first = items[0]
+				const last = items[items.length - 1]
+				if (event.shiftKey && doc.activeElement === first) {
+					event.preventDefault()
+					last.focus()
+				} else if (!event.shiftKey && doc.activeElement === last) {
+					event.preventDefault()
+					first.focus()
+				}
 			}
 			doc.addEventListener('keydown', onKey)
 			return () => {
-				doc.body.style.overflow = previous
+				doc.body.style.overflow = previousOverflow
 				doc.removeEventListener('keydown', onKey)
+				previouslyFocused?.focus?.()
 			}
 		}, [open])
 		const setRefs = (node: HTMLElement | null) => {

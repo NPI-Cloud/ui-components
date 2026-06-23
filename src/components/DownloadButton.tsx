@@ -1,7 +1,7 @@
 'use client'
 
 import { Link } from './ui-primitives'
-import { forwardRef, useEffect, useRef, useState } from 'react'
+import { forwardRef, useEffect, useId, useRef, useState } from 'react'
 import { Icon } from '../icons'
 
 export interface DownloadVariant {
@@ -63,23 +63,37 @@ export const DownloadButton = forwardRef<HTMLDivElement, DownloadButtonProps>(
 		const isMulti = variants.length > 1
 		const [open, setOpen] = useState(false)
 		const containerRef = useRef<HTMLDivElement>(null)
+		const triggerRef = useRef<HTMLButtonElement>(null)
+		const menuId = useId()
 
 		useEffect(() => {
 			if (!open) return
-			const handler = (e: MouseEvent) => {
-				if (!containerRef.current?.contains(e.target as Node)) setOpen(false)
-			}
-			const onKey = (e: KeyboardEvent) => {
-				if (e.key === 'Escape') setOpen(false)
-			}
+			const container = containerRef.current
 			// Use the owning document so click-outside/Escape work inside the showcase iframe (the
 			// component JS runs in the parent window, but the DOM lives in the iframe).
-			const doc = containerRef.current?.ownerDocument ?? document
+			const doc = container?.ownerDocument ?? document
+			// Move focus to the first download link so keyboard users land inside the open list.
+			container?.querySelector<HTMLAnchorElement>('a')?.focus()
+			const handler = (e: MouseEvent) => {
+				if (!container?.contains(e.target as Node)) setOpen(false)
+			}
+			const onKey = (e: KeyboardEvent) => {
+				if (e.key === 'Escape') {
+					setOpen(false)
+					triggerRef.current?.focus()
+				}
+			}
+			// Tabbing out of the list (focus leaving the container) closes it, keeping aria-expanded honest.
+			const onFocusOut = (e: FocusEvent) => {
+				if (!container?.contains(e.relatedTarget as Node | null)) setOpen(false)
+			}
 			doc.addEventListener('mousedown', handler)
 			doc.addEventListener('keydown', onKey)
+			container?.addEventListener('focusout', onFocusOut)
 			return () => {
 				doc.removeEventListener('mousedown', handler)
 				doc.removeEventListener('keydown', onKey)
+				container?.removeEventListener('focusout', onFocusOut)
 			}
 		}, [open])
 
@@ -114,8 +128,10 @@ export const DownloadButton = forwardRef<HTMLDivElement, DownloadButtonProps>(
 		return (
 			<div ref={setRefs} className="relative inline-block">
 				<button
+					ref={triggerRef}
 					type="button"
-					aria-haspopup="true"
+					aria-haspopup="menu"
+					aria-controls={open ? menuId : undefined}
 					aria-expanded={open}
 					onClick={() => setOpen(o => !o)}
 					className={`inline-flex items-center gap-npi-2 font-npi-sans font-bold text-[1rem] leading-[1.5] transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-npi-blue-light rounded-npi-xxs ${
@@ -127,6 +143,8 @@ export const DownloadButton = forwardRef<HTMLDivElement, DownloadButtonProps>(
 				</button>
 				{open && (
 					<ul
+						id={menuId}
+						aria-label={label}
 						className="absolute left-0 top-full z-10 mt-npi-2 flex w-[195px] flex-col overflow-clip rounded-npi-xs bg-white py-npi-2 shadow-[0_20px_45px_0_#F0F0F0]"
 					>
 						{variants.map((v, i) => (

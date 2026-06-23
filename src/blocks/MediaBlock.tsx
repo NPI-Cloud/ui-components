@@ -73,7 +73,7 @@ export function MediaBlock(
 				<div className="relative aspect-[16/9] w-full overflow-hidden rounded-npi-xxs bg-npi-blue-lighter">
 					<iframe
 						src={embedUrl}
-						title={imageAlt ?? 'Video'}
+						title={imageAlt ?? caption ?? 'Video'}
 						allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
 						allowFullScreen
 						className="size-full border-0"
@@ -106,7 +106,9 @@ export function MediaBlock(
 				)
 
 			if (href) {
-				return <Link href={href} className="block">{imageEl}</Link>
+				// An image link needs an accessible name. When alt is set the image supplies it;
+				// when alt is empty, fall back to the caption so the link isn't announced nameless.
+				return <Link href={href} className="block" aria-label={imageAlt ? undefined : (caption ?? undefined)}>{imageEl}</Link>
 			}
 			if (zoomable) {
 				return (

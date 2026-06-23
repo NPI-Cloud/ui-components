@@ -58,7 +58,8 @@ export function HeroBlock({
 	heroSize,
 	hideVisual,
 }: HeroBlockProps) {
-	const hasCta = ctaLabel || secondaryCtaLabel
+	// A CTA label with no URL would render a dead link, so a CTA only counts when it has both.
+	const hasCta = (ctaLabel && ctaUrl) || (secondaryCtaLabel && secondaryCtaUrl)
 	const config = sizeConfig[heroSize ?? 'homepage11']
 	const imageUrl = image?.url
 	// Without a visual the text would otherwise keep the (often 50/50) split dictated by `heroSize`,
@@ -73,13 +74,13 @@ export function HeroBlock({
 				{subtitle && <Text variant="l">{subtitle}</Text>}
 				{hasCta && (
 					<div className="flex w-full flex-col gap-npi-4 @npi-tablet:w-auto @npi-tablet:flex-row">
-						{ctaLabel && (
-							<Link href={ctaUrl ?? '#'} className={primaryCtaClass}>
+						{ctaLabel && ctaUrl && (
+							<Link href={ctaUrl} className={primaryCtaClass}>
 								{ctaLabel}
 							</Link>
 						)}
-						{secondaryCtaLabel && (
-							<Link href={secondaryCtaUrl ?? '#'} className={secondaryCtaClass}>
+						{secondaryCtaLabel && secondaryCtaUrl && (
+							<Link href={secondaryCtaUrl} className={secondaryCtaClass}>
 								{secondaryCtaLabel}
 							</Link>
 						)}

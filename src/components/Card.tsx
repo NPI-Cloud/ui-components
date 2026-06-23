@@ -31,6 +31,13 @@ const indicatorIconMap: Record<CardIndicator, IconName> = {
 	gallery: 'galery',
 }
 
+// The indicator icon is decorative (aria-hidden), so the media type needs a text equivalent for AT.
+const indicatorLabelMap: Record<CardIndicator, string> = {
+	video: 'Video',
+	podcast: 'Podcast',
+	gallery: 'Galerie',
+}
+
 export interface CardLink {
 	/** Visible label */
 	label: string
@@ -139,6 +146,7 @@ export const Card = forwardRef<HTMLElement, CardProps>(({
 					{indicator && (
 						<span className="relative z-10 flex size-10 shrink-0 items-center justify-center rounded-full bg-npi-white p-npi-1 text-npi-blue">
 							<Icon name={indicatorIconMap[indicator]} className="size-6" />
+							<span className="sr-only">{indicatorLabelMap[indicator]}</span>
 						</span>
 					)}
 					{href && (
