@@ -31,12 +31,18 @@ export type UIImageProps = Pick<ImgHTMLAttributes<HTMLImageElement>, 'alt' | 'cl
 	height?: number
 	/** Fill the (positioned) parent — maps to next/image `fill`; ignored by the plain <img>. */
 	fill?: boolean
+	/**
+	 * Mark this as the above-the-fold LCP image — maps to next/image `priority` (eager load +
+	 * `fetchpriority="high"` + preload). Use on at most one image per view. The plain `<img>`
+	 * fallback maps it to `fetchpriority="high"` + `loading="eager"`.
+	 */
+	priority?: boolean
 }
 
 export type UIImageComponent = React.ForwardRefExoticComponent<UIImageProps & RefAttributes<HTMLImageElement>>
 
-const PlainImage: UIImageComponent = forwardRef<HTMLImageElement, UIImageProps>(({ fill: _fill, sizes: _sizes, alt, ...rest }, ref) => (
-	<img ref={ref} alt={alt ?? ''} {...rest} />
+const PlainImage: UIImageComponent = forwardRef<HTMLImageElement, UIImageProps>(({ fill: _fill, sizes: _sizes, priority, alt, ...rest }, ref) => (
+	<img ref={ref} alt={alt ?? ''} fetchPriority={priority ? 'high' : undefined} loading={priority ? 'eager' : undefined} {...rest} />
 ))
 PlainImage.displayName = 'PlainImage'
 

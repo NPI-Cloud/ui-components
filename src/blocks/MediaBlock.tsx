@@ -18,6 +18,13 @@ export interface MediaBlockProps {
 	imageUrl?: string | null
 	/** Alt text for the image / iframe title. */
 	imageAlt?: string | null
+	/**
+	 * Intrinsic image dimensions (from the Image relation). Only used in `auto` aspect, where there
+	 * is no frame to fill: passing them lets the host optimize the image (resize/WebP) and reserve
+	 * space to prevent layout shift. Omitted dims fall back to an unoptimized natural-size `<img>`.
+	 */
+	imageWidth?: number | null
+	imageHeight?: number | null
 	/** YouTube or Vimeo URL — when parseable, embeds an iframe instead of the image. */
 	videoUrl?: string | null
 	/** Caption rendered below the media as `<figcaption>`. */
@@ -44,6 +51,8 @@ export interface MediaBlockProps {
 	 * Ignored for video/placeholder.
 	 */
 	zoomable?: boolean
+	/** Eager-load as the LCP image (skip lazy-loading). Set when the media is above the fold (e.g. a cover). */
+	priority?: boolean
 }
 
 // Hardcoded so Tailwind's source scanner can see the literal arbitrary values.
@@ -62,7 +71,7 @@ const aspectClasses: Record<Exclude<MediaBlockAspect, 'auto'>, string> = {
  * `<figcaption>`. Frame ratio and image fit are configurable via `aspect` / `fit`.
  */
 export function MediaBlock(
-	{ imageUrl, imageAlt, videoUrl, caption, placeholderLabel = 'Vizuál, foto, video', aspect = '16:9', fit = 'cover', href, zoomable }: MediaBlockProps,
+	{ imageUrl, imageAlt, imageWidth, imageHeight, videoUrl, caption, placeholderLabel = 'Vizuál, foto, video', aspect = '16:9', fit = 'cover', href, zoomable, priority }: MediaBlockProps,
 ) {
 	const embedUrl = videoUrl ? toEmbedUrl(videoUrl) : null
 	const [zoomOpen, setZoomOpen] = useState(false)
@@ -87,9 +96,15 @@ export function MediaBlock(
 		if (imageUrl) {
 			const imageEl = aspect === 'auto'
 				? (
+					// No frame in `auto`: pass intrinsic dimensions so the host can optimize and reserve
+					// space (no layout shift). Without dims, fall back to an unoptimized natural-size image.
 					<Image
 						src={imageUrl}
 						alt={imageAlt ?? ''}
+						width={imageWidth ?? undefined}
+						height={imageHeight ?? undefined}
+						sizes="(min-width: 1080px) 1016px, 100vw"
+						priority={priority}
 						className="h-auto w-full rounded-npi-xxs"
 					/>
 				)
@@ -100,6 +115,7 @@ export function MediaBlock(
 							alt={imageAlt ?? ''}
 							fill
 							sizes="(min-width: 1080px) 1016px, 100vw"
+							priority={priority}
 							className={clsx('size-full', fit === 'contain' ? 'object-contain' : 'object-cover')}
 						/>
 					</div>

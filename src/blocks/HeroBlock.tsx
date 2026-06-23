@@ -28,6 +28,8 @@ export interface HeroBlockProps {
 	heroSize?: HeroSize | null
 	/** When true, omit the visual column entirely (text-only intro). Content keeps the width dictated by `heroSize`. */
 	hideVisual?: boolean | null
+	/** Eager-load the visual as the LCP image (skip lazy-loading). Set when the hero is above the fold. */
+	priority?: boolean
 }
 
 const baseCta =
@@ -57,6 +59,7 @@ export function HeroBlock({
 	imageAlt,
 	heroSize,
 	hideVisual,
+	priority,
 }: HeroBlockProps) {
 	// A CTA label with no URL would render a dead link, so a CTA only counts when it has both.
 	const hasCta = (ctaLabel && ctaUrl) || (secondaryCtaLabel && secondaryCtaUrl)
@@ -96,6 +99,7 @@ export function HeroBlock({
 								alt={imageAlt ?? ''}
 								fill
 								sizes="(min-width: 768px) 50vw, 100vw"
+								priority={priority}
 								className="absolute inset-0 h-full w-full object-contain"
 							/>
 						)

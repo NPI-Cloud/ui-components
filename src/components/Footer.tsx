@@ -287,6 +287,10 @@ export interface FooterLogoItem {
 	alt: string
 	/** Optional click target — when omitted, the logo renders as a plain `<Image>`. */
 	href?: string
+	/** Intrinsic dimensions (from the Image relation). When present, the host optimizes the logo
+	 *  (resize/WebP) instead of serving the full-size original; the rendered size stays fixed-height. */
+	width?: number
+	height?: number
 }
 
 export interface FooterBottomLinkItem {
@@ -415,6 +419,9 @@ export const Footer = forwardRef<HTMLElement, FooterProps>((props, ref) => {
 								key={index}
 								src={logo.src}
 								alt={logo.alt}
+								width={logo.width}
+								height={logo.height}
+								sizes="(min-width: 768px) 220px, 160px"
 								className="h-npi-14 w-auto object-contain"
 							/>
 						)
