@@ -93,6 +93,8 @@ export function HeroBlock({
 							<Image
 								src={imageUrl}
 								alt={imageAlt ?? ''}
+								fill
+								sizes="(min-width: 768px) 50vw, 100vw"
 								className="absolute inset-0 h-full w-full object-contain"
 							/>
 						)

@@ -98,6 +98,8 @@ export function MediaBlock(
 						<Image
 							src={imageUrl}
 							alt={imageAlt ?? ''}
+							fill
+							sizes="(min-width: 1080px) 1016px, 100vw"
 							className={clsx('size-full', fit === 'contain' ? 'object-contain' : 'object-cover')}
 						/>
 					</div>

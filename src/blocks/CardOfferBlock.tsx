@@ -46,7 +46,7 @@ export function CardOfferBlock(
 
 	// Cover only renders @md up (CardOffer hides it on narrow cards, where the navy rule shows instead).
 	const visual = imageUrl
-		? <Image src={imageUrl} alt={imageAlt ?? ''} className="h-[120px] w-[180px] rounded-npi-s object-cover @4xl:h-[150px] @4xl:w-[220px]" />
+		? <Image src={imageUrl} alt={imageAlt ?? ''} width={220} height={150} className="h-[120px] w-[180px] rounded-npi-s object-cover @4xl:h-[150px] @4xl:w-[220px]" />
 		: undefined
 
 	return (

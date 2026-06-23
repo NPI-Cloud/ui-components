@@ -34,7 +34,7 @@ export function BannerBlock({
 	secondaryCtaUrl,
 }: BannerBlockProps) {
 	const visual = imageUrl
-		? <Image src={imageUrl} alt={imageAlt ?? ''} className="absolute inset-0 size-full object-cover" />
+		? <Image src={imageUrl} alt={imageAlt ?? ''} fill sizes="(min-width: 768px) 340px, 100vw" className="absolute inset-0 size-full object-cover" />
 		: undefined
 	const primaryAction = ctaLabel ? { label: ctaLabel, href: ctaUrl ?? undefined } : undefined
 	const secondaryAction = secondaryCtaLabel ? { label: secondaryCtaLabel, href: secondaryCtaUrl ?? undefined } : undefined

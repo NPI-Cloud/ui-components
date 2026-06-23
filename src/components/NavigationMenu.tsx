@@ -228,7 +228,7 @@ export const NavigationMenuBrand = forwardRef<HTMLAnchorElement, NavigationMenuB
 			)}
 			{...props}
 		>
-			<Image src={logoSrc} alt={title ? '' : logoAlt ?? ''} className="size-npi-12 shrink-0" />
+			<Image src={logoSrc} alt={title ? '' : logoAlt ?? ''} width={48} height={48} className="size-npi-12 shrink-0" />
 			{title && (
 				<Heading level={7} className="whitespace-nowrap text-[1rem] font-semibold">
 					{title}

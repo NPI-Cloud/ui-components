@@ -118,8 +118,9 @@ export const MapAddress = forwardRef<HTMLElement, MapAddressProps>((props, ref) 
 			<Image
 				src={mapImageSrc}
 				alt={mapAlt}
+				fill
+				sizes="(min-width: 768px) 50vw, 100vw"
 				className="absolute inset-0 size-full object-cover"
-				loading="lazy"
 			/>
 		)
 		: null)

@@ -71,7 +71,7 @@ export function CardBlock(
 	}: CardBlockProps,
 ) {
 	const visual = imageUrl
-		? <Image src={imageUrl} alt={imageAlt ?? ''} className="absolute inset-0 size-full object-cover" />
+		? <Image src={imageUrl} alt={imageAlt ?? ''} fill sizes="(min-width: 768px) 400px, 100vw" className="absolute inset-0 size-full object-cover" />
 		: undefined
 
 	if (aspect === 'visualOnly') {

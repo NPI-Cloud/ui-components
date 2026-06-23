@@ -78,7 +78,7 @@ export function ContentTemplateMeta(
 		<div className="flex items-center gap-npi-4">
 			{showAuthor && (
 				<div className="flex items-center gap-npi-3">
-					{author.avatarUrl && <Image src={author.avatarUrl} alt="" className="size-12 shrink-0 rounded-full object-cover" />}
+					{author.avatarUrl && <Image src={author.avatarUrl} alt="" width={48} height={48} className="size-12 shrink-0 rounded-full object-cover" />}
 					<Text variant="l">{author.name}</Text>
 				</div>
 			)}
