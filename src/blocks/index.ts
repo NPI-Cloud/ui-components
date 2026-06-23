@@ -34,6 +34,7 @@ export { NavCardBlock, type NavCardBlockProps, type NavCardBlockSize } from './N
 export { NotFoundPage, type NotFoundPageProps, type NotFoundPageTheme, notFoundPageThemes } from './NotFoundPage'
 export { type PodcastPlatformIcon, type PodcastPlatformLink, PodcastTemplate, type PodcastTemplateProps } from './PodcastTemplate'
 export { ProfileCardBlock, type ProfileCardBlockOrientation, type ProfileCardBlockProps, type ProfileCardBlockSize } from './ProfileCardBlock'
+export { RichTextView, type RichTextReferences } from './RichTextView'
 export { TestimonialBlock, type TestimonialBlockProps, type TestimonialBlockSize } from './TestimonialBlock'
 export {
 	TextBlock,

@@ -68,8 +68,8 @@ function isEffectivelyEmpty(content: TextBlockRichContent): boolean {
 	for (const paragraph of content.children) {
 		for (const node of paragraph.children) {
 			if ('type' in node) {
-				if (node.children.some(leaf => leaf.text.length > 0)) return false
-			} else if (node.text.length > 0) {
+				if (node.children.some(leaf => (leaf.text ?? '').length > 0)) return false
+			} else if ((node.text ?? '').length > 0) {
 				return false
 			}
 		}
@@ -86,8 +86,15 @@ export function renderRichInlines(children: TextBlockRichInline[]): ReactNode {
 				</a>
 			)
 		}
-		const leaf = node as TextBlockRichLeaf
-		return <Fragment key={index}>{renderLeaf(leaf)}</Fragment>
+		// Richer bodies than the web-builder Text block (e.g. EduRevue article imports) can carry
+		// element nodes — list items, headings, … — which have `children` instead of a `text` leaf.
+		// Recurse into them so their text still renders (flattened) rather than crashing on
+		// `leaf.text.split`. Proper list/heading formatting is a separate enhancement.
+		const candidate = node as { text?: unknown; children?: unknown }
+		if (typeof candidate.text !== 'string' && Array.isArray(candidate.children)) {
+			return <Fragment key={index}>{renderRichInlines(candidate.children as TextBlockRichInline[])}</Fragment>
+		}
+		return <Fragment key={index}>{renderLeaf(node as TextBlockRichLeaf)}</Fragment>
 	})
 }
 
@@ -97,7 +104,7 @@ function renderLeaves(leaves: TextBlockRichLeaf[]): ReactNode {
 
 function renderLeaf(leaf: TextBlockRichLeaf): ReactNode {
 	const segments: ReactNode[] = []
-	const parts = leaf.text.split('\n')
+	const parts = (leaf.text ?? '').split('\n')
 	parts.forEach((part, index) => {
 		if (index > 0) segments.push(<br key={`br-${index}`} />)
 		if (part.length > 0) segments.push(part)
