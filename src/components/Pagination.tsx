@@ -116,8 +116,10 @@ export interface PaginationProps extends Omit<React.HTMLAttributes<HTMLElement>,
 	previousLabel?: string
 	/** Label for the next-page control (used as both visible text in `text` variant and `aria-label` in `icon` variant). */
 	nextLabel?: string
-	/** `aria-label` for the root `<nav>`. Defaults to `'Pagination'`. */
+	/** `aria-label` for the root `<nav>`. Defaults to `'Stránkování'`. */
 	'aria-label'?: string
+	/** Builds the `aria-label` for a page-number button. Defaults to Czech `Stránka {page}`. */
+	pageLabel?: (page: number) => string
 }
 
 export const Pagination = forwardRef<HTMLElement, PaginationProps>(
@@ -132,8 +134,9 @@ export const Pagination = forwardRef<HTMLElement, PaginationProps>(
 			disabled = false,
 			previousLabel = 'Předchozí',
 			nextLabel = 'Následující',
+			pageLabel = page => `Stránka ${page}`,
 			className,
-			'aria-label': ariaLabel = 'Pagination',
+			'aria-label': ariaLabel = 'Stránkování',
 			...props
 		},
 		ref,
@@ -202,7 +205,7 @@ export const Pagination = forwardRef<HTMLElement, PaginationProps>(
 									onClick={() => goTo(item)}
 									disabled={disabled || isCurrent}
 									aria-current={isCurrent ? 'page' : undefined}
-									aria-label={`Page ${item}`}
+									aria-label={pageLabel(item)}
 									className={clsx(numberCellBase, isCurrent ? numberCellSelected : numberCellIdle)}
 								>
 									{item}

@@ -148,11 +148,14 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>((props, ref) =>
 				triggerRef.current?.focus()
 			}
 		}
-		document.addEventListener('mousedown', onDocClick)
-		document.addEventListener('keydown', onKey)
+		// Use the owning document so click-outside/Escape work inside the showcase iframe (the
+		// component JS runs in the parent window, but the DOM lives in the iframe).
+		const doc = wrapperRef.current?.ownerDocument ?? document
+		doc.addEventListener('mousedown', onDocClick)
+		doc.addEventListener('keydown', onKey)
 		return () => {
-			document.removeEventListener('mousedown', onDocClick)
-			document.removeEventListener('keydown', onKey)
+			doc.removeEventListener('mousedown', onDocClick)
+			doc.removeEventListener('keydown', onKey)
 		}
 	}, [open])
 
@@ -345,11 +348,11 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>((props, ref) =>
 				</span>
 			</button>
 			{name && (
-				<input
-					type="hidden"
-					name={name}
-					value={multiple ? JSON.stringify(selectedValues) : selectedValues[0] ?? ''}
-				/>
+				multiple
+					// One hidden input per value, so a native form submit yields repeated `name=…` pairs
+					// (standard multi-value form semantics) rather than a single JSON blob to parse.
+					? selectedValues.map(v => <input key={v} type="hidden" name={name} value={v} />)
+					: <input type="hidden" name={name} value={selectedValues[0] ?? ''} />
 			)}
 			{open && !disabled && (
 				<div

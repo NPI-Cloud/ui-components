@@ -43,12 +43,14 @@ export interface TagProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonElem
 	inverted?: boolean
 	/** When provided, renders a × dismiss button inside the tag (size M only) */
 	onRemove?: () => void
+	/** `aria-label` for the × dismiss control. Defaults to Czech `'Odebrat'`. */
+	removeLabel?: string
 	/** When provided, renders the tag as an anchor element instead of a button */
 	href?: string
 }
 
 export const Tag = forwardRef<HTMLButtonElement | HTMLAnchorElement, TagProps>(
-	({ label, size = 'M', iconBefore, iconAfter, inverted = false, onRemove, href, className, ...props }, ref) => {
+	({ label, size = 'M', iconBefore, iconAfter, inverted = false, onRemove, removeLabel = 'Odebrat', href, className, ...props }, ref) => {
 		const showIconBefore = iconBefore != null && size === 'M'
 		const showRemove = onRemove != null && size === 'M' && !href
 		const showIconAfter = iconAfter != null && size === 'M' && !showRemove
@@ -62,7 +64,7 @@ export const Tag = forwardRef<HTMLButtonElement | HTMLAnchorElement, TagProps>(
 					<span
 						role="button"
 						tabIndex={0}
-						aria-label="Remove"
+						aria-label={removeLabel}
 						className="inline-flex items-center justify-center rounded-npi-xxs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-npi-blue-light"
 						onClick={e => {
 							e.stopPropagation()

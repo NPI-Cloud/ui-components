@@ -288,8 +288,10 @@ function RegionPath({ code, def, selected, disabledRegion, href, selectable, lab
 
 	// The transform lives on an inner <g> so the shape can sit inside either an interactive <g>
 	// (selection) or an <Link> (navigation) without passing SVG-only props to the typed anchor element.
+	// `aria-hidden` keeps the wrapper's `aria-label` the single accessible name — the `<title>` stays
+	// only for the native hover tooltip, so the region name isn't announced twice.
 	const shape = (
-		<g transform={transform}>
+		<g transform={transform} aria-hidden="true">
 			<title>{label}</title>
 			<path d={def.d} className={stateClass} vectorEffect="non-scaling-stroke" />
 		</g>

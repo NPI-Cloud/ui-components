@@ -15,6 +15,7 @@ import {
 	type ReactNode,
 	useContext,
 	useEffect,
+	useId,
 	useRef,
 	useState,
 } from 'react'
@@ -65,8 +66,8 @@ const InsideDrawerContext = createContext(false)
  */
 const InsideDrawerGroupContext = createContext(false)
 
-type MobileState = { open: boolean; toggle: () => void; close: () => void }
-const MobileContext = createContext<MobileState>({ open: false, toggle: () => {}, close: () => {} })
+type MobileState = { open: boolean; toggle: () => void; close: () => void; drawerId: string }
+const MobileContext = createContext<MobileState>({ open: false, toggle: () => {}, close: () => {}, drawerId: '' })
 
 export interface NavigationMenuProps extends HTMLAttributes<HTMLElement> {}
 
@@ -74,10 +75,12 @@ export const NavigationMenu = forwardRef<HTMLElement, NavigationMenuProps>(
 	({ className, children, ...props }, ref) => {
 		const [open, setOpen] = useState(false)
 		const headerRef = useRef<HTMLElement>(null)
+		const drawerId = useId()
 		const mobile: MobileState = {
 			open,
 			toggle: () => setOpen(v => !v),
 			close: () => setOpen(false),
+			drawerId,
 		}
 		// Lock body scroll while the mobile drawer covers the viewport so the page behind it
 		// doesn't move when the user scrolls inside the drawer. Use the document where the
@@ -89,8 +92,15 @@ export const NavigationMenu = forwardRef<HTMLElement, NavigationMenuProps>(
 			if (!doc) return
 			const previous = doc.body.style.overflow
 			doc.body.style.overflow = 'hidden'
+			// Escape closes the drawer, matching the dialog convention. Listen on the header's own
+			// document so it also works inside the showcase iframe.
+			const onKey = (event: KeyboardEvent) => {
+				if (event.key === 'Escape') setOpen(false)
+			}
+			doc.addEventListener('keydown', onKey)
 			return () => {
 				doc.body.style.overflow = previous
+				doc.removeEventListener('keydown', onKey)
 			}
 		}, [open])
 		const setRefs = (node: HTMLElement | null) => {
@@ -305,12 +315,13 @@ export interface NavigationMenuMobileToggleProps extends Omit<ButtonHTMLAttribut
  */
 export const NavigationMenuMobileToggle = forwardRef<HTMLButtonElement, NavigationMenuMobileToggleProps>(
 	({ openLabel = 'Otevřít menu', closeLabel = 'Zavřít menu', className, onClick, ...props }, ref) => {
-		const { open, toggle } = useContext(MobileContext)
+		const { open, toggle, drawerId } = useContext(MobileContext)
 		return (
 			<button
 				ref={ref}
 				type="button"
 				aria-expanded={open}
+				aria-controls={drawerId || undefined}
 				aria-label={open ? closeLabel : openLabel}
 				onClick={event => {
 					toggle()
@@ -345,7 +356,7 @@ export interface NavigationMenuDrawerProps extends HTMLAttributes<HTMLDivElement
  */
 export const NavigationMenuDrawer = forwardRef<HTMLDivElement, NavigationMenuDrawerProps>(
 	({ className, children, ...props }, ref) => {
-		const { open } = useContext(MobileContext)
+		const { open, drawerId } = useContext(MobileContext)
 		if (!open) return null
 		return (
 			<InsideDrawerContext.Provider value={true}>
@@ -358,6 +369,7 @@ export const NavigationMenuDrawer = forwardRef<HTMLDivElement, NavigationMenuDra
 						),
 					)}
 					{...props}
+					id={props.id ?? drawerId}
 				>
 					{children}
 				</div>

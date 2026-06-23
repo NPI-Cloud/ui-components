@@ -50,7 +50,7 @@ export const Breadcrumbs = forwardRef<HTMLElement, BreadcrumbsProps>(
 		return (
 			<nav
 				ref={ref}
-				aria-label="Breadcrumbs"
+				aria-label="Drobečková navigace"
 				className={twMerge(clsx('font-npi-sans', className))}
 				{...props}
 			>

@@ -1,28 +1,28 @@
 'use client'
 
 import { clsx } from 'clsx'
+import { forwardRef } from 'react'
 import { Text } from './Text'
 
-export interface VideoProps {
+export interface VideoProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {
 	/** YouTube or Vimeo URL — supports `youtube.com/watch?v=…`, `youtu.be/…`, `youtube.com/embed/…`, `vimeo.com/<id>`, `vimeo.com/video/<id>`. */
 	url?: string | null
 	/** Accessible title for the iframe; used as the placeholder caption when no URL resolves. */
 	title?: string
 	/** Aspect ratio of the player frame. Defaults to 16:9. */
 	aspect?: 'video' | 'square'
-	className?: string
 }
 
 /**
  * Embedded YouTube / Vimeo video player. Self-contained — renders its own 16:9 frame with
  * rounded corners and a light placeholder background; pass the raw share URL via `url`.
  */
-export function Video({ url, title, aspect = 'video', className }: VideoProps) {
+export const Video = forwardRef<HTMLDivElement, VideoProps>(({ url, title, aspect = 'video', className, ...rest }, ref) => {
 	const embedUrl = url ? toEmbedUrl(url) : null
 	const aspectClass = aspect === 'square' ? 'aspect-square' : 'aspect-[16/9]'
 
 	return (
-		<div className={clsx('relative w-full overflow-hidden rounded-npi-xxs bg-npi-blue-lighter', aspectClass, className)}>
+		<div ref={ref} className={clsx('relative w-full overflow-hidden rounded-npi-xxs bg-npi-blue-lighter', aspectClass, className)} {...rest}>
 			{embedUrl
 				? (
 					<iframe
@@ -40,7 +40,8 @@ export function Video({ url, title, aspect = 'video', className }: VideoProps) {
 				)}
 		</div>
 	)
-}
+})
+Video.displayName = 'Video'
 
 /** Translate a public-facing video URL to its `iframe`-embeddable form. Returns `null` for unsupported sources. */
 export function toEmbedUrl(url: string): string | null {

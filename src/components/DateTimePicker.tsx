@@ -309,11 +309,14 @@ export const DateTimePicker = forwardRef<HTMLButtonElement, DateTimePickerProps>
 	const currentMinute = isDateValue(value) ? value.getMinutes() : null
 
 	const hiddenInputValue: string = (() => {
+		// Local Y-M-D — `toISOString()` is UTC, which rolls a date picked near midnight to the wrong day
+		// in negative-offset timezones for a date-only field.
+		const localDate = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 		if (mode === 'time' && isDateValue(value)) return formatTime(value)
-		if (mode === 'date' && isDateValue(value)) return value.toISOString().slice(0, 10)
+		if (mode === 'date' && isDateValue(value)) return localDate(value)
 		if (mode === 'date-range' && isRangeValue(value)) {
-			const s = value.start ? value.start.toISOString().slice(0, 10) : ''
-			const e = value.end ? value.end.toISOString().slice(0, 10) : ''
+			const s = value.start ? localDate(value.start) : ''
+			const e = value.end ? localDate(value.end) : ''
 			return `${s}/${e}`
 		}
 		return ''
@@ -394,6 +397,7 @@ export const DateTimePicker = forwardRef<HTMLButtonElement, DateTimePickerProps>
 				<div
 					id={popoverId}
 					role="dialog"
+					aria-label={mode === 'time' ? 'Výběr času' : mode === 'date-range' ? 'Výběr rozsahu dat' : 'Výběr data'}
 					className={clsx(
 						'absolute left-0 top-full z-50 mt-npi-1 flex flex-col overflow-hidden rounded-npi-xs bg-npi-bg-white p-npi-4 shadow-npi-m',
 					)}

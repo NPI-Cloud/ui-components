@@ -3,6 +3,7 @@
 import { clsx } from 'clsx'
 import { forwardRef, type HTMLAttributes, type KeyboardEvent, type PointerEvent, type ReactNode, useCallback, useId, useMemo, useRef } from 'react'
 import { twMerge } from 'tailwind-merge'
+import { useControllableState } from '../utils/use-controllable-state'
 
 export const sliderSizes = ['m', 's'] as const
 export type SliderSize = typeof sliderSizes[number]
@@ -10,10 +11,12 @@ export type SliderSize = typeof sliderSizes[number]
 type SliderValue = number | [number, number]
 
 export interface SliderProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange' | 'defaultValue'> {
-	/** Current value. Pass a number for a single-thumb slider, or `[min, max]` for a range slider with two thumbs. */
-	value: SliderValue
+	/** Current value (controlled). Number = single thumb, `[min, max]` = range. Omit and pass `defaultValue` to run uncontrolled. */
+	value?: SliderValue
+	/** Initial value for the uncontrolled slider. Defaults to `0`. Ignored when `value` is set. */
+	defaultValue?: SliderValue
 	/** Called whenever the user moves a thumb. The shape matches `value`. */
-	onChange: (value: SliderValue) => void
+	onChange?: (value: SliderValue) => void
 	/** Lower bound of the scale. Defaults to `0`. */
 	min?: number
 	/** Upper bound of the scale. Defaults to `100`. */
@@ -59,7 +62,8 @@ const trimFloatingError = (value: number, step: number) => {
 
 export const Slider = forwardRef<HTMLDivElement, SliderProps>((props, ref) => {
 	const {
-		value,
+		value: valueProp,
+		defaultValue = 0,
 		onChange,
 		min = 0,
 		max = 100,
@@ -76,6 +80,7 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>((props, ref) => {
 		...rest
 	} = props
 
+	const [value, commit] = useControllableState<SliderValue>(valueProp, defaultValue, onChange)
 	const isRange = Array.isArray(value)
 	const [startValue, endValue] = isRange ? value : [min, value]
 	const trackRef = useRef<HTMLDivElement | null>(null)
@@ -99,12 +104,12 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>((props, ref) => {
 			const clamped = clampValue(next, min, Math.min(endValue, max))
 			const snapped = trimFloatingError(snapToStep(clamped, min, step), step)
 			if (isRange) {
-				if (snapped !== startValue) onChange([snapped, endValue])
+				if (snapped !== startValue) commit([snapped, endValue])
 			} else if (snapped !== endValue) {
-				onChange(snapped)
+				commit(snapped)
 			}
 		},
-		[min, max, step, endValue, isRange, startValue, onChange],
+		[min, max, step, endValue, isRange, startValue, commit],
 	)
 
 	const setEnd = useCallback(
@@ -113,12 +118,12 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>((props, ref) => {
 			const clamped = clampValue(next, lowerBound, max)
 			const snapped = trimFloatingError(snapToStep(clamped, min, step), step)
 			if (isRange) {
-				if (snapped !== endValue) onChange([startValue, snapped])
+				if (snapped !== endValue) commit([startValue, snapped])
 			} else if (snapped !== endValue) {
-				onChange(snapped)
+				commit(snapped)
 			}
 		},
-		[min, max, step, isRange, startValue, endValue, onChange],
+		[min, max, step, isRange, startValue, endValue, commit],
 	)
 
 	const valueAtPointer = useCallback((clientX: number): number => {

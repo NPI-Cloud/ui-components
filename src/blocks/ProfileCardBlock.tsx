@@ -1,6 +1,6 @@
 'use client'
 
-import { ProfileCard, type ProfileCardOrientation, type ProfileCardSize } from '../components/ProfileCard'
+import { ProfileCard, type ProfileCardSize } from '../components/ProfileCard'
 
 export type ProfileCardBlockSize = 's' | 'm'
 export type ProfileCardBlockOrientation = 'horizontal' | 'vertical'
@@ -40,7 +40,7 @@ export function ProfileCardBlock({
 			email={email || undefined}
 			phone={phone || undefined}
 			size={size ? sizeMap[size] : 'M'}
-			orientation={(orientation as ProfileCardOrientation) || 'horizontal'}
+			orientation={orientation || 'horizontal'}
 		/>
 	)
 }

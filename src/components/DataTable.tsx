@@ -52,6 +52,10 @@ export interface DataTableProps<T> {
 	onSelectionChange?: (ids: ReadonlySet<string>) => void
 	/** Initial sort for the uncontrolled case. */
 	defaultSort?: { key: string; direction: TableSortDirection }
+	/** Controlled sort. Omit to let `DataTable` manage sort internally (seeded by `defaultSort`). */
+	sort?: { key: string; direction: TableSortDirection } | null
+	/** Fires when the user toggles a sortable header — pair with `sort` for server-side / controlled ordering. */
+	onSortChange?: (sort: { key: string; direction: TableSortDirection }) => void
 	/** Wrap in the horizontal scroll container (on by default — keeps wide tables usable on mobile). */
 	scrollable?: boolean
 	/** Rendered in place of rows when `data` is empty. */
@@ -77,10 +81,14 @@ export function DataTable<T>({
 	selectedIds,
 	onSelectionChange,
 	defaultSort,
+	sort: sortProp,
+	onSortChange,
 	scrollable = true,
 	emptyState,
 }: DataTableProps<T>) {
-	const [sort, setSort] = useState<{ key: string; direction: TableSortDirection } | null>(defaultSort ?? null)
+	const [internalSort, setInternalSort] = useState<{ key: string; direction: TableSortDirection } | null>(defaultSort ?? null)
+	const isSortControlled = sortProp !== undefined
+	const sort = isSortControlled ? sortProp : internalSort
 	const [internalSelected, setInternalSelected] = useState<ReadonlySet<string>>(() => new Set<string>())
 
 	const selected = selectedIds ?? internalSelected
@@ -101,8 +109,13 @@ export function DataTable<T>({
 		})
 		: data
 
-	const toggleSort = (key: string) =>
-		setSort(prev => (prev?.key === key ? { key, direction: prev.direction === 'asc' ? 'desc' : 'asc' } : { key, direction: 'asc' }))
+	const toggleSort = (key: string) => {
+		const next: { key: string; direction: TableSortDirection } = sort?.key === key
+			? { key, direction: sort.direction === 'asc' ? 'desc' : 'asc' }
+			: { key, direction: 'asc' }
+		if (!isSortControlled) setInternalSort(next)
+		onSortChange?.(next)
+	}
 
 	const allSelected = data.length > 0 && data.every(r => selected.has(rowId(r)))
 	const someSelected = !allSelected && data.some(r => selected.has(rowId(r)))

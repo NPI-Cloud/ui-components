@@ -1,7 +1,7 @@
 'use client'
 
 import { clsx } from 'clsx'
-import { forwardRef, type ReactNode, useCallback, useEffect, useImperativeHandle, useRef } from 'react'
+import { forwardRef, type ReactNode, useCallback, useEffect, useId, useImperativeHandle, useRef } from 'react'
 import { twMerge } from 'tailwind-merge'
 import { Icon } from '../icons'
 
@@ -75,6 +75,9 @@ export const Modal = forwardRef<HTMLDialogElement, ModalProps>((props, ref) => {
 	const internalRef = useRef<HTMLDialogElement | null>(null)
 	useImperativeHandle(ref, () => internalRef.current as HTMLDialogElement, [])
 
+	// Wire the heading as the dialog's accessible name — native `<dialog>` does not auto-associate it.
+	const titleId = useId()
+
 	// Drive the native dialog's open state via the `<dialog>` API.
 	// `showModal()` puts the element in the top layer with focus trapping and inert background.
 	useEffect(() => {
@@ -118,6 +121,7 @@ export const Modal = forwardRef<HTMLDialogElement, ModalProps>((props, ref) => {
 			onCancel={handleCancel}
 			onClose={handleClose}
 			onClick={handleClick}
+			aria-labelledby={title ? titleId : undefined}
 			className={twMerge(clsx(dialogClass, className))}
 			{...rest}
 		>
@@ -133,7 +137,7 @@ export const Modal = forwardRef<HTMLDialogElement, ModalProps>((props, ref) => {
 						<Icon name="zavrit" className="size-6" aria-hidden="true" />
 					</button>
 				)}
-				{title && <h2 className={titleClass}>{title}</h2>}
+				{title && <h2 id={titleId} className={titleClass}>{title}</h2>}
 				{children && <div className={bodyClass}>{children}</div>}
 				{actions && <div className={actionsClass}>{actions}</div>}
 			</div>

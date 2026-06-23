@@ -388,9 +388,11 @@ export const Footer = forwardRef<HTMLElement, FooterProps>((props, ref) => {
 									</FooterLink>
 								)}
 								{contact?.address && (
-									<FooterLink icon="lokace" href="#">
+									// Non-interactive: an address isn't a link. Keep the icon + blue styling, drop the dead `#` anchor.
+									<div className="inline-flex items-center gap-npi-2 self-start text-[0.875rem] leading-[1.3] text-npi-blue">
+										<Icon name="lokace" size="s" className="size-4 shrink-0" aria-hidden="true" />
 										<span className="whitespace-pre-line">{contact.address}</span>
-									</FooterLink>
+									</div>
 								)}
 							</FooterColumn>
 						)}

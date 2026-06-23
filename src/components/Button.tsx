@@ -89,6 +89,9 @@ export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPr
 	({ label, iconBefore, iconAfter, className, variant, href, inverted, ...props }, ref) => {
 		const resolvedInverted = useInverted(inverted)
 		const isIcon = variant === 'icon'
+		// An icon-only button renders no text, so it needs an accessible name. Fall back to `label`
+		// (the semantic name callers already pass) when no explicit aria-label is given.
+		const resolvedAriaLabel = isIcon ? (props['aria-label'] ?? label) : props['aria-label']
 		const isSmall = variant === 'tertiary-s'
 		const iconSize = isSmall ? ('s' as const) : ('m' as const)
 		const iconClass = isSmall ? 'size-4' : ICON_SIZE
@@ -121,7 +124,7 @@ export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPr
 		if (href) {
 			return (
 				<ButtonRoot asChild variant={variant} inverted={resolvedInverted} className={mergedClassName}>
-					<Link ref={ref as React.Ref<HTMLAnchorElement>} href={href} {...(props as React.AnchorHTMLAttributes<HTMLAnchorElement>)}>
+					<Link ref={ref as React.Ref<HTMLAnchorElement>} href={href} {...(props as React.AnchorHTMLAttributes<HTMLAnchorElement>)} aria-label={resolvedAriaLabel}>
 						{inner}
 					</Link>
 				</ButtonRoot>
@@ -135,6 +138,7 @@ export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPr
 				inverted={resolvedInverted}
 				className={mergedClassName}
 				{...props}
+				aria-label={resolvedAriaLabel}
 			>
 				{inner}
 			</ButtonRoot>

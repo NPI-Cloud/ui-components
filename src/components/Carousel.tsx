@@ -123,6 +123,9 @@ export const Carousel = forwardRef<HTMLElement, CarouselProps>(
 								aria-roledescription="slide"
 								aria-label={`${i + 1} / ${total}`}
 								aria-hidden={i !== activeIndex}
+								// `inert` also removes off-screen slides from the tab order, so focusable
+								// content in hidden slides can't be reached behind the active one.
+								inert={i !== activeIndex}
 								className={twMerge(clsx('shrink-0 w-full snap-start snap-always', slideClassName))}
 							>
 								{slide}

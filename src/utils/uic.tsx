@@ -68,11 +68,15 @@ export const uic = <El extends React.ElementType, Variants extends ConfigSchema 
 	Component: El,
 	config: Config<Variants, NoInfer<El>>,
 ) => {
-	const cls = cva<any>(config?.baseClass as any, {
+	// cva's generic `Config<T>` is inferred from `variants`, but our `config` is generic over the
+	// untyped `Variants` schema, so the object shape (esp. `compoundVariants`) doesn't line up with
+	// cva's. Cast the config to cva's own parameter type, and the returned matcher to a permissive
+	// selection signature — the runtime contract is identical, only the static types differ.
+	const cls = cva(config?.baseClass, {
 		variants: config?.variants,
 		defaultVariants: config?.defaultVariants,
 		compoundVariants: config?.compoundVariants,
-	})
+	} as Parameters<typeof cva<ConfigSchema>>[1]) as (selection?: Record<string, unknown>) => string
 	const passVariantProps = config?.passVariantProps ? new Set(config.passVariantProps) : undefined
 
 	const component = forwardRef<
@@ -84,13 +88,16 @@ export const uic = <El extends React.ElementType, Variants extends ConfigSchema 
 		} & ConfigVariants<Variants>
 	>((props, ref) => {
 		const { className: classNameProp, children: childrenBase, ...rest } = props
+		// `rest` carries arbitrary host props plus the variant keys we strip below; a typed record lets us
+		// read/delete those dynamic keys without reaching for `any`.
+		const restRecord = rest as Record<string, unknown>
 
-		const variants: Record<string, string> = {}
+		const variants: Record<string, unknown> = {}
 
 		for (const key in config?.variants) {
-			variants[key] = (rest as any)[key]
+			variants[key] = restRecord[key]
 			if (key in rest && !passVariantProps?.has(key)) {
-				delete (rest as any)[key]
+				delete restRecord[key]
 			}
 		}
 
@@ -100,7 +107,7 @@ export const uic = <El extends React.ElementType, Variants extends ConfigSchema 
 		if (config?.variantsAsDataAttrs && config.variants) {
 			for (const key of config.variantsAsDataAttrs) {
 				const keyAsString = key.toString()
-				const variantValue = rest[key as any] ?? (config.defaultVariants?.[key] as string | null | undefined | boolean)
+				const variantValue = restRecord[keyAsString] ?? config.defaultVariants?.[key]
 
 				dataAttrs[`data-${keyAsString}` as DataAttr<Variants>] = dataAttribute(variantValue)
 			}
@@ -111,12 +118,12 @@ export const uic = <El extends React.ElementType, Variants extends ConfigSchema 
 		let FinalComponent: React.ElementType = Component
 		if (props.asChild && typeof Component === 'string') {
 			FinalComponent = Slot
-			delete (rest as any).asChild
+			delete restRecord.asChild
 		}
 
 		let children = childrenBase
 		if (config?.wrapInner) {
-			children = createElement(config.wrapInner, props as any, children)
+			children = createElement(config.wrapInner, props as React.ComponentProps<typeof config.wrapInner>, children)
 		}
 
 		if (config?.beforeChildren || config?.afterChildren) {
@@ -139,7 +146,7 @@ export const uic = <El extends React.ElementType, Variants extends ConfigSchema 
 				{children}
 			</FinalComponent>
 		)
-		return config?.wrapOuter ? createElement(config.wrapOuter, props as any, innerEl) : innerEl
+		return config?.wrapOuter ? createElement(config.wrapOuter, props as React.ComponentProps<typeof config.wrapOuter>, innerEl) : innerEl
 	})
 	component.displayName = config?.displayName
 

@@ -45,7 +45,9 @@ export function BlockColumns({ ratio, mode = 'live', children, className }: Bloc
 	const spans = spansByRatio[ratio]
 	const childArray = Children.toArray(children)
 
-	if (childArray.length !== spans.length) {
+	// Only an authoring concern — warn on the editor canvas, stay silent on the public site so a
+	// content mismatch doesn't spam the production console for end users.
+	if (childArray.length !== spans.length && mode === 'editor') {
 		console.warn(
 			`BlockColumns: ratio "${ratio}" expects ${spans.length} children, got ${childArray.length}.`,
 		)

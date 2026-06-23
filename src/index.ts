@@ -6,5 +6,4 @@ export { ApplePodcasts, Info, Kalendar, Podcast, Spotify, Stahnout, Tym, Video, 
 export * from './RenderBlock'
 export * from './spacing'
 export * from './story.types'
-export * from './types'
 export { type ConfigVariants, uic, uiconfig } from './utils/uic'

@@ -32,6 +32,8 @@ export interface LightboxProps extends Omit<React.DialogHTMLAttributes<HTMLDialo
 	prevLabel?: string
 	/** Override the next-image aria-label. Defaults to `'Další'`. */
 	nextLabel?: string
+	/** Accessible name for the lightbox dialog. Defaults to `'Galerie obrázků'`. */
+	label?: string
 }
 
 // `<dialog>` lives in the top layer. We make it span the full viewport so the backdrop covers
@@ -104,6 +106,7 @@ export const Lightbox = forwardRef<HTMLDialogElement, LightboxProps>((props, ref
 		closeLabel = 'Zavřít',
 		prevLabel = 'Předchozí',
 		nextLabel = 'Další',
+		label = 'Galerie obrázků',
 		className,
 		...rest
 	} = props
@@ -235,6 +238,7 @@ export const Lightbox = forwardRef<HTMLDialogElement, LightboxProps>((props, ref
 			onClose={handleClose}
 			onClick={handleClick}
 			onKeyDown={handleKeyDown}
+			aria-label={label}
 			className={twMerge(clsx(dialogClass, className))}
 			{...rest}
 		>

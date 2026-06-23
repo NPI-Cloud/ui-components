@@ -2,7 +2,7 @@
 
 import { Image } from '../components/ui-primitives'
 import type { ReactNode } from 'react'
-import { Accordion, AccordionItem, type AccordionSize } from '../components/Accordion'
+import { Accordion, AccordionItem } from '../components/Accordion'
 import { normalizeRichContent, renderRichInlines, type TextBlockRichContent } from './TextBlock'
 
 export type AccordionBlockSize = 's' | 'm'
@@ -17,7 +17,7 @@ export interface AccordionBlockProps {
 
 export function AccordionBlock({ boxed, size, children }: AccordionBlockProps) {
 	return (
-		<Accordion variant={boxed ? 'boxed' : 'plain'} size={(size ?? 'm') as AccordionSize}>
+		<Accordion variant={boxed ? 'boxed' : 'plain'} size={size ?? 'm'}>
 			{children}
 		</Accordion>
 	)

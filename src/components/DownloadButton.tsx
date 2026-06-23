@@ -72,11 +72,14 @@ export const DownloadButton = forwardRef<HTMLDivElement, DownloadButtonProps>(
 			const onKey = (e: KeyboardEvent) => {
 				if (e.key === 'Escape') setOpen(false)
 			}
-			document.addEventListener('mousedown', handler)
-			document.addEventListener('keydown', onKey)
+			// Use the owning document so click-outside/Escape work inside the showcase iframe (the
+			// component JS runs in the parent window, but the DOM lives in the iframe).
+			const doc = containerRef.current?.ownerDocument ?? document
+			doc.addEventListener('mousedown', handler)
+			doc.addEventListener('keydown', onKey)
 			return () => {
-				document.removeEventListener('mousedown', handler)
-				document.removeEventListener('keydown', onKey)
+				doc.removeEventListener('mousedown', handler)
+				doc.removeEventListener('keydown', onKey)
 			}
 		}, [open])
 
@@ -112,7 +115,7 @@ export const DownloadButton = forwardRef<HTMLDivElement, DownloadButtonProps>(
 			<div ref={setRefs} className="relative inline-block">
 				<button
 					type="button"
-					aria-haspopup="menu"
+					aria-haspopup="true"
 					aria-expanded={open}
 					onClick={() => setOpen(o => !o)}
 					className={`inline-flex items-center gap-npi-2 font-npi-sans font-bold text-[1rem] leading-[1.5] transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-npi-blue-light rounded-npi-xxs ${
@@ -124,13 +127,11 @@ export const DownloadButton = forwardRef<HTMLDivElement, DownloadButtonProps>(
 				</button>
 				{open && (
 					<ul
-						role="menu"
 						className="absolute left-0 top-full z-10 mt-npi-2 flex w-[195px] flex-col overflow-clip rounded-npi-xs bg-white py-npi-2 shadow-[0_20px_45px_0_#F0F0F0]"
 					>
 						{variants.map((v, i) => (
-							<li key={i} role="none">
+							<li key={i}>
 								<Link
-									role="menuitem"
 									href={v.url}
 									{...(download ? { download: v.fileName ?? '' } : {})}
 									onClick={() => {
