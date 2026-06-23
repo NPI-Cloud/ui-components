@@ -1,5 +1,6 @@
 'use client'
 
+import { Link } from '../components/ui-primitives'
 import { clsx } from 'clsx'
 import { Fragment, type ReactNode } from 'react'
 import { Text, type TextSize } from '../components/Text'
@@ -81,9 +82,9 @@ export function renderRichInlines(children: TextBlockRichInline[]): ReactNode {
 	return children.map((node, index) => {
 		if ('type' in node && node.type === 'anchor') {
 			return (
-				<a key={index} href={node.href} className="text-npi-blue underline">
+				<Link key={index} href={node.href} className="text-npi-blue underline">
 					{renderLeaves(node.children)}
-				</a>
+				</Link>
 			)
 		}
 		// Richer bodies than the web-builder Text block (e.g. EduRevue article imports) can carry

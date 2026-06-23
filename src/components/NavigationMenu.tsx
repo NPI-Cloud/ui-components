@@ -1,5 +1,6 @@
 'use client'
 
+import { Image, Link } from './ui-primitives'
 import * as RadixNavMenu from '@radix-ui/react-navigation-menu'
 import { clsx } from 'clsx'
 import {
@@ -39,7 +40,7 @@ export type NavigationPromoVariant = (typeof navigationPromoVariants)[number]
 /**
  * Signals to nested `NavigationMenuItem`s that they live inside the Radix NavigationMenu.Root
  * rendered by `NavigationMenuItems`. When `true`, items render as Radix Trigger/Link so hover
- * and focus open/close the associated Subnav; when `false` they render as plain `<a>` / `<button>`.
+ * and focus open/close the associated Subnav; when `false` they render as plain `<Link>` / `<button>`.
  */
 const InsideItemsContext = createContext(false)
 
@@ -157,7 +158,7 @@ export const NavigationMenuSiteSwitcher = forwardRef<HTMLDivElement, NavigationM
 						const isCurrent = site.label === currentLabel
 						return (
 							<li key={site.label} className="flex">
-								<a
+								<Link
 									href={site.href}
 									aria-current={isCurrent ? 'page' : undefined}
 									className={clsx(
@@ -168,7 +169,7 @@ export const NavigationMenuSiteSwitcher = forwardRef<HTMLDivElement, NavigationM
 									)}
 								>
 									{site.label}
-								</a>
+								</Link>
 							</li>
 						)
 					})}
@@ -206,7 +207,7 @@ export interface NavigationMenuBrandProps extends AnchorHTMLAttributes<HTMLAncho
 
 export const NavigationMenuBrand = forwardRef<HTMLAnchorElement, NavigationMenuBrandProps>(
 	({ logoSrc, title, logoAlt, className, ...props }, ref) => (
-		<a
+		<Link
 			ref={ref}
 			className={twMerge(
 				clsx(
@@ -217,13 +218,13 @@ export const NavigationMenuBrand = forwardRef<HTMLAnchorElement, NavigationMenuB
 			)}
 			{...props}
 		>
-			<img src={logoSrc} alt={title ? '' : logoAlt ?? ''} className="size-npi-12 shrink-0" />
+			<Image src={logoSrc} alt={title ? '' : logoAlt ?? ''} className="size-npi-12 shrink-0" />
 			{title && (
 				<Heading level={7} className="whitespace-nowrap text-[1rem] font-semibold">
 					{title}
 				</Heading>
 			)}
-		</a>
+		</Link>
 	),
 )
 NavigationMenuBrand.displayName = 'NavigationMenuBrand'
@@ -542,7 +543,7 @@ export const NavigationMenuItem = forwardRef<HTMLElement, NavigationMenuItemProp
 		if (icon && label && !insideGroup && !hasSubnav) {
 			const showBadge = trailing === 'badge' && badgeCount != null
 			return (
-				<a
+				<Link
 					ref={ref as React.Ref<HTMLAnchorElement>}
 					className={twMerge(
 						clsx(
@@ -568,14 +569,14 @@ export const NavigationMenuItem = forwardRef<HTMLElement, NavigationMenuItemProp
 						)
 						: <Icon name={icon} className="size-6 shrink-0" aria-hidden="true" />}
 					<span className="whitespace-nowrap">{label}</span>
-				</a>
+				</Link>
 			)
 		}
 
 		if (insideGroup) {
 			return (
 				<li className="flex w-full">
-					<a
+					<Link
 						ref={ref as React.Ref<HTMLAnchorElement>}
 						className={twMerge(
 							clsx(
@@ -588,7 +589,7 @@ export const NavigationMenuItem = forwardRef<HTMLElement, NavigationMenuItemProp
 						{...anchorProps}
 					>
 						<span className="whitespace-nowrap">{label}</span>
-					</a>
+					</Link>
 				</li>
 			)
 		}
@@ -607,14 +608,14 @@ export const NavigationMenuItem = forwardRef<HTMLElement, NavigationMenuItemProp
 
 		return (
 			<li className={liClass}>
-				<a
+				<Link
 					ref={ref as React.Ref<HTMLAnchorElement>}
 					className={twMerge(clsx(drawerRowClass, className))}
 					aria-current={state === 'select' ? 'page' : undefined}
 					{...anchorProps}
 				>
 					<span className="whitespace-nowrap">{label}</span>
-				</a>
+				</Link>
 			</li>
 		)
 	}
@@ -687,7 +688,7 @@ export const NavigationMenuItem = forwardRef<HTMLElement, NavigationMenuItemProp
 		const anchorProps = rest as AnchorHTMLAttributes<HTMLAnchorElement>
 
 		if (hasSubnav) {
-			// Render the trigger as a <button>, not an <a>. On touch devices there's no hover, so the
+			// Render the trigger as a <button>, not an <Link>. On touch devices there's no hover, so the
 			// subnav can only be opened via click. An anchor's default navigation fires preventDefault'd
 			// clicks as well, which Radix's composeEventHandlers treats as "skip the open handler" —
 			// so tap would either navigate away or do nothing. A button has no navigation default.
@@ -722,14 +723,14 @@ export const NavigationMenuItem = forwardRef<HTMLElement, NavigationMenuItemProp
 			<RadixNavMenu.Item asChild>
 				<li className="relative flex">
 					<RadixNavMenu.Link asChild>
-						<a
+						<Link
 							ref={ref as React.Ref<HTMLAnchorElement>}
 							className={baseClass}
 							aria-current={state === 'select' ? 'page' : undefined}
 							{...anchorProps}
 						>
 							{content}
-						</a>
+						</Link>
 					</RadixNavMenu.Link>
 				</li>
 			</RadixNavMenu.Item>
@@ -756,14 +757,14 @@ export const NavigationMenuItem = forwardRef<HTMLElement, NavigationMenuItemProp
 	const anchorProps = rest as AnchorHTMLAttributes<HTMLAnchorElement>
 	return (
 		<li className="flex">
-			<a
+			<Link
 				ref={ref as React.Ref<HTMLAnchorElement>}
 				className={baseClass}
 				aria-current={state === 'select' ? 'page' : undefined}
 				{...anchorProps}
 			>
 				{content}
-			</a>
+			</Link>
 		</li>
 	)
 })
@@ -943,9 +944,9 @@ export const NavigationSubnavGroup = forwardRef<HTMLLIElement, NavigationSubnavG
 			: 'font-bold text-[1rem] leading-[1.5] text-npi-blue hover:text-npi-blue-dark focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-npi-blue-light'
 		return (
 			<li ref={ref} className={twMerge(clsx('flex flex-col', insideDrawer ? 'gap-npi-2' : 'gap-npi-3', className))} {...props}>
-				<a href={headingHref} className={headingClass}>
+				<Link href={headingHref} className={headingClass}>
 					{heading}
-				</a>
+				</Link>
 				<ul className="flex flex-col gap-npi-2 pl-npi-4">{children}</ul>
 			</li>
 		)
@@ -961,7 +962,7 @@ export const NavigationSubnavItem = forwardRef<HTMLAnchorElement, NavigationSubn
 		const insideDrawer = useContext(InsideDrawerContext)
 		return (
 			<li className="flex">
-				<a
+				<Link
 					ref={ref}
 					className={twMerge(
 						clsx(
@@ -975,7 +976,7 @@ export const NavigationSubnavItem = forwardRef<HTMLAnchorElement, NavigationSubn
 					{...props}
 				>
 					{children}
-				</a>
+				</Link>
 			</li>
 		)
 	},
@@ -1001,7 +1002,7 @@ export const NavigationPromo = forwardRef<HTMLAnchorElement, NavigationPromoProp
 	({ variant = 'icon', eyebrow, title, icon = 'podcast', coverSrc, href, className, ...props }, ref) => {
 		if (variant === 'icon') {
 			return (
-				<a
+				<Link
 					ref={ref}
 					href={href}
 					className={twMerge(
@@ -1024,12 +1025,12 @@ export const NavigationPromo = forwardRef<HTMLAnchorElement, NavigationPromoProp
 							<span>{title}</span>
 						</Text>
 					</span>
-				</a>
+				</Link>
 			)
 		}
 
 		return (
-			<a
+			<Link
 				ref={ref}
 				href={href}
 				className={twMerge(
@@ -1044,8 +1045,8 @@ export const NavigationPromo = forwardRef<HTMLAnchorElement, NavigationPromoProp
 				<Text asChild variant="m" secondary>
 					<span>{title}</span>
 				</Text>
-				{coverSrc && <img src={coverSrc} alt="" className="aspect-video w-full rounded-npi-xs object-cover" />}
-			</a>
+				{coverSrc && <Image src={coverSrc} alt="" className="aspect-video w-full rounded-npi-xs object-cover" />}
+			</Link>
 		)
 	},
 )

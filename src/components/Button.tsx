@@ -1,5 +1,6 @@
 'use client'
 
+import { Link } from './ui-primitives'
 import { forwardRef } from 'react'
 import { Icon, type IconName } from '../icons'
 import { useInverted } from '../utils/inverted-context'
@@ -120,9 +121,9 @@ export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPr
 		if (href) {
 			return (
 				<ButtonRoot asChild variant={variant} inverted={resolvedInverted} className={mergedClassName}>
-					<a ref={ref as React.Ref<HTMLAnchorElement>} href={href} {...(props as React.AnchorHTMLAttributes<HTMLAnchorElement>)}>
+					<Link ref={ref as React.Ref<HTMLAnchorElement>} href={href} {...(props as React.AnchorHTMLAttributes<HTMLAnchorElement>)}>
 						{inner}
-					</a>
+					</Link>
 				</ButtonRoot>
 			)
 		}

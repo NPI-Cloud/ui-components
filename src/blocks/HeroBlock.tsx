@@ -1,5 +1,6 @@
 'use client'
 
+import { Image, Link } from '../components/ui-primitives'
 import { clsx } from 'clsx'
 import { Heading } from '../components/Heading'
 import { Text } from '../components/Text'
@@ -73,14 +74,14 @@ export function HeroBlock({
 				{hasCta && (
 					<div className="flex w-full flex-col gap-npi-4 @npi-tablet:w-auto @npi-tablet:flex-row">
 						{ctaLabel && (
-							<a href={ctaUrl ?? '#'} className={primaryCtaClass}>
+							<Link href={ctaUrl ?? '#'} className={primaryCtaClass}>
 								{ctaLabel}
-							</a>
+							</Link>
 						)}
 						{secondaryCtaLabel && (
-							<a href={secondaryCtaUrl ?? '#'} className={secondaryCtaClass}>
+							<Link href={secondaryCtaUrl ?? '#'} className={secondaryCtaClass}>
 								{secondaryCtaLabel}
-							</a>
+							</Link>
 						)}
 					</div>
 				)}
@@ -89,7 +90,7 @@ export function HeroBlock({
 				<div className={clsx('relative w-full overflow-hidden', config.visualAspect)}>
 					{imageUrl
 						? (
-							<img
+							<Image
 								src={imageUrl}
 								alt={imageAlt ?? ''}
 								className="absolute inset-0 h-full w-full object-contain"

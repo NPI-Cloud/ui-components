@@ -1,5 +1,6 @@
 'use client'
 
+import { Link } from './ui-primitives'
 import { clsx } from 'clsx'
 import { forwardRef } from 'react'
 import { twMerge } from 'tailwind-merge'
@@ -54,7 +55,7 @@ export const Breadcrumbs = forwardRef<HTMLElement, BreadcrumbsProps>(
 				{...props}
 			>
 				{parent && (
-					<a
+					<Link
 						href={parent.href}
 						className={clsx(
 							'inline-flex items-center gap-npi-2 npi-tablet:hidden',
@@ -68,7 +69,7 @@ export const Breadcrumbs = forwardRef<HTMLElement, BreadcrumbsProps>(
 					>
 						<Icon name="arrowVlevo" size="m" className="size-6 shrink-0" aria-hidden="true" />
 						<span>{parent.label}</span>
-					</a>
+					</Link>
 				)}
 
 				<ol className="hidden flex-wrap items-center gap-npi-2 npi-tablet:inline-flex">
@@ -90,9 +91,9 @@ export const Breadcrumbs = forwardRef<HTMLElement, BreadcrumbsProps>(
 								{isHome
 									? (isLinked
 										? (
-											<a href={item.href} aria-label={item.label} className={homeLinkClass}>
+											<Link href={item.href} aria-label={item.label} className={homeLinkClass}>
 												<Icon name="domecek" size="m" className="size-6" />
-											</a>
+											</Link>
 										)
 										: (
 											<span
@@ -104,7 +105,7 @@ export const Breadcrumbs = forwardRef<HTMLElement, BreadcrumbsProps>(
 											</span>
 										))
 									: (isLinked
-										? <a href={item.href} className={linkClass}>{item.label}</a>
+										? <Link href={item.href} className={linkClass}>{item.label}</Link>
 										: (
 											<span aria-current={isCurrent ? 'page' : undefined} className={currentTextClass}>
 												{item.label}

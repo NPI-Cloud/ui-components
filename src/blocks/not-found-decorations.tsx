@@ -1,5 +1,6 @@
 'use client'
 
+import { Image } from '../components/ui-primitives'
 import type { NotFoundPageTheme } from './NotFoundPage'
 import leftDigitalizace from '../illustrations/not-found/left-digitalizace.png'
 import leftRevizeRvp from '../illustrations/not-found/left-revize-rvp.png'
@@ -38,10 +39,10 @@ const rightByTheme: Record<NotFoundPageTheme, RasterImport> = {
 
 /** Left decoration cluster — big blue blob, themed accent blob, and the blue dot field. */
 export function LeftDecoration({ theme }: { theme: NotFoundPageTheme }) {
-	return <img src={toUrl(leftByTheme[theme])} alt="" aria-hidden="true" width={236} height={236} className="block size-[236px] shrink-0" />
+	return <Image src={toUrl(leftByTheme[theme])} alt="" aria-hidden="true" width={236} height={236} className="block size-[236px] shrink-0" />
 }
 
 /** Right decoration cluster — graph-paper grid, themed triangle, and the blue arch. */
 export function RightDecoration({ theme }: { theme: NotFoundPageTheme }) {
-	return <img src={toUrl(rightByTheme[theme])} alt="" aria-hidden="true" width={236} height={236} className="block size-[236px] shrink-0" />
+	return <Image src={toUrl(rightByTheme[theme])} alt="" aria-hidden="true" width={236} height={236} className="block size-[236px] shrink-0" />
 }

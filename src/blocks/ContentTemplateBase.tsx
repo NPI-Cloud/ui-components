@@ -1,5 +1,6 @@
 'use client'
 
+import { Image, Link } from '../components/ui-primitives'
 import { clsx } from 'clsx'
 import { type ReactNode, useEffect, useRef, useState } from 'react'
 import { Breadcrumbs, type BreadcrumbsItem } from '../components/Breadcrumbs'
@@ -77,7 +78,7 @@ export function ContentTemplateMeta(
 		<div className="flex items-center gap-npi-4">
 			{showAuthor && (
 				<div className="flex items-center gap-npi-3">
-					{author.avatarUrl && <img src={author.avatarUrl} alt="" className="size-12 shrink-0 rounded-full object-cover" />}
+					{author.avatarUrl && <Image src={author.avatarUrl} alt="" className="size-12 shrink-0 rounded-full object-cover" />}
 					<Text variant="l">{author.name}</Text>
 				</div>
 			)}
@@ -131,7 +132,7 @@ export function ContentTemplateShareRow({ share }: { share: ContentTemplateShare
 			<div className="flex items-center gap-npi-4">
 				<Text variant="l">Sdílet</Text>
 				{SOCIAL_SHARES.map(({ iconName, label, url }) => (
-					<a
+					<Link
 						key={iconName}
 						href={url(share.url)}
 						target="_blank"
@@ -140,7 +141,7 @@ export function ContentTemplateShareRow({ share }: { share: ContentTemplateShare
 						className="inline-flex size-8 items-center justify-center rounded-npi-xxs text-npi-blue transition-colors hover:text-npi-blue-hover focus-visible:outline-none focus-visible:shadow-[0_0_0_2px_var(--npi-blue-light)]"
 					>
 						<Icon name={iconName} size="m" className="size-8" aria-hidden="true" />
-					</a>
+					</Link>
 				))}
 			</div>
 			<button

@@ -1,5 +1,6 @@
 'use client'
 
+import { Link } from './ui-primitives'
 import { forwardRef, useEffect, useRef, useState } from 'react'
 import { Icon } from '../icons'
 
@@ -22,7 +23,7 @@ export interface DownloadButtonProps {
 	 * If two or more, clicking opens a dropdown that lets the user pick a format.
 	 */
 	variants: DownloadVariant[]
-	/** Render as `<a>` with `download` attribute (default true). When false, clicks are passed to `onSelect` */
+	/** Render as `<Link>` with `download` attribute (default true). When false, clicks are passed to `onSelect` */
 	download?: boolean
 	/** Called with the picked variant when the user activates one (useful for analytics or custom handling) */
 	onSelect?: (variant: DownloadVariant) => void
@@ -91,7 +92,7 @@ export const DownloadButton = forwardRef<HTMLDivElement, DownloadButtonProps>(
 			if (!variant) return null
 			return (
 				<div ref={setRefs} className="relative inline-block">
-					<a
+					<Link
 						href={variant.url}
 						{...(download ? { download: variant.fileName ?? '' } : {})}
 						onClick={() => onSelect?.(variant)}
@@ -101,7 +102,7 @@ export const DownloadButton = forwardRef<HTMLDivElement, DownloadButtonProps>(
 					>
 						<Icon name="stahnout" className="size-6 shrink-0" />
 						<span>{label}</span>
-					</a>
+					</Link>
 				</div>
 			)
 		}
@@ -128,7 +129,7 @@ export const DownloadButton = forwardRef<HTMLDivElement, DownloadButtonProps>(
 					>
 						{variants.map((v, i) => (
 							<li key={i} role="none">
-								<a
+								<Link
 									role="menuitem"
 									href={v.url}
 									{...(download ? { download: v.fileName ?? '' } : {})}
@@ -140,7 +141,7 @@ export const DownloadButton = forwardRef<HTMLDivElement, DownloadButtonProps>(
 								>
 									<Icon name="stahnout" className="size-6 shrink-0" />
 									<span className="font-npi-sans font-bold text-[1rem] leading-[1.5]">{formatLabel(v)}</span>
-								</a>
+								</Link>
 							</li>
 						))}
 					</ul>

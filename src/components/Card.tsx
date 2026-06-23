@@ -1,5 +1,6 @@
 'use client'
 
+import { Link } from './ui-primitives'
 import { clsx } from 'clsx'
 import { forwardRef, Fragment } from 'react'
 import { twMerge } from 'tailwind-merge'
@@ -141,7 +142,7 @@ export const Card = forwardRef<HTMLElement, CardProps>(({
 						</span>
 					)}
 					{href && (
-						<a
+						<Link
 							href={href}
 							aria-label={title}
 							className="absolute inset-0 outline-none focus-visible:ring-4 focus-visible:ring-npi-blue-light"
@@ -196,12 +197,12 @@ export const Card = forwardRef<HTMLElement, CardProps>(({
 					<Heading level={5} className={clsx(titleClass, href && titleHoverClass)}>
 						{href
 							? (
-								<a
+								<Link
 									href={href}
 									className='text-inherit no-underline outline-none focus-visible:ring-4 focus-visible:ring-npi-blue-light rounded-npi-xxs before:absolute before:inset-0 before:content-[""]'
 								>
 									{title}
-								</a>
+								</Link>
 							)
 							: title}
 					</Heading>

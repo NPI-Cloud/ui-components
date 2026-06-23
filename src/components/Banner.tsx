@@ -1,5 +1,6 @@
 'use client'
 
+import { Link } from './ui-primitives'
 import { clsx } from 'clsx'
 import { forwardRef } from 'react'
 import { twMerge } from 'tailwind-merge'
@@ -15,7 +16,7 @@ export type BannerIndicator = (typeof bannerIndicators)[number]
 export interface BannerAction {
 	/** Visible label */
 	label: string
-	/** Navigation target — renders the CTA as `<a>` */
+	/** Navigation target — renders the CTA as `<Link>` */
 	href?: string
 	/** Click handler — required when `href` is absent */
 	onClick?: (event: React.MouseEvent<HTMLElement>) => void
@@ -102,9 +103,9 @@ function BannerActionButton({
 	const className = twMerge(actionBaseClass, actionVariantClass[variant][inverted ? 'inverted' : 'default'])
 	if (action.href) {
 		return (
-			<a href={action.href} onClick={action.onClick} className={className}>
+			<Link href={action.href} onClick={action.onClick} className={className}>
 				{action.label}
-			</a>
+			</Link>
 		)
 	}
 	return (

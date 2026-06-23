@@ -1,5 +1,6 @@
 'use client'
 
+import { Image } from './ui-primitives'
 import { clsx } from 'clsx'
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef } from 'react'
 import { twMerge } from 'tailwind-merge'
@@ -252,7 +253,7 @@ export const Lightbox = forwardRef<HTMLDialogElement, LightboxProps>((props, ref
 					>
 						{/* TODO: zoom is listed as a Figma capability ("Umožňuje … zoom") but is not
 						    designed in detail and was deferred — the image renders without zoom/pan for now. */}
-						<img src={current.src} alt={current.alt} className={imageClass} />
+						<Image src={current.src} alt={current.alt} className={imageClass} />
 					</div>
 
 					{hasMultiple && (

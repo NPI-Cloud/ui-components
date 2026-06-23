@@ -1,5 +1,6 @@
 'use client'
 
+import { Image, Link } from '../components/ui-primitives'
 import { clsx } from 'clsx'
 import { useState } from 'react'
 import { Text } from '../components/Text'
@@ -56,7 +57,7 @@ const aspectClasses: Record<Exclude<MediaBlockAspect, 'auto'>, string> = {
 /**
  * Unified media component — used both as the cover of a content page and as an inline
  * media block in the page builder. Renders an embedded YouTube/Vimeo player when
- * `videoUrl` parses, otherwise an `<img>`, otherwise a labelled placeholder. The frame
+ * `videoUrl` parses, otherwise an `<Image>`, otherwise a labelled placeholder. The frame
  * and rounded corners are owned by the component; an optional caption renders below as
  * `<figcaption>`. Frame ratio and image fit are configurable via `aspect` / `fit`.
  */
@@ -86,7 +87,7 @@ export function MediaBlock(
 		if (imageUrl) {
 			const imageEl = aspect === 'auto'
 				? (
-					<img
+					<Image
 						src={imageUrl}
 						alt={imageAlt ?? ''}
 						className="h-auto w-full rounded-npi-xxs"
@@ -94,7 +95,7 @@ export function MediaBlock(
 				)
 				: (
 					<div className={clsx('relative w-full overflow-hidden rounded-npi-xxs', aspectClasses[frameAspect])}>
-						<img
+						<Image
 							src={imageUrl}
 							alt={imageAlt ?? ''}
 							className={clsx('size-full', fit === 'contain' ? 'object-contain' : 'object-cover')}
@@ -103,7 +104,7 @@ export function MediaBlock(
 				)
 
 			if (href) {
-				return <a href={href} className="block">{imageEl}</a>
+				return <Link href={href} className="block">{imageEl}</Link>
 			}
 			if (zoomable) {
 				return (

@@ -1,5 +1,6 @@
 'use client'
 
+import { Image } from '../components/ui-primitives'
 import type { ReactNode } from 'react'
 import { Accordion, AccordionItem, type AccordionSize } from '../components/Accordion'
 import { normalizeRichContent, renderRichInlines, type TextBlockRichContent } from './TextBlock'
@@ -44,7 +45,7 @@ export function AccordionItemBlock({ question, description, avatarSrc, avatarAlt
 			description={description || undefined}
 			avatar={avatarSrc
 				? (
-					<img
+					<Image
 						src={avatarSrc}
 						alt={avatarAlt ?? ''}
 						className="size-npi-14 shrink-0 rounded-full object-cover"

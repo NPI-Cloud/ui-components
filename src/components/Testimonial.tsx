@@ -1,5 +1,6 @@
 'use client'
 
+import { Image } from './ui-primitives'
 import { clsx } from 'clsx'
 import { forwardRef, type ReactNode } from 'react'
 import { twMerge } from 'tailwind-merge'
@@ -126,7 +127,7 @@ export const Testimonial = forwardRef<HTMLElement, TestimonialProps>((props, ref
 			</blockquote>
 			<figcaption className="flex items-center gap-npi-4">
 				{authorAvatarSrc && (
-					<img
+					<Image
 						src={authorAvatarSrc}
 						alt={authorAvatarAlt ?? authorName}
 						width={avatarPx}

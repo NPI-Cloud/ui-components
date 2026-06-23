@@ -1,5 +1,6 @@
 'use client'
 
+import { Image, Link } from './ui-primitives'
 import { clsx } from 'clsx'
 import { forwardRef, type ReactNode } from 'react'
 import { twMerge } from 'tailwind-merge'
@@ -114,7 +115,7 @@ export const MapAddress = forwardRef<HTMLElement, MapAddressProps>((props, ref) 
 
 	const mapNode = mapSlot ?? (mapImageSrc
 		? (
-			<img
+			<Image
 				src={mapImageSrc}
 				alt={mapAlt}
 				className="absolute inset-0 size-full object-cover"
@@ -175,12 +176,12 @@ export const MapAddress = forwardRef<HTMLElement, MapAddressProps>((props, ref) 
 					{email && (
 						<div className="flex items-start gap-npi-2">
 							<Icon name="dopis" size="m" className="size-npi-6 shrink-0 text-npi-blue" aria-hidden />
-							<a
+							<Link
 								href={`mailto:${email}`}
 								className="font-npi-sans font-normal text-[1rem] leading-[1.5] text-npi-blue no-underline hover:underline focus-visible:rounded-npi-xxs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-npi-blue-light"
 							>
 								{email}
-							</a>
+							</Link>
 						</div>
 					)}
 
@@ -188,12 +189,12 @@ export const MapAddress = forwardRef<HTMLElement, MapAddressProps>((props, ref) 
 						<div className="flex items-start gap-npi-2">
 							<Icon name="telefon" size="m" className="size-npi-6 shrink-0 text-npi-blue" aria-hidden />
 							<div className="flex flex-col items-start">
-								<a
+								<Link
 									href={`tel:${phoneObj.number.replace(/\s+/g, '')}`}
 									className="font-npi-sans font-normal text-[1rem] leading-[1.5] text-npi-blue no-underline hover:underline focus-visible:rounded-npi-xxs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-npi-blue-light"
 								>
 									{phoneObj.number}
-								</a>
+								</Link>
 								{phoneObj.note && (
 									<span className="font-npi-sans font-normal text-[0.75rem] leading-[1.3] text-npi-gray-700">
 										{phoneObj.note}

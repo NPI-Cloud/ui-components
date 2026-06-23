@@ -1,5 +1,6 @@
 'use client'
 
+import { Link } from './ui-primitives'
 import { clsx } from 'clsx'
 import { forwardRef } from 'react'
 import { twMerge } from 'tailwind-merge'
@@ -57,9 +58,9 @@ export const NavCard = forwardRef<HTMLElement, NavCardProps>(({ title, icon, siz
 
 	if (href) {
 		return (
-			<a ref={ref as React.Ref<HTMLAnchorElement>} href={href} className={rootClass} {...(props as React.AnchorHTMLAttributes<HTMLAnchorElement>)}>
+			<Link ref={ref as React.Ref<HTMLAnchorElement>} href={href} className={rootClass} {...(props as React.AnchorHTMLAttributes<HTMLAnchorElement>)}>
 				{content}
-			</a>
+			</Link>
 		)
 	}
 

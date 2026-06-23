@@ -1,5 +1,6 @@
 'use client'
 
+import { Link } from './ui-primitives'
 import { forwardRef } from 'react'
 import { Icon, type IconName } from '../icons'
 import { uic } from '../utils/uic'
@@ -84,9 +85,9 @@ export const Tag = forwardRef<HTMLButtonElement | HTMLAnchorElement, TagProps>(
 		if (href) {
 			return (
 				<TagRoot asChild size={size} inverted={inverted} className={className}>
-					<a ref={ref as React.Ref<HTMLAnchorElement>} href={href} {...(props as React.AnchorHTMLAttributes<HTMLAnchorElement>)}>
+					<Link ref={ref as React.Ref<HTMLAnchorElement>} href={href} {...(props as React.AnchorHTMLAttributes<HTMLAnchorElement>)}>
 						{inner}
-					</a>
+					</Link>
 				</TagRoot>
 			)
 		}

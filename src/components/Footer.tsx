@@ -1,5 +1,6 @@
 'use client'
 
+import { Image, Link } from './ui-primitives'
 import { clsx } from 'clsx'
 import { type AnchorHTMLAttributes, forwardRef, type HTMLAttributes, type ReactNode } from 'react'
 import { twMerge } from 'tailwind-merge'
@@ -101,7 +102,7 @@ export interface FooterLinkProps extends AnchorHTMLAttributes<HTMLAnchorElement>
  */
 export const FooterLink = forwardRef<HTMLAnchorElement, FooterLinkProps>(
 	({ icon, className, children, ...props }, ref) => (
-		<a
+		<Link
 			ref={ref}
 			className={twMerge(
 				clsx(
@@ -115,7 +116,7 @@ export const FooterLink = forwardRef<HTMLAnchorElement, FooterLinkProps>(
 		>
 			{icon && <Icon name={icon} size="s" className="size-4 shrink-0" aria-hidden="true" />}
 			<span>{children}</span>
-		</a>
+		</Link>
 	),
 )
 FooterLink.displayName = 'FooterLink'
@@ -151,7 +152,7 @@ export interface FooterSocialProps extends AnchorHTMLAttributes<HTMLAnchorElemen
 export const FooterSocial = forwardRef<HTMLAnchorElement, FooterSocialProps>(
 	({ icon, label, className, ...props }, ref) => (
 		<li className="flex">
-			<a
+			<Link
 				ref={ref}
 				aria-label={label}
 				className={twMerge(
@@ -165,7 +166,7 @@ export const FooterSocial = forwardRef<HTMLAnchorElement, FooterSocialProps>(
 				{...props}
 			>
 				<Icon name={icon} className="size-full" aria-hidden="true" />
-			</a>
+			</Link>
 		</li>
 	),
 )
@@ -284,7 +285,7 @@ export interface FooterSocialItem {
 export interface FooterLogoItem {
 	src: string
 	alt: string
-	/** Optional click target — when omitted, the logo renders as a plain `<img>`. */
+	/** Optional click target — when omitted, the logo renders as a plain `<Image>`. */
 	href?: string
 }
 
@@ -408,7 +409,7 @@ export const Footer = forwardRef<HTMLElement, FooterProps>((props, ref) => {
 				<FooterLogos>
 					{logos.map((logo, index) => {
 						const img = (
-							<img
+							<Image
 								key={index}
 								src={logo.src}
 								alt={logo.alt}
@@ -417,9 +418,9 @@ export const Footer = forwardRef<HTMLElement, FooterProps>((props, ref) => {
 						)
 						return logo.href
 							? (
-								<a key={index} href={logo.href} className="inline-flex">
+								<Link key={index} href={logo.href} className="inline-flex">
 									{img}
-								</a>
+								</Link>
 							)
 							: img
 					})}

@@ -1,5 +1,6 @@
 'use client'
 
+import { Image, Link } from './ui-primitives'
 import { clsx } from 'clsx'
 import { forwardRef } from 'react'
 import { twMerge } from 'tailwind-merge'
@@ -100,7 +101,7 @@ function ProfileAvatar({ size, name, avatarSrc, avatarAlt, initials, useIconFall
 	const dim = avatarSizeClass[size]
 	if (avatarSrc) {
 		return (
-			<img
+			<Image
 				src={avatarSrc}
 				alt={avatarAlt ?? name}
 				className={clsx('shrink-0 rounded-full object-cover', dim)}
@@ -141,7 +142,7 @@ function SocialRow({ socials, orientation }: SocialRowProps): React.ReactElement
 	return (
 		<div className={clsx('flex items-center gap-npi-2 pt-[2px]', orientation === 'vertical' && 'justify-center')}>
 			{socials.map(item => (
-				<a
+				<Link
 					key={item.platform + item.url}
 					href={item.url}
 					aria-label={item.label ?? socialLabelMap[item.platform]}
@@ -150,7 +151,7 @@ function SocialRow({ socials, orientation }: SocialRowProps): React.ReactElement
 					className="inline-flex items-center justify-center text-npi-blue transition-colors hover:text-npi-blue-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-npi-blue-light rounded-npi-xxs"
 				>
 					<Icon name={socialIconMap[item.platform]} size="s" className={socialIconSize} />
-				</a>
+				</Link>
 			))}
 		</div>
 	)
@@ -222,14 +223,14 @@ export const ProfileCard = forwardRef<HTMLElement, ProfileCardProps>(({
 				<p className={nameTextClass[size]}>{name}</p>
 				{role && <p className={roleTextClass}>{role}</p>}
 				{email && (
-					<a href={`mailto:${email}`} className={contactLinkClass}>
+					<Link href={`mailto:${email}`} className={contactLinkClass}>
 						{email}
-					</a>
+					</Link>
 				)}
 				{phone && (
-					<a href={`tel:${phone.replace(/\s+/g, '')}`} className={contactLinkClass}>
+					<Link href={`tel:${phone.replace(/\s+/g, '')}`} className={contactLinkClass}>
 						{phone}
-					</a>
+					</Link>
 				)}
 				{socials && socials.length > 0 && <SocialRow socials={socials} orientation={orientation} />}
 			</div>
@@ -287,12 +288,12 @@ export const ContactCard = forwardRef<HTMLElement, ContactCardProps>(({
 				</p>
 			)}
 			{email && (
-				<a
+				<Link
 					href={`mailto:${email}`}
 					className="font-npi-sans font-normal text-[0.75rem] leading-[1.3] text-npi-blue no-underline transition-colors hover:text-npi-blue-hover hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-npi-blue-light rounded-npi-xxs"
 				>
 					{email}
-				</a>
+				</Link>
 			)}
 		</article>
 	)

@@ -1,5 +1,6 @@
 'use client'
 
+import { Link } from './ui-primitives'
 import { forwardRef, type ReactNode, type SVGAttributes, useCallback, useLayoutEffect, useRef, useState } from 'react'
 import { twMerge } from 'tailwind-merge'
 
@@ -246,7 +247,7 @@ const REGION_INTERACTIVE = 'cursor-pointer'
 // Idle fill: light gray (Figma #E0E0E0).
 const REGION_IDLE = 'fill-npi-gray-200'
 // Idle + interactive: dark blue on hover, and on keyboard focus of the parent group (Figma #02216E).
-// Driven by `group-focus-visible` so the highlight comes from the focusable <g>/<a>, not a square outline.
+// Driven by `group-focus-visible` so the highlight comes from the focusable <g>/<Link>, not a square outline.
 const REGION_IDLE_HOVER = 'hover:fill-npi-blue-dark group-focus-visible:fill-npi-blue-dark'
 // Selected: blue fill (Figma #3566FC). Stays blue on hover.
 const REGION_SELECTED = 'fill-npi-blue'
@@ -258,7 +259,7 @@ interface RegionPathProps {
 	def: MapRegionDef
 	selected: boolean
 	disabledRegion: boolean
-	/** Link target — when set, the region renders as an `<a>` and clicking navigates (numbered variant). */
+	/** Link target — when set, the region renders as an `<Link>` and clicking navigates (numbered variant). */
 	href: string | undefined
 	/** Whether clicking toggles selection (selection variant). Mutually exclusive with `href` in practice. */
 	selectable: boolean
@@ -286,7 +287,7 @@ function RegionPath({ code, def, selected, disabledRegion, href, selectable, lab
 		: `${REGION_BASE} ${REGION_IDLE}`
 
 	// The transform lives on an inner <g> so the shape can sit inside either an interactive <g>
-	// (selection) or an <a> (navigation) without passing SVG-only props to the typed anchor element.
+	// (selection) or an <Link> (navigation) without passing SVG-only props to the typed anchor element.
 	const shape = (
 		<g transform={transform}>
 			<title>{label}</title>
@@ -296,9 +297,9 @@ function RegionPath({ code, def, selected, disabledRegion, href, selectable, lab
 
 	if (isLink) {
 		return (
-			<a href={href} aria-label={label} data-region={code} className="group outline-none">
+			<Link href={href} aria-label={label} data-region={code} className="group outline-none">
 				{shape}
-			</a>
+			</Link>
 		)
 	}
 

@@ -1,5 +1,6 @@
 'use client'
 
+import { Image } from '../components/ui-primitives'
 import { CardOffer, type CardOfferDisplay, type CardOfferMetaItem } from '../components/CardOffer'
 import { iconRegistryM, type IconName } from '../icons'
 
@@ -45,7 +46,7 @@ export function CardOfferBlock(
 
 	// Cover only renders @md up (CardOffer hides it on narrow cards, where the navy rule shows instead).
 	const visual = imageUrl
-		? <img src={imageUrl} alt={imageAlt ?? ''} className="h-[120px] w-[180px] rounded-npi-s object-cover @4xl:h-[150px] @4xl:w-[220px]" />
+		? <Image src={imageUrl} alt={imageAlt ?? ''} className="h-[120px] w-[180px] rounded-npi-s object-cover @4xl:h-[150px] @4xl:w-[220px]" />
 		: undefined
 
 	return (

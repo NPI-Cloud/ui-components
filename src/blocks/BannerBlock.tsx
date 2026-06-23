@@ -1,5 +1,6 @@
 'use client'
 
+import { Image } from '../components/ui-primitives'
 import { Banner, type BannerIndicator, type BannerTone } from '../components/Banner'
 
 export type BannerBlockTone = BannerTone
@@ -33,7 +34,7 @@ export function BannerBlock({
 	secondaryCtaUrl,
 }: BannerBlockProps) {
 	const visual = imageUrl
-		? <img src={imageUrl} alt={imageAlt ?? ''} className="absolute inset-0 size-full object-cover" />
+		? <Image src={imageUrl} alt={imageAlt ?? ''} className="absolute inset-0 size-full object-cover" />
 		: undefined
 	const primaryAction = ctaLabel ? { label: ctaLabel, href: ctaUrl ?? undefined } : undefined
 	const secondaryAction = secondaryCtaLabel ? { label: secondaryCtaLabel, href: secondaryCtaUrl ?? undefined } : undefined

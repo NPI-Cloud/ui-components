@@ -1,5 +1,6 @@
 'use client'
 
+import { Link } from '../components/ui-primitives'
 import { Fragment, type ReactNode } from 'react'
 import { DownloadButton, type DownloadVariant } from '../components/DownloadButton'
 import { Heading, type HeadingLevel } from '../components/Heading'
@@ -84,9 +85,9 @@ function renderNode(node: SlateNode, key: number, references: RichTextReferences
 			return <li key={key}>{children}</li>
 		case 'anchor':
 			return (
-				<a key={key} href={(node.href as string | undefined) ?? '#'} className="text-npi-blue underline">
+				<Link key={key} href={(node.href as string | undefined) ?? '#'} className="text-npi-blue underline">
 					{children}
-				</a>
+				</Link>
 			)
 		case 'calloutBox':
 			// "Kam dál"-style tinted box: children are ordinary rich-text blocks, the box only paints

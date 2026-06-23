@@ -1,5 +1,6 @@
 'use client'
 
+import { Link } from './ui-primitives'
 import { clsx } from 'clsx'
 import { forwardRef, type ReactNode } from 'react'
 import { twMerge } from 'tailwind-merge'
@@ -22,7 +23,7 @@ export interface CardOfferAction {
 	label: string
 	/** Icon rendered before the label (defaults to `'stahnout'`) */
 	iconBefore?: IconName
-	/** Navigation target — renders the CTA as `<a>` */
+	/** Navigation target — renders the CTA as `<Link>` */
 	href?: string
 	/** Click handler */
 	onClick?: (event: React.MouseEvent<HTMLElement>) => void
@@ -162,12 +163,12 @@ export const CardOffer = forwardRef<HTMLElement, CardOfferProps>(({
 					<Heading level={6} className={clsx(titleClass, display === 'card' && titleCardScaleClass, href && titleHoverClass)}>
 						{href
 							? (
-								<a
+								<Link
 									href={href}
 									className='text-inherit no-underline outline-none focus-visible:ring-4 focus-visible:ring-npi-blue-light rounded-npi-xxs before:absolute before:inset-0 before:content-[""]'
 								>
 									{title}
-								</a>
+								</Link>
 							)
 							: title}
 					</Heading>

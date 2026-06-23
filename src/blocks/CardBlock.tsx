@@ -1,5 +1,6 @@
 'use client'
 
+import { Image } from '../components/ui-primitives'
 import { Card, type CardAspect, type CardIndicator } from '../components/Card'
 import type { DownloadVariant } from '../components/DownloadButton'
 
@@ -70,7 +71,7 @@ export function CardBlock(
 	}: CardBlockProps,
 ) {
 	const visual = imageUrl
-		? <img src={imageUrl} alt={imageAlt ?? ''} className="absolute inset-0 size-full object-cover" />
+		? <Image src={imageUrl} alt={imageAlt ?? ''} className="absolute inset-0 size-full object-cover" />
 		: undefined
 
 	if (aspect === 'visualOnly') {
