@@ -93,8 +93,12 @@ export const NavigationMenu = forwardRef<HTMLElement, NavigationMenuProps>(
 			const header = headerRef.current
 			const doc = header?.ownerDocument
 			if (!header || !doc) return
-			const previousOverflow = doc.body.style.overflow
-			doc.body.style.overflow = 'hidden'
+			// Pin BOTH the body and the document element: which one owns the page scroll depends on the
+			// host layout (the Next.js site scrolls `<html>` since it carries `h-full`, so locking only
+			// `body` leaves the page scrollable behind the drawer).
+			const scrollTargets = [doc.documentElement, doc.body]
+			const previousOverflow = scrollTargets.map(el => el.style.overflow)
+			scrollTargets.forEach(el => { el.style.overflow = 'hidden' })
 			const previouslyFocused = doc.activeElement as HTMLElement | null
 
 			const focusSelector = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
@@ -126,7 +130,7 @@ export const NavigationMenu = forwardRef<HTMLElement, NavigationMenuProps>(
 			}
 			doc.addEventListener('keydown', onKey)
 			return () => {
-				doc.body.style.overflow = previousOverflow
+				scrollTargets.forEach((el, i) => { el.style.overflow = previousOverflow[i] })
 				doc.removeEventListener('keydown', onKey)
 				previouslyFocused?.focus?.()
 			}
