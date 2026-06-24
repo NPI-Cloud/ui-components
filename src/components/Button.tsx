@@ -83,6 +83,9 @@ export type ButtonProps =
 		iconAfter?: IconName
 		/** When provided, renders the button as an anchor element instead of a button */
 		href?: string
+		/** Anchor attributes — only meaningful together with `href` (the button renders as a link). */
+		target?: React.HTMLAttributeAnchorTarget
+		rel?: string
 	}
 
 export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonProps>(
