@@ -29,6 +29,10 @@ export interface MediaBlockProps {
 	videoUrl?: string | null
 	/** Caption rendered below the media as `<figcaption>`. */
 	caption?: string | null
+	/** Author attribution, appended to the caption line as `autor: …`. */
+	author?: string | null
+	/** Source attribution, appended to the caption line as `zdroj: …`. */
+	source?: string | null
 	/** Placeholder text shown when neither URL is provided. */
 	placeholderLabel?: string
 	/**
@@ -71,7 +75,7 @@ const aspectClasses: Record<Exclude<MediaBlockAspect, 'auto'>, string> = {
  * `<figcaption>`. Frame ratio and image fit are configurable via `aspect` / `fit`.
  */
 export function MediaBlock(
-	{ imageUrl, imageAlt, imageWidth, imageHeight, videoUrl, caption, placeholderLabel = 'Vizuál, foto, video', aspect = '16:9', fit = 'cover', href, zoomable, priority }: MediaBlockProps,
+	{ imageUrl, imageAlt, imageWidth, imageHeight, videoUrl, caption, author, source, placeholderLabel = 'Vizuál, foto, video', aspect = '16:9', fit = 'cover', href, zoomable, priority }: MediaBlockProps,
 ) {
 	const embedUrl = videoUrl ? toEmbedUrl(videoUrl) : null
 	const [zoomOpen, setZoomOpen] = useState(false)
@@ -167,7 +171,15 @@ export function MediaBlock(
 		)
 		: null
 
-	if (!caption) {
+	// Caption line = optional caption text followed by `autor: …` / `zdroj: …` attribution,
+	// joined with commas. Any of the three may be absent.
+	const figcaptionText = [
+		caption,
+		author ? `autor: ${author}` : null,
+		source ? `zdroj: ${source}` : null,
+	].filter(Boolean).join(', ')
+
+	if (!figcaptionText) {
 		return <>{media}{lightbox}</>
 	}
 
@@ -176,7 +188,7 @@ export function MediaBlock(
 			<figure className="flex flex-col items-start gap-npi-2">
 				{media}
 				<figcaption>
-					<Text variant="l">{caption}</Text>
+					<Text variant="l">{figcaptionText}</Text>
 				</figcaption>
 			</figure>
 			{lightbox}
