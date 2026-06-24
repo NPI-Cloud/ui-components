@@ -141,11 +141,30 @@ export const FooterSocials = forwardRef<HTMLUListElement, FooterSocialsProps>(
 )
 FooterSocials.displayName = 'FooterSocials'
 
+/**
+ * Human-readable platform names for the curated social icons. Drives the
+ * icon-only links' accessible label, so editors don't hand-type one per row.
+ */
+const SOCIAL_LABELS: Record<string, string> = {
+	facebook: 'Facebook',
+	instagram: 'Instagram',
+	linkedIn: 'LinkedIn',
+	youTube: 'YouTube',
+	x: 'X',
+	spotify: 'Spotify',
+	mastodon: 'Mastodon',
+	threads: 'Threads',
+	tikTok: 'TikTok',
+}
+
+/** Accessible label for a social icon — the platform name, falling back to the icon id. */
+export const socialLabel = (icon: IconName): string => SOCIAL_LABELS[icon] ?? icon
+
 export interface FooterSocialProps extends AnchorHTMLAttributes<HTMLAnchorElement> {
 	/** Social-platform icon — `facebook`, `instagram`, `linkedIn`, `youTube`, `x`, `spotify`, … */
 	icon: IconName
-	/** Accessible label — typically the platform name (e.g. `"Facebook"`, `"Instagram NPI"`). */
-	label: string
+	/** Accessible label — defaults to the platform name derived from `icon`. */
+	label?: string
 }
 
 /** Icon-only link to an NPI social-media profile. Must be a child of `FooterSocials`. */
@@ -154,7 +173,7 @@ export const FooterSocial = forwardRef<HTMLAnchorElement, FooterSocialProps>(
 		<li className="flex">
 			<Link
 				ref={ref}
-				aria-label={label}
+				aria-label={label ?? socialLabel(icon)}
 				className={twMerge(
 					clsx(
 						'inline-flex size-npi-10 items-center justify-center rounded-npi-xxs text-npi-blue npi-desktop:size-npi-6',
@@ -277,8 +296,6 @@ export interface FooterContact {
 
 export interface FooterSocialItem {
 	icon: IconName
-	/** Accessible label — typically the platform name. */
-	label: string
 	href: string
 }
 
@@ -403,7 +420,7 @@ export const Footer = forwardRef<HTMLElement, FooterProps>((props, ref) => {
 						{socials.length > 0 && (
 							<FooterColumn heading="Sociální sítě">
 								<FooterSocials>
-									{socials.map((social, index) => <FooterSocial key={index} icon={social.icon} label={social.label} href={social.href} />)}
+									{socials.map((social, index) => <FooterSocial key={index} icon={social.icon} href={social.href} />)}
 								</FooterSocials>
 							</FooterColumn>
 						)}
