@@ -131,16 +131,20 @@ export const Lightbox = forwardRef<HTMLDialogElement, LightboxProps>((props, ref
 
 	// Block background scroll while open ("Blokuje scroll pozadí"). `showModal()` makes the backdrop
 	// inert but does not stop the underlying document from scrolling — wheel/touch still reach the
-	// body on most engines — so we pin the owning document's body. `ownerDocument` keeps this correct
-	// inside the showcase iframe (component JS runs in the parent window, DOM lives in the iframe).
+	// page on most engines. We pin BOTH the body and the document element: which one actually owns the
+	// scroll depends on the host layout (the Next.js site scrolls `<html>` since it carries `h-full`,
+	// so locking only `body` leaves the page scrollable behind the lightbox). `ownerDocument` keeps
+	// this correct inside the showcase iframe (component JS runs in the parent window, DOM lives in
+	// the iframe).
 	useEffect(() => {
 		if (!open) return
-		const body = internalRef.current?.ownerDocument.body
-		if (!body) return
-		const previousOverflow = body.style.overflow
-		body.style.overflow = 'hidden'
+		const doc = internalRef.current?.ownerDocument
+		if (!doc) return
+		const targets = [doc.documentElement, doc.body]
+		const previous = targets.map((el) => el.style.overflow)
+		targets.forEach((el) => { el.style.overflow = 'hidden' })
 		return () => {
-			body.style.overflow = previousOverflow
+			targets.forEach((el, i) => { el.style.overflow = previous[i] })
 		}
 	}, [open])
 
