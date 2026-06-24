@@ -179,7 +179,7 @@ export function ContentTemplateShareRow({ share }: { share: ContentTemplateShare
  */
 export function ContentTemplateShell({ children, className }: { children: ReactNode; className?: string }) {
 	return (
-		<div className="mx-auto w-full max-w-npi-layout px-npi-6">
+		<div className="mx-auto w-full max-w-npi-layout pt-npi-6">
 			<article className={clsx('flex w-full max-w-[calc(var(--container-npi-layout)*2/3)] flex-col gap-npi-12 font-npi-sans', className)}>
 				{children}
 			</article>
