@@ -474,7 +474,7 @@ export const NavigationMenuItems = forwardRef<
 			>
 				<InsideItemsContext.Provider value={true}>
 					<WidePortalContext.Provider value={widePortalEl}>
-						<RadixNavMenu.List className="mx-auto flex w-full max-w-npi-layout items-center gap-npi-8 px-npi-6 pt-npi-2 pb-npi-6">
+						<RadixNavMenu.List className="mx-auto flex w-full max-w-npi-layout items-center gap-npi-8 px-npi-6 pt-npi-4 pb-npi-6">
 							{children}
 						</RadixNavMenu.List>
 						{/* Wide-subnav portal target: spans full Root width, centered below the List. */}
