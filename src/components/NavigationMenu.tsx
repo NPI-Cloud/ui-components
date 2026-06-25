@@ -1277,11 +1277,14 @@ function NavigationConfiguredDropdown({ dropdown }: { dropdown: NavigationDropdo
 	return (
 		<NavigationSubnav variant="wide">
 			<NavigationSubnavGrid columns={columns}>
-				{cells.map((cell, index) => (
-					<NavigationSubnavCell key={index} column={Math.min(Math.floor(index / perColumn), columns - 1)}>
-						<NavigationConfiguredCell cell={cell} />
-					</NavigationSubnavCell>
-				))}
+				{cells.map((cell, index) => {
+					const column = Math.min(Math.floor(index / perColumn), columns - 1)
+					return (
+						<NavigationSubnavCell key={index} column={column} row={index - column * perColumn}>
+							<NavigationConfiguredCell cell={cell} />
+						</NavigationSubnavCell>
+					)
+				})}
 			</NavigationSubnavGrid>
 		</NavigationSubnav>
 	)
