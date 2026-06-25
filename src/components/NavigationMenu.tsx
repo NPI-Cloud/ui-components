@@ -560,6 +560,9 @@ export const NavigationMenuItem = forwardRef<HTMLElement, NavigationMenuItemProp
 	const insideItems = useContext(InsideItemsContext)
 	const insideDrawer = useContext(InsideDrawerContext)
 	const insideGroup = useContext(InsideDrawerGroupContext)
+	// Programmatic navigation target for a subnav item that ALSO has its own link (dropdown + link
+	// at once). See the `hasSubnav` branch below for why navigation can't live on the trigger itself.
+	const hybridLinkRef = useRef<HTMLAnchorElement>(null)
 	const {
 		label,
 		icon,
@@ -732,11 +735,23 @@ export const NavigationMenuItem = forwardRef<HTMLElement, NavigationMenuItemProp
 		const anchorProps = rest as AnchorHTMLAttributes<HTMLAnchorElement>
 
 		if (hasSubnav) {
-			// Render the trigger as a <button>, not an <Link>. On touch devices there's no hover, so the
-			// subnav can only be opened via click. An anchor's default navigation fires preventDefault'd
-			// clicks as well, which Radix's composeEventHandlers treats as "skip the open handler" —
-			// so tap would either navigate away or do nothing. A button has no navigation default.
-			const { href: _href, ...buttonProps } = anchorProps
+			// The trigger is a <button>, never an <a>. On touch there's no hover, so the only way to open
+			// the subnav is a tap — and an anchor would navigate on that tap instead (Radix also skips its
+			// own open handler once an anchor's click is preventDefault'd). A button has no nav default, so
+			// a tap reliably opens the panel on every device.
+			//
+			// A subnav item MAY still carry its own `href` — "dropdown and link at once". The tap gesture
+			// is reserved for opening, so navigation is pointer-only: on a hover-capable device the panel
+			// opens on hover and a real pointer click follows the link. Keyboard activation (click `detail`
+			// 0) and touch (no hover) fall through to a plain open. The click is routed through a hidden
+			// <Link> so it uses the host router (next/link) and is caught by the editor preview's
+			// anchor-swallow, instead of a raw location change that would bypass both.
+			const { href, onClick: _onClick, ...buttonProps } = anchorProps
+			const navigateOnPointer: React.MouseEventHandler<HTMLButtonElement> = event => {
+				if (href != null && event.detail > 0 && window.matchMedia('(hover: hover)').matches) {
+					hybridLinkRef.current?.click()
+				}
+			}
 			return (
 				<RadixNavMenu.Item asChild>
 					<li className="relative flex">
@@ -747,10 +762,12 @@ export const NavigationMenuItem = forwardRef<HTMLElement, NavigationMenuItemProp
 								className={baseClass}
 								aria-current={state === 'select' ? 'page' : undefined}
 								{...(buttonProps as ButtonHTMLAttributes<HTMLButtonElement>)}
+								onClick={href != null ? navigateOnPointer : undefined}
 							>
 								{content}
 							</button>
 						</RadixNavMenu.Trigger>
+						{href != null && <Link ref={hybridLinkRef} href={href} tabIndex={-1} aria-hidden className="hidden" />}
 						{
 							/* Content has no visual styling — the Subnav child places itself (narrow: anchored here; wide: portals to nav root).
 						    top offset matches the List's bottom `pb-npi-6` so narrow panels align with wide ones (which anchor to the List's bottom). */
@@ -1155,7 +1172,8 @@ export interface NavigationDropdown {
 export interface NavigationItem {
 	/** Visible label. */
 	label: string
-	/** Link target — used only when there's no `dropdown`. */
+	/** Link target. With a `dropdown` it's optional — set it for a "dropdown and link at once" item
+	 * (label navigates on pointer click, panel opens on hover/tap); omit for a plain dropdown. */
 	href?: string
 	/** Force the "current page" visual state (underline). The `open` state is owned by Radix. */
 	state?: 'default' | 'select'
@@ -1253,8 +1271,10 @@ function NavigationConfiguredItem({ item }: { item: NavigationItem }) {
 	if (!item.dropdown) {
 		return <NavigationMenuItem label={item.label} href={item.href ?? '#'} state={item.state} />
 	}
+	// A dropdown item may also be a link (`item.href`): the label navigates on pointer click while the
+	// panel opens on hover/tap. With no href it's a plain dropdown trigger.
 	return (
-		<NavigationMenuItem label={item.label} state={item.state}>
+		<NavigationMenuItem label={item.label} href={item.href} state={item.state}>
 			<NavigationConfiguredDropdown dropdown={item.dropdown} />
 		</NavigationMenuItem>
 	)
