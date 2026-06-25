@@ -1,21 +1,74 @@
 {
 	"name": "@npicz/ui-components",
-	"private": true,
+	"version": "0.0.0",
+	"description": "NPI design system — React component library: blocks, components, icons, illustrations and design tokens (Tailwind v4).",
+	"license": "MIT",
 	"type": "module",
 	"main": "src/index.ts",
-
+	"sideEffects": [
+		"**/*.css"
+	],
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/NPI-Cloud/ui-components.git"
+	},
+	"homepage": "https://github.com/NPI-Cloud/ui-components#readme",
+	"bugs": "https://github.com/NPI-Cloud/ui-components/issues",
+	"keywords": [
+		"react",
+		"component-library",
+		"design-system",
+		"tailwindcss",
+		"npi"
+	],
+	"files": [
+		"dist",
+		"*.css",
+		"favicons",
+		"README.md",
+		"LICENSE"
+	],
+	"scripts": {
+		"build": "tsup",
+		"prepare-publish": "node scripts/prepare-publish.mjs",
+		"prepublishOnly": "tsup",
+		"publish:npm": "node scripts/prepare-publish.mjs && bun publish"
+	},
+	"publishConfig": {
+		"access": "public",
+		"main": "./dist/index.js",
+		"module": "./dist/index.js",
+		"types": "./dist/index.d.ts",
+		"exports": {
+			".": {
+				"types": "./dist/index.d.ts",
+				"import": "./dist/index.js",
+				"default": "./dist/index.js"
+			},
+			"./styles.css": "./styles.css",
+			"./npi-tokens.css": "./npi-tokens.css",
+			"./npi-theme.css": "./npi-theme.css",
+			"./favicons/*": "./favicons/*",
+			"./package.json": "./package.json"
+		}
+	},
 	"dependencies": {
 		"@radix-ui/react-accordion": "catalog:ui",
 		"@radix-ui/react-navigation-menu": "catalog:ui",
 		"@radix-ui/react-slot": "catalog:ui",
 		"class-variance-authority": "catalog:ui",
 		"clsx": "catalog:ui",
-		"react": "catalog:ui",
-		"react-dom": "catalog:ui",
-		"tailwind-merge": "catalog:ui",
-		"tailwindcss": "catalog:ui-dev"
+		"tailwind-merge": "catalog:ui"
+	},
+	"peerDependencies": {
+		"react": ">=19",
+		"react-dom": ">=19",
+		"tailwindcss": "^4"
 	},
 	"devDependencies": {
-		"@types/react": "catalog:ui-dev"
+		"@types/react": "catalog:ui-dev",
+		"react": "catalog:ui",
+		"react-dom": "catalog:ui",
+		"tsup": "catalog:build"
 	}
 }
