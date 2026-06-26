@@ -71,4 +71,4 @@ The NPI favicon set is bundled and resolvable as static assets:
 
 ## License
 
-[MIT](./LICENSE) © NPI Cloud
+[MIT](./LICENSE) © Národní pedagogický institut České republiky
