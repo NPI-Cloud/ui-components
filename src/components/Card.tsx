@@ -7,7 +7,7 @@ import { twMerge } from 'tailwind-merge'
 import { Icon, type IconName } from '../icons'
 import { Button } from './Button'
 import { DownloadButton, type DownloadVariant } from './DownloadButton'
-import { Heading } from './Heading'
+import { Heading, type HeadingLevel } from './Heading'
 import { Tag } from './Tag'
 import { Text } from './Text'
 
@@ -53,6 +53,12 @@ export interface CardCta extends CardLink {
 export interface CardProps extends Omit<React.HTMLAttributes<HTMLElement>, 'title'> {
 	/** Main heading. Required unless `visualOnly` is true. */
 	title?: string
+	/**
+	 * Semantic heading level for the title (the visual size stays fixed at the level-5 spec). A card
+	 * is a subsection of the section heading above it, so the default `3` keeps a page's outline
+	 * sequential under a typical `h2` section — overriding only the HTML tag, never the look.
+	 */
+	titleLevel?: HeadingLevel
 	/** Small caps label shown above the title */
 	label?: string
 	/** Meta info shown below the title, separated by bullets */
@@ -104,6 +110,7 @@ const titleHoverClass = 'group-hover:text-npi-blue-hover'
 
 export const Card = forwardRef<HTMLElement, CardProps>(({
 	title,
+	titleLevel = 3,
 	label,
 	meta,
 	description,
@@ -202,7 +209,7 @@ export const Card = forwardRef<HTMLElement, CardProps>(({
 				)}
 				<div className="flex w-full min-w-0 flex-col items-start gap-npi-4 px-npi-6 pt-npi-6 pb-npi-8 @md:flex-1 @md:p-0">
 					{label && <Text variant="label">{label}</Text>}
-					<Heading level={5} className={clsx(titleClass, href && titleHoverClass)}>
+					<Heading level={titleLevel} visualLevel={5} className={clsx(titleClass, href && titleHoverClass)}>
 						{href
 							? (
 								<Link

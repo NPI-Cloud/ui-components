@@ -332,7 +332,7 @@ function CookieBannerSettings({
 	)
 }
 
-export const CookieBanner = forwardRef<HTMLElement, CookieBannerProps>(({
+export const CookieBanner = forwardRef<HTMLDivElement, CookieBannerProps>(({
 	mode: modeProp,
 	defaultMode = 'banner',
 	title,
@@ -372,7 +372,7 @@ export const CookieBanner = forwardRef<HTMLElement, CookieBannerProps>(({
 	}
 
 	return (
-		<aside
+		<div
 			ref={ref}
 			role="dialog"
 			aria-label={typeof title === 'string' ? title : 'Cookies'}
@@ -411,7 +411,7 @@ export const CookieBanner = forwardRef<HTMLElement, CookieBannerProps>(({
 						closeLabel={closeLabel}
 					/>
 				)}
-		</aside>
+		</div>
 	)
 })
 CookieBanner.displayName = 'CookieBanner'
