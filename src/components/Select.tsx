@@ -236,8 +236,8 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>((props, ref) =>
 		if (selectedValues.length === 0) return null
 		const selectedOptions = options.filter(o => selectedValues.includes(o.value))
 		if (multiple) {
-			if (selectedOptions.length === 1) return selectedOptions[0]?.label
-			return `${selectedOptions.length} vybráno`
+			// Spell out every selected label ("Praha, Brno") rather than a count; the trigger truncates on overflow.
+			return selectedOptions.map((o, i) => <span key={o.value}>{i > 0 && ', '}{o.label}</span>)
 		}
 		return selectedOptions[0]?.label ?? null
 	})()
