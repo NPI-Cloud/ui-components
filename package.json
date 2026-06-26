@@ -29,10 +29,7 @@
 		"LICENSE"
 	],
 	"scripts": {
-		"build": "tsup",
-		"prepare-publish": "node scripts/prepare-publish.mjs",
-		"prepublishOnly": "tsup",
-		"publish:npm": "node scripts/prepare-publish.mjs && bun publish"
+		"build": "tsup"
 	},
 	"publishConfig": {
 		"access": "public",
@@ -67,8 +64,10 @@
 	},
 	"devDependencies": {
 		"@types/react": "catalog:ui-dev",
+		"@types/react-dom": "catalog:ui-dev",
 		"react": "catalog:ui",
 		"react-dom": "catalog:ui",
-		"tsup": "catalog:build"
+		"tsup": "catalog:build",
+		"typescript": "catalog:build"
 	}
 }
