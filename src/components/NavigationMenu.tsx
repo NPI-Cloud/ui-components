@@ -994,18 +994,24 @@ export interface NavigationSubnavGroupProps extends HTMLAttributes<HTMLLIElement
 	heading: ReactNode
 	/** Optional href for the heading. Omit for a non-link heading. */
 	headingHref?: string
+	/** `select` underlines the heading to mark it as the current page. */
+	headingState?: 'default' | 'select'
 }
 
 /** Groups a bold heading with its nested (indented, regular-weight) items. Used inside narrow Subnavs. */
 export const NavigationSubnavGroup = forwardRef<HTMLLIElement, NavigationSubnavGroupProps>(
-	({ heading, headingHref, className, children, ...props }, ref) => {
+	({ heading, headingHref, headingState = 'default', className, children, ...props }, ref) => {
 		const insideDrawer = useContext(InsideDrawerContext)
-		const headingClass = insideDrawer
-			? 'font-normal text-[0.875rem] leading-[20px] text-npi-blue hover:text-npi-blue-dark focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-npi-blue-light rounded-npi-xxs'
-			: 'font-bold text-[1rem] leading-[1.5] text-npi-blue hover:text-npi-blue-dark focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-npi-blue-light'
+		const headingActive = headingState === 'select'
+		const headingClass = clsx(
+			insideDrawer ? 'font-normal text-[0.875rem] leading-[20px]' : 'font-bold text-[1rem] leading-[1.5]',
+			headingActive ? 'text-npi-blue-dark underline decoration-2 underline-offset-4' : 'text-npi-blue hover:text-npi-blue-dark',
+			'focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-npi-blue-light',
+			insideDrawer && 'rounded-npi-xxs',
+		)
 		return (
 			<li ref={ref} className={twMerge(clsx('flex flex-col', insideDrawer ? 'gap-npi-2' : 'gap-npi-3', className))} {...props}>
-				<Link href={headingHref} className={headingClass}>
+				<Link href={headingHref} className={headingClass} aria-current={headingActive ? 'page' : undefined}>
 					{heading}
 				</Link>
 				<ul className="flex flex-col gap-npi-2 pl-npi-4">{children}</ul>
@@ -1016,20 +1022,26 @@ export const NavigationSubnavGroup = forwardRef<HTMLLIElement, NavigationSubnavG
 NavigationSubnavGroup.displayName = 'NavigationSubnavGroup'
 
 /** Nested item used inside a NavigationSubnavGroup — regular weight, indented by the group. */
-export interface NavigationSubnavItemProps extends AnchorHTMLAttributes<HTMLAnchorElement> {}
+export interface NavigationSubnavItemProps extends AnchorHTMLAttributes<HTMLAnchorElement> {
+	/** `select` underlines the link to mark it as the current page. */
+	state?: 'default' | 'select'
+}
 
 export const NavigationSubnavItem = forwardRef<HTMLAnchorElement, NavigationSubnavItemProps>(
-	({ className, children, ...props }, ref) => {
+	({ state = 'default', className, children, ...props }, ref) => {
 		const insideDrawer = useContext(InsideDrawerContext)
+		const isActive = state === 'select'
 		return (
 			<li className="flex">
 				<Link
 					ref={ref}
+					aria-current={isActive ? 'page' : undefined}
 					className={twMerge(
 						clsx(
-							insideDrawer
-								? 'font-normal text-[0.875rem] leading-[20px] text-npi-blue hover:text-npi-blue-dark'
-								: 'font-normal text-[1rem] leading-[1.5] text-npi-blue hover:text-npi-blue-dark',
+							insideDrawer ? 'font-normal text-[0.875rem] leading-[20px]' : 'font-normal text-[1rem] leading-[1.5]',
+							isActive
+								? 'text-npi-blue-dark underline decoration-2 underline-offset-4'
+								: 'text-npi-blue hover:text-npi-blue-dark',
 							'focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-npi-blue-light',
 							className,
 						),
@@ -1141,8 +1153,10 @@ export interface NavigationGroupCell {
 	heading: ReactNode
 	/** Optional click target for the heading. */
 	headingHref?: string
-	/** Indented links shown under the heading. */
-	items: { title: ReactNode; href?: string }[]
+	/** Mark the heading as the current page (underline) — set by the host from the active URL. */
+	headingActive?: boolean
+	/** Indented links shown under the heading. `active` underlines the one that is the current page. */
+	items: { title: ReactNode; href?: string; active?: boolean }[]
 }
 
 export interface NavigationPromoCell {
@@ -1324,9 +1338,9 @@ function NavigationConfiguredCell({ cell }: { cell: NavigationCell }) {
 		)
 	}
 	return (
-		<NavigationSubnavGroup heading={cell.heading} headingHref={cell.headingHref}>
+		<NavigationSubnavGroup heading={cell.heading} headingHref={cell.headingHref} headingState={cell.headingActive ? 'select' : 'default'}>
 			{cell.items.map((item, index) => (
-				<NavigationSubnavItem key={index} href={item.href}>
+				<NavigationSubnavItem key={index} href={item.href} state={item.active ? 'select' : 'default'}>
 					{item.title}
 				</NavigationSubnavItem>
 			))}
