@@ -1,6 +1,6 @@
 {
 	"name": "@npicz/ui-components",
-	"version": "0.0.0",
+	"version": "0.1.0",
 	"description": "NPI design system — React component library: blocks, components, icons, illustrations and design tokens (Tailwind v4).",
 	"license": "MIT",
 	"type": "module",
