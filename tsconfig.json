@@ -1,14 +1,19 @@
 {
-	"extends": ["../../tsconfig.settings.json"],
 	"compilerOptions": {
-		"allowSyntheticDefaultImports": true,
-		"outDir": "./dist",
+		"composite": true,
+		"isolatedModules": true,
+		"emitDeclarationOnly": true,
+		"declaration": true,
+		"module": "esnext",
+		"moduleResolution": "Bundler",
+		"target": "esnext",
+		"lib": ["esnext", "dom", "dom.iterable"],
 		"jsx": "react-jsx",
-		"lib": [
-			"esnext",
-			"dom",
-			"dom.iterable"
-		]
+		"strict": true,
+		"noImplicitAny": true,
+		"skipLibCheck": true,
+		"allowSyntheticDefaultImports": true,
+		"outDir": "./dist"
 	},
 	"include": ["src"]
 }

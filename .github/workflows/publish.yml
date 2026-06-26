@@ -1,0 +1,48 @@
+name: Publish to npm
+
+# Lives at packages/ui-components/.github/workflows/ in the NPI monorepo; splitsh-lite strips the
+# prefix so it sits at the repo root here in the public mirror, where GitHub Actions runs it.
+# Publishes @npicz/ui-components with provenance via npm Trusted Publishing (GitHub OIDC) — no
+# long-lived NPM_TOKEN. Triggered by the version tags the monorepo's mirror sync pushes here.
+#
+# One-time setup on npmjs.com: package @npicz/ui-components → Settings → Trusted Publishing →
+# add GitHub Actions publisher: org NPI-Cloud, repo ui-components, workflow publish.yml.
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  id-token: write # required for OIDC trusted publishing + provenance
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # Trusted Publishing needs npm >= 11.5.1; the runner ships an older npm.
+      - run: npm install -g npm@latest
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.14
+
+      - name: Install
+        run: bun install
+
+      - name: Build
+        run: bun run build
+
+      # Promote publishConfig (main/exports → dist) to top level at publish time only — keeps the
+      # committed package.json on `main: src/index.ts` so the mirror stays a faithful source split.
+      - name: Flatten publishConfig
+        run: node scripts/flatten-publish-config.mjs
+
+      - name: Publish with provenance
+        run: npm publish --provenance --access public

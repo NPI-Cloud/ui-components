@@ -50,12 +50,12 @@
 		}
 	},
 	"dependencies": {
-		"@radix-ui/react-accordion": "catalog:ui",
-		"@radix-ui/react-navigation-menu": "catalog:ui",
-		"@radix-ui/react-slot": "catalog:ui",
-		"class-variance-authority": "catalog:ui",
-		"clsx": "catalog:ui",
-		"tailwind-merge": "catalog:ui"
+		"@radix-ui/react-accordion": "1.2.12",
+		"@radix-ui/react-navigation-menu": "1.2.14",
+		"@radix-ui/react-slot": "1.2.4",
+		"class-variance-authority": "0.7.1",
+		"clsx": "2.1.1",
+		"tailwind-merge": "3.5.0"
 	},
 	"peerDependencies": {
 		"react": ">=19",
@@ -63,11 +63,11 @@
 		"tailwindcss": "^4"
 	},
 	"devDependencies": {
-		"@types/react": "catalog:ui-dev",
-		"@types/react-dom": "catalog:ui-dev",
-		"react": "catalog:ui",
-		"react-dom": "catalog:ui",
-		"tsup": "catalog:build",
-		"typescript": "catalog:build"
+		"@types/react": "19.2.14",
+		"@types/react-dom": "19.2.3",
+		"react": "19.2.5",
+		"react-dom": "19.2.5",
+		"tsup": "8.5.1",
+		"typescript": "6.0.2"
 	}
 }
