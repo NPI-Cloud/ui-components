@@ -15,6 +15,7 @@ export { CardBlock, type CardBlockAspect, cardBlockAspects, type CardBlockProps 
 export { CardOfferBlock, type CardOfferBlockDisplay, type CardOfferBlockMetaItem, type CardOfferBlockProps } from './CardOfferBlock'
 export { ColumnBlock } from './ColumnBlock'
 export { ContactCardBlock, type ContactCardBlockProps } from './ContactCardBlock'
+export { EmbedBlock, type EmbedBlockProps } from './EmbedBlock'
 export {
 	type ContentTemplateAuthor,
 	type ContentTemplateBaseProps,
