@@ -11,10 +11,12 @@ export type ToastTone = (typeof toastTones)[number]
 export interface ToastProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {
 	/** Visual + semantic tone — drives color bar, icon, and aria-live politeness */
 	tone?: ToastTone
-	/** Main message rendered as the toast body */
-	title: string
+	/** Main message rendered as the toast body. Optional when `children` supplies the body. */
+	title?: string
 	/** Optional secondary content rendered below the title */
 	description?: ReactNode
+	/** Replaces the default title/description block entirely — render a fully custom body here. */
+	children?: ReactNode
 	/** Slot for an action button rendered next to the close icon */
 	action?: ReactNode
 	/** When provided, a close button is rendered and this fires on click */
@@ -63,10 +65,11 @@ const toneRole: Record<ToastTone, 'status' | 'alert'> = {
 	error: 'alert',
 }
 
-// Outer shell: 4px radius (`npi-xxs`), drop-shadow with the exact #E0E0E0 colour from Figma
-// (= `npi-gray-200`). This shadow has different blur (25px) than `shadow-npi-m` (45px), so we
-// use an arbitrary drop-shadow that matches the design 1:1.
-const rootClass = 'flex w-full items-stretch rounded-npi-xxs drop-shadow-[0_20px_25px_var(--npi-gray-200)]'
+// Outer shell: 4px radius (`npi-xxs`) with a soft, dark, transparent drop-shadow
+// (`drop-shadow` so it follows the rounded corners and the color bar). Mirrors the
+// design-token shadow family (`--npi-shadow-m`, rgba(0,0,0,~0.1)); a light opaque
+// shadow would read as a white halo on dark backgrounds.
+const rootClass = 'flex w-full items-stretch rounded-npi-xxs drop-shadow-[0_20px_25px_rgba(0,0,0,0.1)]'
 
 // Left color bar: 4px wide, full height of the inner content row.
 const barClass = 'w-npi-1 shrink-0 rounded-l-npi-xxs'
@@ -87,6 +90,7 @@ export const Toast = forwardRef<HTMLDivElement, ToastProps>(({
 	tone = 'info',
 	title,
 	description,
+	children,
 	action,
 	onDismiss,
 	dismissLabel = 'Zavřít',
@@ -105,8 +109,12 @@ export const Toast = forwardRef<HTMLDivElement, ToastProps>(({
 			<div className={contentClass}>
 				<Icon name={toneIconName[tone]} aria-hidden="true" className={clsx('size-6 shrink-0', toneIconClass[tone])} />
 				<div className={textClass}>
-					<p>{title}</p>
-					{description && <div className="mt-npi-1">{description}</div>}
+					{children ?? (
+						<>
+							<p>{title}</p>
+							{description && <div className="mt-npi-1">{description}</div>}
+						</>
+					)}
 				</div>
 				{action && <div className="shrink-0">{action}</div>}
 				{onDismiss && (
