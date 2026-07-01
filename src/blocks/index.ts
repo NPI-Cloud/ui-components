@@ -38,12 +38,16 @@ export { ProfileCardBlock, type ProfileCardBlockOrientation, type ProfileCardBlo
 export { RichTextView, type RichTextReferences } from './RichTextView'
 export { TestimonialBlock, type TestimonialBlockProps, type TestimonialBlockSize } from './TestimonialBlock'
 export {
+	renderRichBlocks,
 	TextBlock,
 	type TextBlockProps,
 	type TextBlockRichAnchor,
+	type TextBlockRichBlock,
 	type TextBlockRichContent,
 	type TextBlockRichInline,
 	type TextBlockRichLeaf,
+	type TextBlockRichList,
+	type TextBlockRichListItem,
 	type TextBlockRichParagraph,
 } from './TextBlock'
 export { VideoBlock, type VideoBlockProps } from './VideoBlock'

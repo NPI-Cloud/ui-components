@@ -3,7 +3,7 @@
 import { Image } from '../components/ui-primitives'
 import type { ReactNode } from 'react'
 import { Accordion, AccordionItem } from '../components/Accordion'
-import { normalizeRichContent, renderRichInlines, type TextBlockRichContent } from './TextBlock'
+import { normalizeRichContent, renderRichBlocks, renderRichInlines, type TextBlockRichContent } from './TextBlock'
 
 export type AccordionBlockSize = 's' | 'm'
 
@@ -38,7 +38,7 @@ export interface AccordionItemBlockProps {
 }
 
 export function AccordionItemBlock({ question, description, avatarSrc, avatarAlt, content, defaultOpen }: AccordionItemBlockProps) {
-	const paragraphs = normalizeRichContent(content)
+	const blocks = normalizeRichContent(content)
 	return (
 		<AccordionItem
 			title={question || 'Titulek'}
@@ -56,10 +56,10 @@ export function AccordionItemBlock({ question, description, avatarSrc, avatarAlt
 				: undefined}
 			defaultOpen={defaultOpen}
 		>
-			{paragraphs
-				? paragraphs.map((paragraph, index) => (
-					<p key={index} className="[&:not(:last-child)]:mb-npi-6">
-						{renderRichInlines(paragraph.children)}
+			{blocks
+				? renderRichBlocks(blocks, (children, key) => (
+					<p key={key} className="[&:not(:last-child)]:mb-npi-4">
+						{renderRichInlines(children)}
 					</p>
 				))
 				: <p className="text-npi-text-secondary">Obsah…</p>}

@@ -10,6 +10,10 @@ type TextBlockVariant = TextSize
 export interface TextBlockRichLeaf {
 	text: string
 	isBold?: boolean
+	isItalic?: boolean
+	// Slate's underline mark key is `isUnderlined` (the bindx-editor default) — keep it as-is so the
+	// renderer reads exactly what the editor writes.
+	isUnderlined?: boolean
 }
 
 export interface TextBlockRichAnchor {
@@ -25,9 +29,22 @@ export interface TextBlockRichParagraph {
 	children: TextBlockRichInline[]
 }
 
+export interface TextBlockRichListItem {
+	type: 'listItem'
+	children: TextBlockRichInline[]
+}
+
+export interface TextBlockRichList {
+	type: 'orderedList' | 'unorderedList'
+	children: TextBlockRichListItem[]
+}
+
+// A top-level node in the rich document: a paragraph or a bullet/numbered list.
+export type TextBlockRichBlock = TextBlockRichParagraph | TextBlockRichList
+
 export interface TextBlockRichContent {
 	formatVersion?: number
-	children: TextBlockRichParagraph[]
+	children: TextBlockRichBlock[]
 }
 
 export interface TextBlockProps {
@@ -43,12 +60,12 @@ const FALLBACK_PARAGRAPH: TextBlockRichParagraph = {
 }
 
 export function TextBlock({ variant, content, boxed }: TextBlockProps) {
-	const paragraphs = normalizeRichContent(content) ?? [FALLBACK_PARAGRAPH]
+	const blocks = normalizeRichContent(content) ?? [FALLBACK_PARAGRAPH]
 	return (
-		<div className={clsx('flex flex-col gap-npi-6', boxed && 'rounded-npi-m bg-npi-bg-light px-npi-12 py-npi-10')}>
-			{paragraphs.map((paragraph, index) => (
-				<Text key={index} variant={variant ?? 'l'}>
-					{renderRichInlines(paragraph.children)}
+		<div className={clsx('flex flex-col gap-npi-4', boxed && 'rounded-npi-m bg-npi-bg-light px-npi-12 py-npi-10')}>
+			{renderRichBlocks(blocks, (children, key) => (
+				<Text key={key} variant={variant ?? 'l'}>
+					{renderRichInlines(children)}
 				</Text>
 			))}
 		</div>
@@ -57,7 +74,7 @@ export function TextBlock({ variant, content, boxed }: TextBlockProps) {
 
 // Shared by every block that stores Slate rich text on `content.data` (Text, AccordionItem body).
 // Returns null for empty/unusable content so each consumer picks its own fallback.
-export function normalizeRichContent(content: TextBlockProps['content']): TextBlockRichParagraph[] | null {
+export function normalizeRichContent(content: TextBlockProps['content']): TextBlockRichBlock[] | null {
 	if (content === null || content === undefined || content === '') return null
 	if (typeof content === 'string') return [{ type: 'paragraph', children: [{ text: content }] }]
 	if (typeof content !== 'object' || !Array.isArray(content.children) || content.children.length === 0) return null
@@ -65,17 +82,41 @@ export function normalizeRichContent(content: TextBlockProps['content']): TextBl
 	return content.children
 }
 
+// True when the document carries no visible text anywhere — walks paragraphs, anchors and list
+// items uniformly so a document of empty list rows still counts as empty.
+function nodeHasText(node: unknown): boolean {
+	if (!node || typeof node !== 'object') return false
+	const rec = node as { text?: unknown; children?: unknown }
+	if (typeof rec.text === 'string' && rec.text.length > 0) return true
+	return Array.isArray(rec.children) && rec.children.some(nodeHasText)
+}
+
 function isEffectivelyEmpty(content: TextBlockRichContent): boolean {
-	for (const paragraph of content.children) {
-		for (const node of paragraph.children) {
-			if ('type' in node) {
-				if (node.children.some(leaf => (leaf.text ?? '').length > 0)) return false
-			} else if ((node.text ?? '').length > 0) {
-				return false
-			}
-		}
-	}
-	return true
+	return !content.children.some(nodeHasText)
+}
+
+// Renders the top-level rich nodes (paragraphs + bullet/numbered lists). `wrapInlines` frames a run
+// of inline content — each caller styles it its own way (the text block wraps it in `<Text
+// variant>`, the accordion in a spaced `<p>`) — and it's reused for both paragraph bodies and
+// list-item bodies so list text matches body text. Lists render as real `<ul>`/`<ol>`.
+export function renderRichBlocks(
+	nodes: TextBlockRichBlock[],
+	wrapInlines: (children: TextBlockRichInline[], key: number) => ReactNode,
+): ReactNode[] {
+	return nodes.map((node, index) => {
+		if (node.type === 'paragraph') return wrapInlines(node.children, index)
+		const ListTag = node.type === 'orderedList' ? 'ol' : 'ul'
+		return (
+			<ListTag
+				key={index}
+				className={clsx('flex flex-col gap-npi-1 pl-5', node.type === 'orderedList' ? 'list-decimal' : 'list-disc')}
+			>
+				{node.children.map((item, itemIndex) => (
+					<li key={itemIndex}>{wrapInlines(item.children, itemIndex)}</li>
+				))}
+			</ListTag>
+		)
+	})
 }
 
 export function renderRichInlines(children: TextBlockRichInline[]): ReactNode {
@@ -110,6 +151,9 @@ function renderLeaf(leaf: TextBlockRichLeaf): ReactNode {
 		if (index > 0) segments.push(<br key={`br-${index}`} />)
 		if (part.length > 0) segments.push(part)
 	})
-	if (leaf.isBold) return <strong>{segments}</strong>
-	return <>{segments}</>
+	let content: ReactNode = <>{segments}</>
+	if (leaf.isBold) content = <strong>{content}</strong>
+	if (leaf.isItalic) content = <em>{content}</em>
+	if (leaf.isUnderlined) content = <u>{content}</u>
+	return content
 }
