@@ -3,7 +3,8 @@
 import { Image } from '../components/ui-primitives'
 import type { ReactNode } from 'react'
 import { Accordion, AccordionItem } from '../components/Accordion'
-import { normalizeRichContent, renderRichBlocks, renderRichInlines, type TextBlockRichContent } from './TextBlock'
+import { clsx } from 'clsx'
+import { normalizeRichContent, renderRichBlocks, renderRichInlines, textBlockAlignClass, type TextBlockRichContent } from './TextBlock'
 
 export type AccordionBlockSize = 's' | 'm'
 
@@ -57,8 +58,8 @@ export function AccordionItemBlock({ question, description, avatarSrc, avatarAlt
 			defaultOpen={defaultOpen}
 		>
 			{blocks
-				? renderRichBlocks(blocks, (children, key) => (
-					<p key={key} className="[&:not(:last-child)]:mb-npi-4">
+				? renderRichBlocks(blocks, (children, key, align) => (
+					<p key={key} className={clsx('[&:not(:last-child)]:mb-npi-4', textBlockAlignClass(align))}>
 						{renderRichInlines(children)}
 					</p>
 				))

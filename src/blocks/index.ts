@@ -40,6 +40,8 @@ export { TestimonialBlock, type TestimonialBlockProps, type TestimonialBlockSize
 export {
 	renderRichBlocks,
 	TextBlock,
+	type TextBlockAlign,
+	textBlockAlignClass,
 	type TextBlockProps,
 	type TextBlockRichAnchor,
 	type TextBlockRichBlock,

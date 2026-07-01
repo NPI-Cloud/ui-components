@@ -24,8 +24,13 @@ export interface TextBlockRichAnchor {
 
 export type TextBlockRichInline = TextBlockRichLeaf | TextBlockRichAnchor
 
+// Block text alignment, stored on the paragraph node (bindx-editor's `align` attribute). `start` is
+// the default (left) so an unset paragraph and an explicit `start` render identically.
+export type TextBlockAlign = 'start' | 'center' | 'end' | 'justify'
+
 export interface TextBlockRichParagraph {
 	type: 'paragraph'
+	align?: TextBlockAlign
 	children: TextBlockRichInline[]
 }
 
@@ -63,8 +68,8 @@ export function TextBlock({ variant, content, boxed }: TextBlockProps) {
 	const blocks = normalizeRichContent(content) ?? [FALLBACK_PARAGRAPH]
 	return (
 		<div className={clsx('flex flex-col gap-npi-4', boxed && 'rounded-npi-m bg-npi-bg-light px-npi-12 py-npi-10')}>
-			{renderRichBlocks(blocks, (children, key) => (
-				<Text key={key} variant={variant ?? 'l'}>
+			{renderRichBlocks(blocks, (children, key, align) => (
+				<Text key={key} variant={variant ?? 'l'} className={textBlockAlignClass(align)}>
 					{renderRichInlines(children)}
 				</Text>
 			))}
@@ -95,16 +100,30 @@ function isEffectivelyEmpty(content: TextBlockRichContent): boolean {
 	return !content.children.some(nodeHasText)
 }
 
+// Tailwind text-align utility for a stored alignment. `undefined` (no alignment) inherits the
+// default left/start, so callers only add a class when an alignment is actually set.
+const ALIGN_CLASS: Record<TextBlockAlign, string> = {
+	start: 'text-start',
+	center: 'text-center',
+	end: 'text-end',
+	justify: 'text-justify',
+}
+
+export function textBlockAlignClass(align: TextBlockAlign | undefined): string | undefined {
+	return align ? ALIGN_CLASS[align] : undefined
+}
+
 // Renders the top-level rich nodes (paragraphs + bullet/numbered lists). `wrapInlines` frames a run
 // of inline content — each caller styles it its own way (the text block wraps it in `<Text
 // variant>`, the accordion in a spaced `<p>`) — and it's reused for both paragraph bodies and
-// list-item bodies so list text matches body text. Lists render as real `<ul>`/`<ol>`.
+// list-item bodies so list text matches body text. Paragraphs pass their alignment through; list
+// items inherit the list's default. Lists render as real `<ul>`/`<ol>`.
 export function renderRichBlocks(
 	nodes: TextBlockRichBlock[],
-	wrapInlines: (children: TextBlockRichInline[], key: number) => ReactNode,
+	wrapInlines: (children: TextBlockRichInline[], key: number, align?: TextBlockAlign) => ReactNode,
 ): ReactNode[] {
 	return nodes.map((node, index) => {
-		if (node.type === 'paragraph') return wrapInlines(node.children, index)
+		if (node.type === 'paragraph') return wrapInlines(node.children, index, node.align)
 		const ListTag = node.type === 'orderedList' ? 'ol' : 'ul'
 		return (
 			<ListTag
