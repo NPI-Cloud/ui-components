@@ -1,3 +1,4 @@
+export * from './anchor'
 export * from './blocks/index'
 export * from './components/index'
 export * from './icons/index'
