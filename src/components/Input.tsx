@@ -114,7 +114,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
 						? 'border-npi-status-error'
 						: disabled
 						? 'border-npi-gray-300 bg-npi-gray-50'
-						: 'border-npi-gray-300 hover:border-npi-text-primary focus-within:border-npi-blue',
+						: 'border-npi-gray-300 [&:hover:not(:focus-within)]:border-npi-text-primary focus-within:border-npi-blue',
 				)}
 			>
 				<input
