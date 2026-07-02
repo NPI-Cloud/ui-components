@@ -198,7 +198,10 @@ export const ProfileCard = forwardRef<HTMLElement, ProfileCardProps>(({
 			className={twMerge(
 				clsx(
 					'flex w-full',
-					isVertical ? 'flex-col items-center text-center' : 'items-start',
+					// Horizontal: stretch the text column to the row height so its own justify-center
+					// centers a short contact block against the taller avatar; when the text is the
+					// taller child it fills the row exactly and stays top-aligned.
+					isVertical ? 'flex-col items-center text-center' : 'items-stretch',
 					'gap-npi-4',
 					className,
 				),
