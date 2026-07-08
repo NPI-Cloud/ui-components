@@ -28,6 +28,10 @@ export interface CardBlockProps {
 	imageUrl?: string | null
 	imageAlt?: string | null
 	aspect?: CardBlockAspect | null
+	/** Stretch the standard card to fill the height of its grid cell. */
+	fillHeight?: boolean
+	/** Clamp the body description to a fixed number of lines. */
+	clampDescription?: 2 | 3 | 4
 	indicator?: CardIndicator | null
 	tagLabel?: string | null
 	tagUrl?: string | null
@@ -61,6 +65,8 @@ export function CardBlock(
 		imageUrl,
 		imageAlt,
 		aspect,
+		fillHeight,
+		clampDescription,
 		indicator,
 		tagLabel,
 		tagUrl,
@@ -82,6 +88,8 @@ export function CardBlock(
 				visual={visual}
 				indicator={indicator ?? undefined}
 				href={href ?? undefined}
+				fillHeight={fillHeight}
+				clampDescription={clampDescription}
 			/>
 		)
 	}
@@ -104,6 +112,8 @@ export function CardBlock(
 			visual={visual}
 			hideVisual={!hasVisualIntent}
 			aspect={resolvedAspect}
+			fillHeight={fillHeight}
+			clampDescription={clampDescription}
 			indicator={indicator ?? undefined}
 			tag={tag}
 			href={href ?? undefined}
