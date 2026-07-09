@@ -110,6 +110,7 @@ export {
 	type NavigationMenuItemsProps,
 	type NavigationMenuItemState,
 	navigationMenuItemStates,
+	type NavigationMenuStyle,
 	type NavigationMenuItemTrailing,
 	navigationMenuItemTrailings,
 	NavigationMenuMobileToggle,

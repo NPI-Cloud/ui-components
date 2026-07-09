@@ -38,6 +38,16 @@ export type NavigationSubnavVariant = (typeof navigationSubnavVariants)[number]
 export const navigationPromoVariants = ['icon', 'cover'] as const
 export type NavigationPromoVariant = (typeof navigationPromoVariants)[number]
 
+export type NavigationMenuStyle = 'spacing' | 'shadow' | 'greyBackground'
+
+const navigationMenuShadowClass = 'shadow-[0_2px_5px_0_rgba(0,0,0,0.12)]'
+const navigationMenuMobileShadowClass = 'max-npi-desktop:shadow-[0_2px_5px_0_rgba(0,0,0,0.12)]'
+const navigationMenuStuckShadowClass = 'data-[stuck]:shadow-[0_2px_5px_0_rgba(0,0,0,0.12)]'
+
+function navigationMenuBackgroundClass(menuStyle: NavigationMenuStyle) {
+	return menuStyle === 'greyBackground' ? 'bg-npi-gray-50' : 'bg-npi-white'
+}
+
 /**
  * Signals to nested `NavigationMenuItem`s that they live inside the Radix NavigationMenu.Root
  * rendered by `NavigationMenuItems`. When `true`, items render as Radix Trigger/Link so hover
@@ -69,10 +79,15 @@ const InsideDrawerGroupContext = createContext(false)
 type MobileState = { open: boolean; toggle: () => void; close: () => void; drawerId: string }
 const MobileContext = createContext<MobileState>({ open: false, toggle: () => {}, close: () => {}, drawerId: '' })
 
-export interface NavigationMenuProps extends HTMLAttributes<HTMLElement> {}
+const NavigationMenuStyleContext = createContext<NavigationMenuStyle>('spacing')
+
+export interface NavigationMenuProps extends HTMLAttributes<HTMLElement> {
+	/** Visual separation between the menu chrome and page content. */
+	menuStyle?: NavigationMenuStyle
+}
 
 export const NavigationMenu = forwardRef<HTMLElement, NavigationMenuProps>(
-	({ className, children, ...props }, ref) => {
+	({ menuStyle = 'spacing', className, children, ...props }, ref) => {
 		const [open, setOpen] = useState(false)
 		const headerRef = useRef<HTMLElement>(null)
 		const drawerId = useId()
@@ -141,28 +156,31 @@ export const NavigationMenu = forwardRef<HTMLElement, NavigationMenuProps>(
 			else if (ref) ref.current = node
 		}
 		return (
-			<MobileContext.Provider value={mobile}>
-				<header
-					ref={setRefs}
-					data-mobile-open={open ? '' : undefined}
-					className={twMerge(
-						clsx(
-							// At mobile the header is a normal flex column with `bg-npi-white`; `data-[mobile-open]`
-							// grows it to viewport height so the absolutely-positioned drawer has room to render.
-							// Inside auto-sizing iframes (showcase) `100dvh` is circular with the iframe's scrollHeight,
-							// so we floor the min-height at 40rem (~typical mobile viewport).
-							// At desktop the header dissolves via `display: contents` so its children (site switcher,
-							// brand bar, items) become direct siblings of the page wrapper. That lets the items bar
-							// sticky-pin to the actual viewport while the bars above scroll away.
-							'relative flex flex-col font-npi-sans bg-npi-white data-[mobile-open]:min-h-[max(40rem,100dvh)] npi-desktop:contents',
-							className,
-						),
-					)}
-					{...props}
-				>
-					{children}
-				</header>
-			</MobileContext.Provider>
+			<NavigationMenuStyleContext.Provider value={menuStyle}>
+				<MobileContext.Provider value={mobile}>
+					<header
+						ref={setRefs}
+						data-mobile-open={open ? '' : undefined}
+						className={twMerge(
+							clsx(
+								// At mobile the header is a normal flex column with its own background; `data-[mobile-open]`
+								// grows it to viewport height so the absolutely-positioned drawer has room to render.
+								// Inside auto-sizing iframes (showcase) `100dvh` is circular with the iframe's scrollHeight,
+								// so we floor the min-height at 40rem (~typical mobile viewport).
+								// At desktop the header dissolves via `display: contents` so its children (site switcher,
+								// brand bar, items) become direct siblings of the page wrapper. That lets the items bar
+								// sticky-pin to the actual viewport while the bars above scroll away.
+								'relative flex flex-col font-npi-sans data-[mobile-open]:min-h-[max(40rem,100dvh)] npi-desktop:contents',
+								navigationMenuBackgroundClass(menuStyle),
+								className,
+							),
+						)}
+						{...props}
+					>
+						{children}
+					</header>
+				</MobileContext.Provider>
+			</NavigationMenuStyleContext.Provider>
 		)
 	},
 )
@@ -225,16 +243,30 @@ NavigationMenuSiteSwitcher.displayName = 'NavigationMenuSiteSwitcher'
 export interface NavigationMenuBarProps extends HTMLAttributes<HTMLDivElement> {}
 
 export const NavigationMenuBar = forwardRef<HTMLDivElement, NavigationMenuBarProps>(
-	({ className, children, ...props }, ref) => (
-		// Outer wrapper provides the full-bleed white backdrop so the bar still has its own background
-		// once the parent `<header>` dissolves at desktop (`npi-desktop:contents`). Inner div keeps the
-		// 1064 px content column with the existing layout.
-		<div ref={ref} className={twMerge(clsx('flex w-full justify-center bg-npi-white', className))} {...props}>
-			<div className="mx-auto flex h-24 w-full max-w-npi-layout items-center justify-between gap-npi-6 px-npi-6">
-				{children}
+	({ className, children, ...props }, ref) => {
+		const menuStyle = useContext(NavigationMenuStyleContext)
+		return (
+			// Outer wrapper provides the full-bleed backdrop so the bar still has its own background
+			// once the parent `<header>` dissolves at desktop (`npi-desktop:contents`). Inner div keeps the
+			// 1064 px content column with the existing layout.
+			<div
+				ref={ref}
+				className={twMerge(
+					clsx(
+						'flex w-full justify-center',
+						navigationMenuBackgroundClass(menuStyle),
+						menuStyle === 'shadow' && navigationMenuMobileShadowClass,
+						className,
+					),
+				)}
+				{...props}
+			>
+				<div className="mx-auto flex h-24 w-full max-w-npi-layout items-center justify-between gap-npi-6 px-npi-6">
+					{children}
+				</div>
 			</div>
-		</div>
-	),
+		)
+	},
 )
 NavigationMenuBar.displayName = 'NavigationMenuBar'
 
@@ -389,6 +421,7 @@ export interface NavigationMenuDrawerProps extends HTMLAttributes<HTMLDivElement
 export const NavigationMenuDrawer = forwardRef<HTMLDivElement, NavigationMenuDrawerProps>(
 	({ className, children, ...props }, ref) => {
 		const { open, drawerId } = useContext(MobileContext)
+		const menuStyle = useContext(NavigationMenuStyleContext)
 		if (!open) return null
 		return (
 			<InsideDrawerContext.Provider value={true}>
@@ -396,7 +429,8 @@ export const NavigationMenuDrawer = forwardRef<HTMLDivElement, NavigationMenuDra
 					ref={ref}
 					className={twMerge(
 						clsx(
-							'absolute inset-x-0 bottom-0 top-24 z-40 flex flex-col gap-npi-6 overflow-y-auto bg-npi-white px-npi-6 pt-npi-2 npi-desktop:hidden',
+							'absolute inset-x-0 bottom-0 top-24 z-40 flex flex-col gap-npi-6 overflow-y-auto px-npi-6 pt-npi-2 npi-desktop:hidden',
+							navigationMenuBackgroundClass(menuStyle),
 							className,
 						),
 					)}
@@ -418,6 +452,7 @@ export const NavigationMenuItems = forwardRef<
 	NavigationMenuItemsProps
 >(({ className, children, ...props }, ref) => {
 	const insideDrawer = useContext(InsideDrawerContext)
+	const menuStyle = useContext(NavigationMenuStyleContext)
 	const [widePortalEl, setWidePortalEl] = useState<HTMLDivElement | null>(null)
 	const [stuck, setStuck] = useState(false)
 	const sentinelRef = useRef<HTMLDivElement>(null)
@@ -462,11 +497,13 @@ export const NavigationMenuItems = forwardRef<
 					clsx(
 						// Full-width sticky bar at desktop: parent header dissolves via `npi-desktop:contents`,
 						// so this Root becomes a direct sibling of the page wrapper and `top-0` resolves against
-						// the actual viewport. White bg + z-index keep page content from showing through.
+						// the actual viewport. Background + z-index keep page content from showing through.
 						// `data-[stuck]` toggles the drop shadow only once the bar pins to the viewport top
 						// (driven by an IntersectionObserver on the sentinel above). Dark, semi-transparent
 						// shadow so it stays visible above light AND dark page surfaces.
-						'relative flex w-full justify-center bg-npi-white max-npi-desktop:hidden npi-desktop:sticky npi-desktop:top-0 npi-desktop:z-30 npi-desktop:transition-shadow data-[stuck]:shadow-[0_2px_5px_0_rgba(0,0,0,0.12)]',
+						'relative flex w-full justify-center max-npi-desktop:hidden npi-desktop:sticky npi-desktop:top-0 npi-desktop:z-30 npi-desktop:transition-shadow',
+						navigationMenuBackgroundClass(menuStyle),
+						menuStyle === 'shadow' ? navigationMenuShadowClass : navigationMenuStuckShadowClass,
 						className,
 					),
 				)}
@@ -1222,6 +1259,8 @@ export interface NavigationProps extends Omit<HTMLAttributes<HTMLElement>, 'chil
 	/** Top dark bar with NPI sites. Hidden when omitted. */
 	siteSwitcher?: NavigationMenuSiteSwitcherProps
 	brand: NavigationBrand
+	/** Visual separation between the menu chrome and page content. */
+	menuStyle?: NavigationMenuStyle
 	/** Search input — when provided, appears in the bar (desktop) and the drawer (mobile). */
 	search?: NavigationSearch
 	/** Primary CTA — appears in the bar (desktop) and as a regular item in the drawer (mobile). */
@@ -1230,12 +1269,12 @@ export interface NavigationProps extends Omit<HTMLAttributes<HTMLElement>, 'chil
 }
 
 export const Navigation = forwardRef<HTMLElement, NavigationProps>((props, ref) => {
-	const { siteSwitcher, brand, search, cta, items, ...rest } = props
+	const { siteSwitcher, brand, menuStyle = 'spacing', search, cta, items, ...rest } = props
 	const itemNodes = items.map((item, index) => <NavigationConfiguredItem key={index} item={item} />)
 	const switcher = siteSwitcher && <NavigationMenuSiteSwitcher {...siteSwitcher} />
 
 	return (
-		<NavigationMenu ref={ref} {...rest}>
+		<NavigationMenu ref={ref} menuStyle={menuStyle} {...rest}>
 			{switcher}
 			<NavigationMenuBar>
 				<NavigationMenuBrand
