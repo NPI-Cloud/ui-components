@@ -159,7 +159,8 @@ export const Card = forwardRef<HTMLElement, CardProps>(({
 				)}
 				{...props}
 			>
-				<div className={clsx('relative flex items-end justify-end bg-npi-blue-dark p-npi-2', aspectClassMap[visualAspect])}>
+				{/* Dark-blue placeholder shows only without a visual — a real image may be transparent (SVG) and must sit on the card white. */}
+				<div className={clsx('relative flex items-end justify-end p-npi-2', visual ? 'bg-npi-white' : 'bg-npi-blue-dark', aspectClassMap[visualAspect])}>
 					{visual}
 					{indicator && (
 						<span className="relative z-10 flex size-10 shrink-0 items-center justify-center rounded-full bg-npi-white p-npi-1 text-npi-blue">
@@ -200,7 +201,9 @@ export const Card = forwardRef<HTMLElement, CardProps>(({
 						: (
 							<div
 								className={clsx(
-									'relative flex items-end justify-end bg-npi-blue-dark p-npi-2',
+									// Dark-blue placeholder shows only without a visual — a real image may be transparent (SVG) and must sit on the card white.
+									'relative flex items-end justify-end p-npi-2',
+									visual ? 'bg-npi-white' : 'bg-npi-blue-dark',
 									// Narrow (S): full-width with caller-provided aspect, no inner radius (clipped by overflow-hidden)
 									'w-full',
 									aspectClassMap[resolvedAspect],
