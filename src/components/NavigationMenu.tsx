@@ -40,8 +40,13 @@ export type NavigationPromoVariant = (typeof navigationPromoVariants)[number]
 
 export type NavigationMenuStyle = 'spacing' | 'shadow' | 'greyBackground'
 
-const navigationMenuShadowClass = 'shadow-[0_2px_5px_0_rgba(0,0,0,0.12)]'
-const navigationMenuMobileShadowClass = 'max-npi-desktop:shadow-[0_2px_5px_0_rgba(0,0,0,0.12)]'
+// The `shadow` menu style per Figma is a soft unoffset halo (0 0 16px #F0F0F0). Expressed as
+// equivalent semi-transparent black (#F0F0F0 over white ≈ 6% black) so it renders identically on
+// white pages but darkens instead of glowing when it lands on dark content (see npi-tokens.css).
+const navigationMenuShadowClass = 'shadow-[0_0_16px_0_rgba(0,0,0,0.06)]'
+const navigationMenuMobileShadowClass = 'max-npi-desktop:shadow-[0_0_16px_0_rgba(0,0,0,0.06)]'
+// Pinned-bar affordance (all menu styles except `shadow`): darker and tighter than the variant
+// halo so it stays visible above both light and dark page surfaces scrolling underneath.
 const navigationMenuStuckShadowClass = 'data-[stuck]:shadow-[0_2px_5px_0_rgba(0,0,0,0.12)]'
 
 function navigationMenuBackgroundClass(menuStyle: NavigationMenuStyle) {
@@ -202,6 +207,7 @@ export interface NavigationMenuSiteSwitcherProps extends HTMLAttributes<HTMLDivE
 
 export const NavigationMenuSiteSwitcher = forwardRef<HTMLDivElement, NavigationMenuSiteSwitcherProps>(
 	({ sites, currentLabel, className, ...props }, ref) => {
+		const menuStyle = useContext(NavigationMenuStyleContext)
 		const inList = sites.some(site => site.label === currentLabel)
 		const resolved = inList ? sites : [{ label: currentLabel, href: '#' }, ...sites]
 
@@ -224,7 +230,12 @@ export const NavigationMenuSiteSwitcher = forwardRef<HTMLDivElement, NavigationM
 									className={clsx(
 										'inline-flex items-center whitespace-nowrap transition-colors focus-visible:outline-none',
 										isCurrent
-											? '-mx-npi-4 -mt-1.5 -mb-npi-3 rounded-t-npi-xxs bg-npi-white px-npi-4 pt-1.5 pb-npi-3 text-npi-blue-dark'
+											? clsx(
+												// The active tab visually continues the menu surface below, so it takes the
+												// menu style's background (grey in the greyBackground variant, white otherwise).
+												'-mx-npi-4 -mt-1.5 -mb-npi-3 rounded-t-npi-xxs px-npi-4 pt-1.5 pb-npi-3 text-npi-blue-dark',
+												navigationMenuBackgroundClass(menuStyle),
+											)
 											: 'text-npi-white hover:text-npi-white/80 focus-visible:shadow-[0_3px_0_0_currentColor]',
 									)}
 								>
@@ -249,11 +260,15 @@ export const NavigationMenuBar = forwardRef<HTMLDivElement, NavigationMenuBarPro
 			// Outer wrapper provides the full-bleed backdrop so the bar still has its own background
 			// once the parent `<header>` dissolves at desktop (`npi-desktop:contents`). Inner div keeps the
 			// 1064 px content column with the existing layout.
+			// At desktop the bar must stack above the items bar (z-30): the `shadow` menu style casts a
+			// permanent box-shadow whose blur extends a few px above the items bar, and without this the
+			// bleed paints over the bar's bottom edge as a grey seam. The two never overlap on screen —
+			// the items bar only sticks after this bar has scrolled out of the viewport.
 			<div
 				ref={ref}
 				className={twMerge(
 					clsx(
-						'flex w-full justify-center',
+						'flex w-full justify-center npi-desktop:relative npi-desktop:z-40',
 						navigationMenuBackgroundClass(menuStyle),
 						menuStyle === 'shadow' && navigationMenuMobileShadowClass,
 						className,
