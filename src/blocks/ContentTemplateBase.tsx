@@ -1,9 +1,10 @@
 'use client'
 
-import { Image, Link } from '../components/ui-primitives'
+import { Image } from '../components/ui-primitives'
 import { clsx } from 'clsx'
 import { type ReactNode, useEffect, useRef, useState } from 'react'
 import { Breadcrumbs, type BreadcrumbsItem } from '../components/Breadcrumbs'
+import { IconGroup } from '../components/IconGroup'
 import { Text } from '../components/Text'
 import { Icon, type IconName } from '../icons'
 import { MediaBlock } from './MediaBlock'
@@ -129,21 +130,10 @@ export function ContentTemplateShareRow({ share }: { share: ContentTemplateShare
 
 	return (
 		<div className="flex flex-wrap items-center gap-x-npi-12 gap-y-npi-4">
-			<div className="flex items-center gap-npi-4">
-				<Text variant="l">Sdílet</Text>
-				{SOCIAL_SHARES.map(({ iconName, label, url }) => (
-					<Link
-						key={iconName}
-						href={url(share.url)}
-						target="_blank"
-						rel="noreferrer noopener"
-						aria-label={label}
-						className="inline-flex size-8 items-center justify-center rounded-npi-xxs text-npi-blue transition-colors hover:text-npi-blue-hover focus-visible:outline-none focus-visible:shadow-[0_0_0_2px_var(--npi-blue-light)]"
-					>
-						<Icon name={iconName} size="m" className="size-8" aria-hidden="true" />
-					</Link>
-				))}
-			</div>
+			<IconGroup
+				label="Sdílet"
+				items={SOCIAL_SHARES.map(({ iconName, label, url }) => ({ icon: iconName, href: url(share.url), label, target: '_blank' }))}
+			/>
 			<button
 				type="button"
 				onClick={handleCopy}
