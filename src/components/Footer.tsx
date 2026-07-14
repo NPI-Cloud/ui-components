@@ -146,6 +146,7 @@ FooterSocials.displayName = 'FooterSocials'
  * icon-only links' accessible label, so editors don't hand-type one per row.
  */
 const SOCIAL_LABELS: Record<string, string> = {
+	applePodcasts: 'Apple Podcasts',
 	facebook: 'Facebook',
 	instagram: 'Instagram',
 	linkedIn: 'LinkedIn',

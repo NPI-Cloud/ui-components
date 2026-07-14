@@ -66,6 +66,7 @@ export {
 	type FooterSocialsProps,
 } from './Footer'
 export { Heading, type HeadingLevel, headingLevels, type HeadingProps, type HeadingSpec, headingSpecs } from './Heading'
+export { IconGroup, type IconGroupItem, type IconGroupProps } from './IconGroup'
 export { Input, type InputProps } from './Input'
 export { Lightbox, type LightboxImage, type LightboxProps } from './Lightbox'
 export {
