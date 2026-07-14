@@ -344,7 +344,10 @@ export const NavigationMenuSearch = forwardRef<HTMLInputElement, NavigationMenuS
 				onSubmit?.(String(formData.get('q') ?? ''))
 			}}
 		>
+			{/* key: uncontrolled input — re-seed when the caller's defaultValue changes (e.g. a new
+			    query landed via client-side navigation); in-progress typing keeps it (same key). */}
 			<input
+				key={String(defaultValue ?? '')}
 				ref={ref}
 				type="search"
 				name="q"
@@ -1261,6 +1264,8 @@ export interface NavigationSearch {
 	label: string
 	placeholder?: string
 	submitLabel?: string
+	/** Pre-filled query — e.g. the active `?q=` on a search results page, so the bar stays in sync. */
+	defaultValue?: string
 	onSubmit?: (value: string) => void
 }
 
@@ -1303,6 +1308,7 @@ export const Navigation = forwardRef<HTMLElement, NavigationProps>((props, ref) 
 						label={search.label}
 						placeholder={search.placeholder}
 						submitLabel={search.submitLabel}
+						defaultValue={search.defaultValue}
 						onSubmit={search.onSubmit}
 						className="max-npi-desktop:hidden"
 					/>
@@ -1324,6 +1330,7 @@ export const Navigation = forwardRef<HTMLElement, NavigationProps>((props, ref) 
 						label={search.label}
 						placeholder={search.placeholder}
 						submitLabel={search.submitLabel}
+						defaultValue={search.defaultValue}
 						onSubmit={search.onSubmit}
 					/>
 				)}
