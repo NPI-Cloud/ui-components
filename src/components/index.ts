@@ -160,6 +160,8 @@ export { type ProgressStep, ProgressSteps, type ProgressStepsProps, type Progres
 export { Radio, type RadioProps, type RadioSize, radioSizes } from './Radio'
 export { Rating, type RatingProps } from './Rating'
 export { Scrollbar, type ScrollbarDirection, scrollbarDirections, type ScrollbarProps } from './Scrollbar'
+export { SearchBar, type SearchBarProps } from './SearchBar'
+export { type HighlightSegment, SearchResultItem, type SearchResultItemProps } from './SearchResultItem'
 export { Select, type SelectOption, type SelectProps, type SelectSize, selectSizes, type SelectVariant, selectVariants } from './Select'
 export { Slider, type SliderProps, type SliderSize, sliderSizes } from './Slider'
 export { StatusIndicator, type StatusIndicatorProps, type StatusIndicatorTone, statusIndicatorTones } from './StatusIndicator'
