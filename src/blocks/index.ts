@@ -29,6 +29,7 @@ export {
 export { FlexEndBlock } from './FlexEndBlock'
 export { FlexStartBlock, type FlexStartBlockProps } from './FlexStartBlock'
 export { HeadingBlock, type HeadingBlockLevel, type HeadingBlockProps } from './HeadingBlock'
+export { IconGroupBlock, type IconGroupBlockItem, type IconGroupBlockProps } from './IconGroupBlock'
 export { HeroBlock, type HeroBlockProps, type HeroSize, heroSizes } from './HeroBlock'
 export { MapBlock, type MapBlockMode, type MapBlockProps, type MapBlockRegion } from './MapBlock'
 export { MediaBlock, type MediaBlockAspect, mediaBlockAspects, type MediaBlockFit, mediaBlockFits, type MediaBlockProps } from './MediaBlock'
