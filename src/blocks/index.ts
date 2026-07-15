@@ -40,6 +40,7 @@ export { ProfileCardBlock, type ProfileCardBlockOrientation, type ProfileCardBlo
 export { RichTextView, type RichTextReferences } from './RichTextView'
 export { TabsBlock, type TabsBlockProps, type TabsBlockTab, tabsBlockTabFallbackTitle, type TabsBlockVariant, tabsBlockVariants } from './TabsBlock'
 export { TabsEndBlock, TabsStartBlock } from './TabsMarkerBlocks'
+export { TagGroupBlock, type TagGroupBlockItem, type TagGroupBlockProps } from './TagGroupBlock'
 export { TestimonialBlock, type TestimonialBlockProps, type TestimonialBlockSize } from './TestimonialBlock'
 export {
 	renderRichBlocks,
