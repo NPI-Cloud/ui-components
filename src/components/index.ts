@@ -205,6 +205,7 @@ export {
 	tableSortDirections,
 } from './Table'
 export { Tag, type TagProps, type TagSize, tagSizes } from './Tag'
+export { TagGroup, type TagGroupItem, type TagGroupProps } from './TagGroup'
 export { Testimonial, type TestimonialProps, type TestimonialSize, testimonialSizes } from './Testimonial'
 export { Text, type TextProps, type TextSize, type TextSpec, textSpecs, textVariants, type TextWeight, textWeights } from './Text'
 export { Toast, type ToastProps, type ToastTone, toastTones } from './Toast'
