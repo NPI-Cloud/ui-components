@@ -10,8 +10,9 @@ export interface TagGroupBlockProps {
 	items?: TagGroupBlockItem[] | null
 }
 
-// Editor-canvas placeholder shown when no items are supplied — the admin has no Typesense access,
-// so the live-data block previews with a representative sample instead of the real facet counts.
+// Editor-canvas placeholder shown when no items are supplied (`items == null`) — the live-data
+// `formatTagGroup` canvas has no Typesense access, and a manual `tagGroup` with no rows yet
+// previews the same representative sample instead of a blank block.
 const placeholderItems: TagGroupItem[] = [
 	{ label: 'Webinář (243)', href: '#' },
 	{ label: 'Kurz (81)', href: '#' },
@@ -23,7 +24,8 @@ const placeholderItems: TagGroupItem[] = [
 export function TagGroupBlock({ items }: TagGroupBlockProps) {
 	const resolved: TagGroupItem[] = (items ?? [])
 		.filter((item): item is TagGroupBlockItem & { label: string } => Boolean(item.label))
-		.map(item => ({ label: item.label, href: item.href || '#' }))
+		// A row without a link renders as a plain (non-anchor) tag rather than a dead `#` link.
+		.map(item => ({ label: item.label, href: item.href || undefined }))
 
 	if (items == null) return <TagGroup items={placeholderItems} />
 	if (resolved.length === 0) return null
