@@ -73,7 +73,9 @@ const rootClass = 'flex w-full flex-col overflow-hidden gap-npi-8 px-npi-6 pt-np
 	+ '@md:flex-row @md:items-center @md:gap-npi-8 @md:p-npi-12 '
 	+ '@4xl:gap-npi-14 @4xl:px-npi-16 @4xl:py-npi-12 @4xl:rounded-npi-l'
 
-const visualClass = 'relative flex items-end justify-end overflow-hidden rounded-npi-xxs bg-npi-blue-lighter p-npi-2 '
+// bg-npi-blue-lighter is a placeholder for the empty visual box only — real content
+// (incl. transparent SVGs/PNGs) must sit on the banner tone, so it's applied conditionally below.
+const visualClass = 'relative flex items-end justify-end overflow-hidden rounded-npi-xxs p-npi-2 '
 	+ 'w-full aspect-[4/3] '
 	+ '@md:w-npi-30 @md:h-[180px] @md:aspect-auto @md:shrink-0 '
 	+ '@4xl:w-[340px] @4xl:h-[255px]'
@@ -190,7 +192,7 @@ export const Banner = forwardRef<HTMLElement, BannerProps>(({
 					)}
 				</div>
 				{!hideVisual && (
-					<div className={visualClass}>
+					<div className={clsx(visualClass, !visual && 'bg-npi-blue-lighter')}>
 						{visual}
 						{indicator && (
 							<span className="absolute bottom-npi-2 right-npi-2 flex size-10 shrink-0 items-center justify-center rounded-full bg-npi-white p-npi-1 text-npi-blue">
