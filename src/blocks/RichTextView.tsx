@@ -67,7 +67,8 @@ function renderLeaf(leaf: SlateText, key: number): ReactNode {
 
 function renderNode(node: SlateNode, key: number, references: RichTextReferences): ReactNode {
 	if (isText(node)) return renderLeaf(node, key)
-	const children = node.children.map((child, i) => renderNode(child, i, references))
+	// Element nodes come from free-form JSON and can lack `children` — render them empty, don't crash.
+	const children = (Array.isArray(node.children) ? node.children : []).map((child, i) => renderNode(child, i, references))
 	switch (node.type) {
 		case 'paragraph':
 			return <p key={key} className="my-npi-4 leading-relaxed">{children}</p>

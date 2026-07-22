@@ -84,7 +84,19 @@ export function normalizeRichContent(content: TextBlockProps['content']): TextBl
 	if (typeof content === 'string') return [{ type: 'paragraph', children: [{ text: content }] }]
 	if (typeof content !== 'object' || !Array.isArray(content.children) || content.children.length === 0) return null
 	if (isEffectivelyEmpty(content)) return null
-	return content.children
+	return content.children.map(sanitizeBlock)
+}
+
+// Stored documents are free-form JSON, so a node can arrive without its `children` array even
+// though the types declare it required (seen in prod: a list item saved without children took down
+// the whole page-editor route). Coerce every level to the declared shape so the renderers can
+// trust it — a malformed node renders empty instead of crashing.
+function sanitizeBlock(node: TextBlockRichBlock): TextBlockRichBlock {
+	if (node.type !== 'paragraph') {
+		const items = Array.isArray(node.children) ? node.children : []
+		return { ...node, children: items.map(item => (Array.isArray(item.children) ? item : { ...item, children: [] })) }
+	}
+	return Array.isArray(node.children) ? node : { ...node, children: [] }
 }
 
 // True when the document carries no visible text anywhere — walks paragraphs, anchors and list
@@ -143,7 +155,7 @@ export function renderRichInlines(children: TextBlockRichInline[]): ReactNode {
 		if ('type' in node && node.type === 'anchor') {
 			return (
 				<Link key={index} href={node.href} className="text-npi-blue underline">
-					{renderLeaves(node.children)}
+					{renderLeaves(Array.isArray(node.children) ? node.children : [])}
 				</Link>
 			)
 		}
