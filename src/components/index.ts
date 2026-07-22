@@ -143,6 +143,18 @@ export {
 	navigationSubnavVariants,
 } from './NavigationMenu'
 export { Pagination, type PaginationProps, type PaginationVariant, paginationVariants } from './Pagination'
+// Pure, server-safe pagination helpers/classes — for building a framework-specific (e.g. Next Link)
+// pagination nav that shares the design-system look.
+export {
+	buildPageItems,
+	ELLIPSIS,
+	navButtonIconBase,
+	navButtonTextBase,
+	numberCellBase,
+	numberCellIdle,
+	numberCellSelected,
+	type PageItem,
+} from './pagination-shared'
 export {
 	ContactCard,
 	type ContactCardProps,
