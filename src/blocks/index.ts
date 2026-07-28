@@ -34,7 +34,7 @@ export { HeroBlock, type HeroBlockProps, type HeroSize, heroSizes } from './Hero
 export { JobPositionsBlock, type JobPositionsBlockItem, type JobPositionsBlockProps } from './JobPositionsBlock'
 export { MapBlock, type MapBlockMode, type MapBlockProps, type MapBlockRegion } from './MapBlock'
 export { MediaBlock, type MediaBlockAspect, mediaBlockAspects, type MediaBlockFit, mediaBlockFits, type MediaBlockProps } from './MediaBlock'
-export { NavCardBlock, type NavCardBlockProps, type NavCardBlockSize } from './NavCardBlock'
+export { type NavCardBlockBackground, NavCardBlock, type NavCardBlockProps, type NavCardBlockSize } from './NavCardBlock'
 export { NotFoundPage, type NotFoundPageProps, type NotFoundPageTheme, notFoundPageThemes } from './NotFoundPage'
 export { type PodcastPlatformIcon, type PodcastPlatformLink, PodcastTemplate, type PodcastTemplateProps } from './PodcastTemplate'
 export { ProfileCardBlock, type ProfileCardBlockOrientation, type ProfileCardBlockProps, type ProfileCardBlockSize } from './ProfileCardBlock'
