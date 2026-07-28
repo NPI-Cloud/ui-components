@@ -13,6 +13,10 @@
 		"noImplicitAny": true,
 		"skipLibCheck": true,
 		"allowSyntheticDefaultImports": true,
+		// `bun` for the co-located *.test.ts files. Naming any type package here turns OFF automatic
+		// @types inclusion, which is why the Google Maps globals come in through the explicit
+		// `src/google-maps.d.ts` reference rather than being picked up implicitly.
+		"types": ["bun"],
 		"outDir": "./dist"
 	},
 	"include": ["src"]

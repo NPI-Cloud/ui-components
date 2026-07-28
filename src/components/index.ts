@@ -86,6 +86,9 @@ export {
 	type MapAddressPhone,
 	type MapAddressProps,
 } from './MapAddress'
+export { type MapsConfig, MapsConfigProvider, useMapsConfig } from './map-config'
+export { type FacadeMarker, MapFacade, type MapFacadeProps } from './MapFacade'
+export { MAP_PIN_DATA_URI, MAP_PIN_HEIGHT, MAP_PIN_WIDTH, MapPin } from './MapPin'
 export { Modal, type ModalProps } from './Modal'
 export { NavCard, type NavCardBackground, navCardBackgrounds, type NavCardProps, type NavCardSize, navCardSizes } from './NavCard'
 export {

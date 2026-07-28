@@ -1,10 +1,21 @@
 'use client'
 
-import { Image, Link } from './ui-primitives'
 import { clsx } from 'clsx'
-import { forwardRef, type ReactNode } from 'react'
+import { forwardRef, lazy, type ReactNode, Suspense, useState } from 'react'
 import { twMerge } from 'tailwind-merge'
 import { Icon } from '../icons'
+import type { LatLng } from '../utils/static-map'
+import { type FacadeMarker, MapFacade } from './MapFacade'
+import { MapPin } from './MapPin'
+import { useMapsConfig } from './map-config'
+import { Image, Link } from './ui-primitives'
+
+// Lazy so neither the Maps JS loader nor the canvas code lands in the initial bundle — a pageview
+// that never activates the map must not pay for it in bytes or in Dynamic Maps loads.
+const GoogleMapCanvas = lazy(() => import('./GoogleMapCanvas'))
+
+/** Zoom of the live map, and therefore of the static facade that stands in for it. Street level: the block answers "where is this address". */
+const LIVE_ZOOM = 15
 
 export interface MapAddressLocation {
 	/** Street and house number, e.g. "Senovážné náměstí 25". */
@@ -34,14 +45,29 @@ export interface MapAddressProps extends Omit<React.HTMLAttributes<HTMLElement>,
 	/** Phone number (string or `{ number, note }`) — rendered with the receiver icon, link-coloured number. */
 	phone?: string | MapAddressPhone
 	/**
-	 * URL of a static map image rendered inside the map container as the background.
-	 * The component is a layout shell — supply your own static map (Mapy.cz / OSM / Google Static Maps).
+	 * Coordinates of the pin. With them the map box becomes a real Google map: a cached static preview
+	 * that boots the live, pannable map on click. Without them it stays a flat panel with a decorative
+	 * centre pin — which is also what you get if the host injected no `MapsConfigProvider`.
+	 */
+	center?: LatLng | null
+	/** Overrides the street-level default zoom (15). Applies to the preview and the live map alike. */
+	zoom?: number | null
+	/**
+	 * Set false to render the map as a picture that never activates — the editor canvas uses this so a
+	 * click selects the block instead of booting (and billing) a live map.
+	 */
+	interactive?: boolean
+	/** Accessible name of the activation control. */
+	activateLabel?: string
+	/**
+	 * URL of a static map image rendered inside the map container as the background. An escape hatch
+	 * for a map that is not Google's — ignored once `center` is set.
 	 */
 	mapImageSrc?: string
 	/** Alt text for the map image. */
 	mapAlt?: string
 	/**
-	 * Custom node rendered inside the map container — takes precedence over `mapImageSrc`.
+	 * Custom node rendered inside the map container — takes precedence over `center` and `mapImageSrc`.
 	 * Use for a full custom map embed (`<iframe>`, Leaflet container, etc.).
 	 */
 	mapSlot?: ReactNode
@@ -58,35 +84,13 @@ export interface MapAddressProps extends Omit<React.HTMLAttributes<HTMLElement>,
 	cardClassName?: string
 }
 
-// Pin marker — npi-blue teardrop with a hollow white circle in the bulb (Figma 7295:3234 "Pin").
-// Geometry copied verbatim from Figma: path3 (teardrop, 7295:3231) is flipped vertically so the point
-// hangs down, and path4 (white hole, 7295:3232) is a r=8.63 circle centred in the upper bulb at (14.75, 14.75).
-// Rendered absolutely inside the map container with the tip at the visual anchor (use `-translate-y-full`).
-function MapPin({ className }: { className?: string }): React.ReactElement {
-	return (
-		<svg
-			aria-hidden
-			width="30"
-			height="40"
-			viewBox="0 0 29.5072 40"
-			fill="none"
-			xmlns="http://www.w3.org/2000/svg"
-			className={className}
-		>
-			<path
-				transform="matrix(1 0 0 -1 0 40)"
-				d="M25.8012 14.264C23.0442 10.189 14.7536 0 14.7536 0C14.7536 0 6.46299 10.189 3.70609 14.264C-1.72364 22.2896 -0.988334 30.1982 4.61257 35.7992C7.41305 38.5999 11.0833 40 14.7536 40C18.4239 40 22.0942 38.5999 24.8946 35.7992C30.4956 30.1982 31.2309 22.2896 25.8012 14.264Z"
-				fill="currentColor"
-			/>
-			<circle cx="14.7536" cy="14.7531" r="8.6305" fill="white" />
-		</svg>
-	)
-}
-
 // Layout switches on the component's own width (it owns the `@container` below): the card is stacked
 // below the map on narrow containers and overlaid on the map's left edge from the `@npi-tablet` (768px)
 // container breakpoint up. No manual orientation — it adapts to the space it's given.
 const wrapperClass = 'relative flex w-full flex-col items-stretch gap-npi-6 @npi-tablet:block'
+// `relative` + a size that does not depend on children is what makes the facade → live-map swap
+// seamless: both layers are absolutely positioned inside this box, so activating one cannot reflow
+// the page.
 const mapClass = 'relative w-full overflow-hidden rounded-npi-s bg-npi-bg-light'
 // Full-width in flow below the map when narrow; from @npi-tablet up it becomes an absolute overlay
 // inset 24px from the map's top-left (Figma 7292:748 — 302px card), shrunk to its content so it stays
@@ -99,6 +103,10 @@ export const MapAddress = forwardRef<HTMLElement, MapAddressProps>((props, ref) 
 		address,
 		email,
 		phone,
+		center,
+		zoom,
+		interactive = true,
+		activateLabel = 'Zobrazit mapu',
 		mapImageSrc,
 		mapAlt = '',
 		mapSlot,
@@ -109,11 +117,42 @@ export const MapAddress = forwardRef<HTMLElement, MapAddressProps>((props, ref) 
 		...rest
 	} = props
 
+	const { apiKey } = useMapsConfig()
+	const [isLive, setIsLive] = useState(false)
+
 	const phoneObj: MapAddressPhone | undefined = typeof phone === 'string' ? { number: phone } : phone
 
 	const cityLine = address.zip ? `${address.zip} ${address.city}` : address.city
 
-	const mapNode = mapSlot ?? (mapImageSrc
+	const liveZoom = zoom ?? LIVE_ZOOM
+	// One pin, on the address itself. `id` is stable so the live map does not rebuild on re-render.
+	const markers: FacadeMarker[] = center ? [{ id: 'address', lat: center.lat, lng: center.lng }] : []
+	// Activating costs a Dynamic Maps load, so only offer it when there is a key to load with and the
+	// host actually wants interaction (the editor canvas does not).
+	const canActivate = Boolean(center && apiKey && interactive)
+
+	const mapNode = mapSlot ?? (center
+		? (
+			<>
+				{/* The facade deliberately stays mounted UNDER the live map: the Maps canvas is opaque once
+				    painted, so during its ~300–800 ms load the visitor keeps seeing the preview instead of
+				    a blank box. */}
+				<MapFacade
+					center={center}
+					liveZoom={liveZoom}
+					markers={markers}
+					active={isLive}
+					onActivate={canActivate ? () => setIsLive(true) : undefined}
+					label={activateLabel}
+				/>
+				{isLive && apiKey && (
+					<Suspense fallback={null}>
+						<GoogleMapCanvas center={center} zoom={liveZoom} markers={markers} apiKey={apiKey} className="absolute inset-0 size-full" />
+					</Suspense>
+				)}
+			</>
+		)
+		: mapImageSrc
 		? (
 			<Image
 				src={mapImageSrc}
@@ -143,8 +182,11 @@ export const MapAddress = forwardRef<HTMLElement, MapAddressProps>((props, ref) 
 					)}
 				>
 					{mapNode}
-					{/* Pin overlay — centered on the map. Hidden when a custom mapSlot owns the visual. */}
-					{!mapSlot && <MapPin className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-full text-npi-blue" />}
+					{/* Decorative centre pin for the map-less panel. A real map draws its own pin at the
+					    actual coordinates, so it must not be doubled here. */}
+					{!mapSlot && !center && (
+						<MapPin className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-full text-npi-blue" />
+					)}
 				</div>
 
 				<article

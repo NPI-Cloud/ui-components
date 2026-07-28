@@ -32,6 +32,7 @@ export { HeadingBlock, type HeadingBlockLevel, type HeadingBlockProps } from './
 export { IconGroupBlock, type IconGroupBlockItem, type IconGroupBlockProps } from './IconGroupBlock'
 export { HeroBlock, type HeroBlockProps, type HeroSize, heroSizes } from './HeroBlock'
 export { JobPositionsBlock, type JobPositionsBlockItem, type JobPositionsBlockProps } from './JobPositionsBlock'
+export { MapAddressBlock, type MapAddressBlockProps } from './MapAddressBlock'
 export { MapBlock, type MapBlockMode, type MapBlockProps, type MapBlockRegion } from './MapBlock'
 export { MediaBlock, type MediaBlockAspect, mediaBlockAspects, type MediaBlockFit, mediaBlockFits, type MediaBlockProps } from './MediaBlock'
 export { type NavCardBlockBackground, NavCardBlock, type NavCardBlockProps, type NavCardBlockSize } from './NavCardBlock'
