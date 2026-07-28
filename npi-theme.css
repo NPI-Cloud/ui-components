@@ -118,6 +118,7 @@
 	/* NPI Shadows — namespaced, does not override Tailwind defaults */
 	--shadow-npi-s: var(--npi-shadow-s);
 	--shadow-npi-s-hover: var(--npi-shadow-s-hover);
+	--shadow-npi-sm: var(--npi-shadow-sm);
 	--shadow-npi-m: var(--npi-shadow-m);
 	--shadow-npi-m-hover: var(--npi-shadow-m-hover);
 
