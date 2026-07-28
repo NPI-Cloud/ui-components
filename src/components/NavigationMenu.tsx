@@ -201,15 +201,35 @@ export interface NavigationMenuSiteSwitcherSite {
 export interface NavigationMenuSiteSwitcherProps extends HTMLAttributes<HTMLDivElement> {
 	/** Ordered list of NPI sites. Order should be stable across sites. */
 	sites: NavigationMenuSiteSwitcherSite[]
-	/** Label of the currently-active site. When it's in `sites`, that tab is highlighted. When absent, the current site is prepended as the first tab. */
-	currentLabel: string
+	/** Domain of the currently-active site (`npi.cz`, `mojeedu.npi.cz`, …). The entry pointing at the
+	 * same host is highlighted; when no entry does, no tab is highlighted. The list is never extended
+	 * with the current site — it is a curated list. */
+	currentDomain?: string | null
+}
+
+/**
+ * Host of a site-switcher target, used to tell which entry is the site being visited. Accepts both a
+ * bare domain (`npi.cz`) and a full URL (`https://www.npi.cz/kurzy`); `www.` and case are
+ * insignificant. Targets that name no host (`/kurzy`, `#`) belong to no site and never match.
+ */
+function siteHost(value: string | null | undefined): string | null {
+	const raw = value?.trim()
+	if (!raw || raw.startsWith('/') || raw.startsWith('#') || raw.startsWith('?')) return null
+	try {
+		const { hostname } = new URL(/^[a-z][a-z0-9+.-]*:\/\//i.test(raw) ? raw : `https://${raw}`)
+		return hostname.toLowerCase().replace(/\.$/, '').replace(/^www\./, '') || null
+	} catch {
+		return null
+	}
 }
 
 export const NavigationMenuSiteSwitcher = forwardRef<HTMLDivElement, NavigationMenuSiteSwitcherProps>(
-	({ sites, currentLabel, className, ...props }, ref) => {
+	({ sites, currentDomain, className, ...props }, ref) => {
 		const menuStyle = useContext(NavigationMenuStyleContext)
-		const inList = sites.some(site => site.label === currentLabel)
-		const resolved = inList ? sites : [{ label: currentLabel, href: '#' }, ...sites]
+		const currentHost = siteHost(currentDomain)
+
+		// Nothing curated — the strip would be an empty dark band, so it collapses instead.
+		if (sites.length === 0) return null
 
 		return (
 			<div
@@ -220,8 +240,8 @@ export const NavigationMenuSiteSwitcher = forwardRef<HTMLDivElement, NavigationM
 				{...props}
 			>
 				<ul className="mx-auto flex max-w-npi-layout items-center gap-npi-10 px-npi-6">
-					{resolved.map(site => {
-						const isCurrent = site.label === currentLabel
+					{sites.map(site => {
+						const isCurrent = currentHost !== null && siteHost(site.href) === currentHost
 						return (
 							<li key={site.label} className="flex">
 								<Link
