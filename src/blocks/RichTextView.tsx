@@ -2,6 +2,7 @@
 
 import { Link } from '../components/ui-primitives'
 import { Fragment, type ReactNode } from 'react'
+import { Accordion, AccordionItem } from '../components/Accordion'
 import { DownloadButton, type DownloadVariant } from '../components/DownloadButton'
 import { Heading, type HeadingLevel } from '../components/Heading'
 import { BigNumberBlock } from './BigNumberBlock'
@@ -94,6 +95,17 @@ function renderNode(node: SlateNode, key: number, references: RichTextReferences
 				</Link>
 			)
 		}
+		case 'accordion':
+			// Collapsible section (typically "Použité zdroje"): children are ordinary rich-text
+			// blocks behind a boxed accordion header, collapsed by default. First/last child
+			// margins are zeroed so the item padding alone frames the content.
+			return (
+				<Accordion key={key} variant="boxed">
+					<AccordionItem title={asString(node.title) || 'Více informací'}>
+						<div className="[&>:first-child]:mt-0 [&>:last-child]:mb-0">{children}</div>
+					</AccordionItem>
+				</Accordion>
+			)
 		case 'calloutBox':
 			// "Kam dál"-style tinted box: children are ordinary rich-text blocks, the box only paints
 			// the surface — 40px padding, 24px radius per design. First/last child margins are zeroed
@@ -191,7 +203,7 @@ function renderNode(node: SlateNode, key: number, references: RichTextReferences
 // Embedded media/widget blocks sit at the 48px article rhythm (`npi-12`) from their neighbours.
 // Text elements (paragraph / heading / list) carry their own collapsing margins; these don't, so
 // the top-level map frames them. The gap collapses with adjacent text margins to the larger value.
-const SPACED_BLOCK_TYPES = new Set(['testimonial', 'media', 'profileCard', 'card', 'bigNumber', 'button', 'download', 'calloutBox'])
+const SPACED_BLOCK_TYPES = new Set(['testimonial', 'media', 'profileCard', 'card', 'bigNumber', 'button', 'download', 'calloutBox', 'accordion'])
 
 export function RichTextView({ value, references = {} }: { value: unknown; references?: RichTextReferences }) {
 	const parsed: unknown = typeof value === 'string' ? safeJsonParse(value) : value
