@@ -7,7 +7,6 @@ import { Breadcrumbs, type BreadcrumbsItem } from '../components/Breadcrumbs'
 import { IconGroup } from '../components/IconGroup'
 import { Text } from '../components/Text'
 import { Icon, type IconName } from '../icons'
-import { MediaBlock } from './MediaBlock'
 
 export interface ContentTemplateAuthor {
 	name: string
@@ -29,7 +28,7 @@ export interface ContentTemplateBaseProps {
 	breadcrumbs?: BreadcrumbsItem[]
 	/** Page title — renders as `<h1>` at the level-2 size from the design. */
 	title: string
-	/** Cover area for the page — typically a `<MediaBlock>`. When omitted, a placeholder is shown. */
+	/** Cover area for the page — typically a `<MediaBlock>`. When omitted, the header renders without a cover. */
 	coverSlot?: ReactNode
 	/** Optional author. Renders alongside the date when both are present. */
 	author?: ContentTemplateAuthor | null
@@ -55,7 +54,7 @@ export function ContentTemplateHeader(
 			<h1 className="font-npi-serif text-[2rem] leading-[1.2] font-normal text-npi-text-primary @npi-tablet:text-[2.5rem]">
 				{title}
 			</h1>
-			{coverSlot ?? <MediaBlock />}
+			{coverSlot}
 		</header>
 	)
 }
