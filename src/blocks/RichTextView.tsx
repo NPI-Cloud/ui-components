@@ -5,6 +5,7 @@ import { Fragment, type ReactNode } from 'react'
 import { Accordion, AccordionItem } from '../components/Accordion'
 import { DownloadButton, type DownloadVariant } from '../components/DownloadButton'
 import { Heading, type HeadingLevel } from '../components/Heading'
+import { TooltipInfo } from '../components/Tooltip'
 import { BigNumberBlock } from './BigNumberBlock'
 import { ButtonBlock, type ButtonBlockVariant } from './ButtonBlock'
 import { CardBlock, type CardBlockAspect, cardBlockAspects } from './CardBlock'
@@ -93,6 +94,17 @@ function renderNode(node: SlateNode, key: number, references: RichTextReferences
 				<Link key={key} href={href} className="text-npi-blue underline">
 					{children}
 				</Link>
+			)
+		}
+		case 'tooltip': {
+			// The run itself stays plain — the info glyph placed after it is the only trigger.
+			// A tooltip with no body has nothing to reveal, so it renders as text alone.
+			const tooltip = asString(node.content)
+			return (
+				<Fragment key={key}>
+					{children}
+					{tooltip && <TooltipInfo content={tooltip} className="ml-npi-1" />}
+				</Fragment>
 			)
 		}
 		case 'accordion':

@@ -72,6 +72,7 @@ export {
 	type TextBlockRichList,
 	type TextBlockRichListItem,
 	type TextBlockRichParagraph,
+	type TextBlockRichTooltip,
 } from './TextBlock'
 export { VideoBlock, type VideoBlockProps } from './VideoBlock'
 export { VideoTemplate, type VideoTemplateProps } from './VideoTemplate'

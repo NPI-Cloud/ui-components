@@ -4,6 +4,7 @@ import { Link } from '../components/ui-primitives'
 import { clsx } from 'clsx'
 import { Fragment, type ReactNode } from 'react'
 import { Text, type TextSize } from '../components/Text'
+import { TooltipInfo } from '../components/Tooltip'
 
 type TextBlockVariant = TextSize
 
@@ -22,7 +23,14 @@ export interface TextBlockRichAnchor {
 	children: TextBlockRichLeaf[]
 }
 
-export type TextBlockRichInline = TextBlockRichLeaf | TextBlockRichAnchor
+// A run of text carrying an explanatory note, revealed on hover/focus of the run itself.
+export interface TextBlockRichTooltip {
+	type: 'tooltip'
+	content: string
+	children: TextBlockRichInline[]
+}
+
+export type TextBlockRichInline = TextBlockRichLeaf | TextBlockRichAnchor | TextBlockRichTooltip
 
 // Block text alignment, stored on the paragraph node (bindx-editor's `align` attribute). `start` is
 // the default (left) so an unset paragraph and an explicit `start` render identically.
@@ -152,6 +160,17 @@ export function renderRichBlocks(
 
 export function renderRichInlines(children: TextBlockRichInline[]): ReactNode {
 	return children.map((node, index) => {
+		if ('type' in node && node.type === 'tooltip') {
+			// The run itself stays plain — the info glyph placed after it is the only trigger.
+			// A tooltip with no body has nothing to reveal, so it renders as text alone.
+			const wrapped = renderRichInlines(Array.isArray(node.children) ? node.children : [])
+			return (
+				<Fragment key={index}>
+					{wrapped}
+					{node.content && <TooltipInfo content={node.content} className="ml-npi-1" />}
+				</Fragment>
+			)
+		}
 		if ('type' in node && node.type === 'anchor') {
 			return (
 				<Link key={index} href={node.href} className="text-npi-blue underline">

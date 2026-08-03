@@ -11,10 +11,12 @@ import {
 	useCallback,
 	useEffect,
 	useId,
+	useLayoutEffect,
 	useRef,
 	useState,
 } from 'react'
 import { twMerge } from 'tailwind-merge'
+import { Icon } from '../icons/Icon'
 
 export const tooltipPlacements = ['top', 'right', 'bottom', 'left'] as const
 export type TooltipPlacement = (typeof tooltipPlacements)[number]
@@ -64,6 +66,49 @@ const placementContainerClass: Record<TooltipPlacement, string> = {
 // The arrow precedes the body when the body sits after the trigger (bottom/right).
 const arrowFirst = (placement: TooltipPlacement) => placement === 'bottom' || placement === 'right'
 
+// Minimum gap the bubble keeps from the viewport edges when it has to be nudged back on screen.
+const VIEWPORT_MARGIN = 16
+
+/**
+ * Keeps a top/bottom-placed bubble inside the viewport on narrow screens. The container centres the
+ * bubble on the trigger, so a trigger near an edge would push a 300px bubble off screen; this
+ * returns the horizontal correction to apply to the BODY only — the arrow stays centred on the
+ * trigger, which is the whole point of shifting the body rather than the container.
+ *
+ * Left/right placements are left alone: shifting them horizontally would detach the arrow from the
+ * trigger, and their own axis is already bounded by the trigger's position.
+ */
+function useViewportShift(bodyRef: React.RefObject<HTMLSpanElement | null>, open: boolean, placement: TooltipPlacement, width: number | string): number {
+	const [shift, setShift] = useState(0)
+	const horizontal = placement === 'top' || placement === 'bottom'
+
+	useLayoutEffect(() => {
+		if (!open || !horizontal) {
+			setShift(0)
+			return
+		}
+		const measure = () => {
+			const node = bodyRef.current
+			if (!node) return
+			// Measure with the current shift removed, so repeated runs converge instead of drifting.
+			const previous = node.style.transform
+			node.style.transform = 'none'
+			const rect = node.getBoundingClientRect()
+			node.style.transform = previous
+			const viewport = node.ownerDocument.defaultView?.innerWidth ?? 0
+			const overflowLeft = VIEWPORT_MARGIN - rect.left
+			const overflowRight = rect.right - (viewport - VIEWPORT_MARGIN)
+			setShift(overflowLeft > 0 ? overflowLeft : overflowRight > 0 ? -overflowRight : 0)
+		}
+		measure()
+		const view = bodyRef.current?.ownerDocument.defaultView
+		view?.addEventListener('resize', measure)
+		return () => view?.removeEventListener('resize', measure)
+	}, [bodyRef, open, horizontal, width])
+
+	return shift
+}
+
 // Whether the primary pointer can hover. Drives the interaction model: hover-capable
 // devices reveal on hover/focus, touch devices toggle on tap. Defaults to `true` so the
 // first SSR/paint matches desktop; the effect corrects it on touch devices.
@@ -97,6 +142,7 @@ export const Tooltip = forwardRef<HTMLSpanElement, TooltipProps>((props, ref) =>
 	const canHover = useCanHover()
 	const [open, setOpen] = useState(false)
 	const rootRef = useRef<HTMLSpanElement | null>(null)
+	const bodyRef = useRef<HTMLSpanElement | null>(null)
 	const showTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 	const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -161,6 +207,7 @@ export const Tooltip = forwardRef<HTMLSpanElement, TooltipProps>((props, ref) =>
 
 	const isOpen = forceOpen || open
 	const widthStyle = typeof width === 'number' ? `${width}px` : width
+	const shiftX = useViewportShift(bodyRef, isOpen, placement, width)
 
 	if (disabled) {
 		return (
@@ -267,8 +314,15 @@ export const Tooltip = forwardRef<HTMLSpanElement, TooltipProps>((props, ref) =>
 				>
 					{arrowFirst(placement) && arrow}
 					<span
+						ref={bodyRef}
 						className="block rounded-npi-xs bg-npi-white p-npi-6 font-npi-sans text-[1rem] leading-[1.5] text-npi-text-primary"
-						style={{ width: widthStyle }}
+						style={{
+							width: widthStyle,
+							// Never wider than the viewport allows, and nudged back on screen when the
+							// trigger sits near an edge (the arrow stays put, pointing at the trigger).
+							maxWidth: `calc(100vw - ${2 * VIEWPORT_MARGIN}px)`,
+							transform: shiftX === 0 ? undefined : `translateX(${shiftX}px)`,
+						}}
 					>
 						{content}
 					</span>
@@ -279,3 +333,48 @@ export const Tooltip = forwardRef<HTMLSpanElement, TooltipProps>((props, ref) =>
 	)
 })
 Tooltip.displayName = 'Tooltip'
+
+export interface TooltipInfoProps {
+	/** Tooltip body — plain text. */
+	content: string
+	placement?: TooltipPlacement
+	/** Accessible name for the trigger. */
+	label?: string
+	className?: string
+}
+
+/**
+ * The standard tooltip trigger: an info glyph that reveals its note on hover/focus (tap on touch).
+ * This is the ONLY trigger posture the design system uses — text and headings that carry a note
+ * render plainly and place this icon after themselves rather than becoming triggers.
+ *
+ * Sizing and alignment are what make an inline icon read as part of the sentence:
+ * - the glyph matches the surrounding font size (capped at 24px so it stays a glyph next to a large
+ *   heading), so it never forces the line box taller than the text itself;
+ * - `align-middle` on both the wrapper and the button centres it against the text's x-height —
+ *   an `inline-flex` box would otherwise baseline-align by its bottom edge and sit visibly low;
+ * - the tap target is grown with a pseudo-element rather than padding, so touch gets a comfortable
+ *   hit area without the button's box disturbing line height.
+ */
+export function TooltipInfo({ content, placement, label = 'Více informací', className }: TooltipInfoProps) {
+	return (
+		<Tooltip content={content} placement={placement} className="align-middle">
+			<button
+				type="button"
+				aria-label={label}
+				style={{ width: 'min(1.5rem, 1em)', height: 'min(1.5rem, 1em)' }}
+				className={twMerge(
+					clsx(
+						'relative inline-flex shrink-0 cursor-pointer items-center justify-center border-0 bg-transparent p-0 align-middle leading-none',
+						'text-npi-blue transition-colors hover:text-npi-blue-hover',
+						'rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-npi-blue',
+						"before:absolute before:-inset-2 before:content-['']",
+						className,
+					),
+				)}
+			>
+				<Icon name="info" size="s" className="size-full" />
+			</button>
+		</Tooltip>
+	)
+}
