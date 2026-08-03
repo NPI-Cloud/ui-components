@@ -44,8 +44,6 @@ export interface TableBlockProps {
 	/** The stored `tableData` JSON — accepts the raw unknown value and normalizes internally. */
 	data: unknown
 	density?: TableDensity | null
-	/** Table title ("Nadpis tabulky") rendered above the grid. */
-	title?: string | null
 	/** Disables the interactive sorting affordance (editor canvas — headers are being edited). */
 	staticHeader?: boolean
 }
@@ -123,7 +121,7 @@ export function TableCellVisual({ cell, column }: { cell: TableBlockCell | undef
  * header cycles asc → desc → authored order; the server always renders the authored order, so
  * there is no CLS and the full content is in the HTML.
  */
-export function TableBlock({ data, density, title, staticHeader }: TableBlockProps) {
+export function TableBlock({ data, density, staticHeader }: TableBlockProps) {
 	const grid = useMemo(() => normalizeTableBlockData(data), [data])
 	const [sort, setSort] = useState<SortState | null>(null)
 
@@ -144,7 +142,7 @@ export function TableBlock({ data, density, title, staticHeader }: TableBlockPro
 		})
 
 	return (
-		<Table density={density ?? undefined} title={title || undefined}>
+		<Table density={density ?? undefined}>
 			<TableHeader>
 				<TableRow>
 					{grid.columns.map(column => (

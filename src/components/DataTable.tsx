@@ -42,8 +42,6 @@ export interface DataTableProps<T> {
 	rowId: (row: T) => string
 	/** Row density — `comfortable` (default), `compact`, or `condensed`. */
 	density?: TableDensity
-	/** Optional heading rendered above the table (see `Table` `title`). */
-	title?: ReactNode
 	/** Adds a leading checkbox column with a select-all checkbox in the header. */
 	selectable?: boolean
 	/** Controlled selection. Omit to let `DataTable` manage selection internally. */
@@ -76,7 +74,6 @@ export function DataTable<T>({
 	data,
 	rowId,
 	density = 'comfortable',
-	title,
 	selectable = false,
 	selectedIds,
 	onSelectionChange,
@@ -130,7 +127,7 @@ export function DataTable<T>({
 	const colSpan = columns.length + (selectable ? 1 : 0)
 
 	return (
-		<Table density={density} title={title} scrollable={scrollable}>
+		<Table density={density} scrollable={scrollable}>
 			<TableHeader>
 				<TableRow>
 					{selectable && (

@@ -1,11 +1,10 @@
 'use client'
 
 import { clsx } from 'clsx'
-import { createContext, forwardRef, type ReactNode, useContext } from 'react'
+import { createContext, forwardRef, useContext } from 'react'
 import { twMerge } from 'tailwind-merge'
 import { Icon } from '../icons'
 import { Scrollbar } from './Scrollbar'
-import { Text } from './Text'
 
 export const tableDensities = ['comfortable', 'compact', 'condensed'] as const
 export type TableDensity = (typeof tableDensities)[number]
@@ -62,7 +61,7 @@ const alignClasses: Record<TableAlign, string> = {
 	right: 'text-right',
 }
 
-export interface TableProps extends Omit<React.TableHTMLAttributes<HTMLTableElement>, 'title'> {
+export interface TableProps extends React.TableHTMLAttributes<HTMLTableElement> {
 	/**
 	 * Visual density. Controls row height, cell padding, and body text size.
 	 * - `comfortable` (default, "vysoká") — 80px rows, 16px body, generous spacing for read-heavy lists
@@ -76,12 +75,6 @@ export interface TableProps extends Omit<React.TableHTMLAttributes<HTMLTableElem
 	 * fits its container shows no scrollbar. Set to `false` to render a bare `<table>`.
 	 */
 	scrollable?: boolean
-	/**
-	 * Optional table heading ("Nadpis tabulky") rendered above the table. Pass a string to get the
-	 * default NPI heading style (16px bold navy), or pass your own `Heading`/`Text` node for a
-	 * different level. The heading stays fixed above the horizontal scroll area.
-	 */
-	title?: ReactNode
 }
 
 /**
@@ -93,7 +86,7 @@ export interface TableProps extends Omit<React.TableHTMLAttributes<HTMLTableElem
  * side-scrolling on mobile rather than breaking the page layout — opt out with `scrollable={false}`.
  */
 export const Table = forwardRef<HTMLTableElement, TableProps>(
-	({ density = 'comfortable', scrollable = true, title, className, children, ...props }, ref) => {
+	({ density = 'comfortable', scrollable = true, className, children, ...props }, ref) => {
 		const table = (
 			<table
 				ref={ref}
@@ -110,16 +103,7 @@ export const Table = forwardRef<HTMLTableElement, TableProps>(
 
 		return (
 			<TableContext.Provider value={{ density }}>
-				{title
-					? (
-						<div className="flex flex-col gap-npi-4">
-							{typeof title === 'string'
-								? <Text variant="l" weight="bold" className="text-npi-text-primary">{title}</Text>
-								: title}
-							{scrolled}
-						</div>
-					)
-					: scrolled}
+				{scrolled}
 			</TableContext.Provider>
 		)
 	},
