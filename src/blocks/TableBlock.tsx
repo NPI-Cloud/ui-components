@@ -1,116 +1,10 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { Table, type TableAlign, TableBody, TableCell, type TableDensity, TableHead, TableHeader, TableRow, type TableSortDirection } from '../components/Table'
-
-export const tableBlockSortTypes = ['text', 'number', 'date'] as const
-export type TableBlockSortType = (typeof tableBlockSortTypes)[number]
-
-export interface TableBlockColumn {
-	id: string
-	header: string
-	align?: TableAlign | null
-	sortable?: boolean | null
-	/** How cell values compare when the visitor sorts this column. Default `text`. */
-	sortAs?: TableBlockSortType | null
-}
-
-/** One formatted text run inside a cell. Mark keys mirror the rich-text leaf convention. */
-export interface TableCellLeaf {
-	text: string
-	isBold?: boolean
-	isItalic?: boolean
-	isUnderlined?: boolean
-}
-
-/** One visual line of a cell — cells support soft line breaks (Shift+Enter in the editor). */
-export type TableCellLine = TableCellLeaf[]
-
-export interface TableBlockCell {
-	/** Plain-text projection of `content`, kept in sync by the editor; sorting compares this. */
-	text?: string | null
-	/** Resolved href snapshot — renders the cell as a link in link-blue. */
-	link?: string | null
-	/** Rich content (marks + line breaks). When absent, `text` renders as-is. */
-	content?: TableCellLine[] | null
-}
-
-export interface TableBlockRow {
-	id: string
-	/** Keyed by column id, so column reorder never re-maps cell values. */
-	cells: Record<string, TableBlockCell>
-}
-
-export interface TableBlockData {
-	columns: TableBlockColumn[]
-	rows: TableBlockRow[]
-}
-
-const isAlign = (v: unknown): v is TableAlign => v === 'left' || v === 'center' || v === 'right'
-const isSortType = (v: unknown): v is TableBlockSortType => v === 'text' || v === 'number' || v === 'date'
-
-const parseCellContent = (value: unknown): TableCellLine[] | null => {
-	if (!Array.isArray(value)) return null
-	const lines = value.flatMap((line): TableCellLine[] => {
-		if (!Array.isArray(line)) return []
-		return [line.flatMap((leaf): TableCellLeaf[] => {
-			if (typeof leaf !== 'object' || leaf === null) return []
-			const { text, isBold, isItalic, isUnderlined } = leaf as Record<string, unknown>
-			if (typeof text !== 'string') return []
-			return [{
-				text,
-				...(isBold === true ? { isBold: true } : {}),
-				...(isItalic === true ? { isItalic: true } : {}),
-				...(isUnderlined === true ? { isUnderlined: true } : {}),
-			}]
-		})]
-	})
-	return lines.length > 0 ? lines : null
-}
-
-/** Plain-text projection of a cell — what sorting compares and what the editor mirrors into `text`. */
-export const tableCellPlainText = (cell: TableBlockCell | undefined): string =>
-	cell?.content ? cell.content.map(line => line.map(leaf => leaf.text).join('')).join('\n') : cell?.text ?? ''
-
-// Tolerant parse of the stored JSON document (`WebsiteBlock.tableData`) into a clean grid. Never
-// throws on malformed input — unknown keys are dropped, missing ids fall back to positional ones
-// (deterministic, so SSR and client render identically). Returns null when there is no usable grid.
-export function normalizeTableBlockData(value: unknown): TableBlockData | null {
-	if (typeof value !== 'object' || value === null) return null
-	const doc = value as { columns?: unknown; rows?: unknown }
-	if (!Array.isArray(doc.columns)) return null
-	const columns = doc.columns.flatMap((entry, index): TableBlockColumn[] => {
-		if (typeof entry !== 'object' || entry === null) return []
-		const col = entry as Record<string, unknown>
-		return [{
-			id: typeof col.id === 'string' && col.id !== '' ? col.id : `c${index}`,
-			header: typeof col.header === 'string' ? col.header : '',
-			align: isAlign(col.align) ? col.align : null,
-			sortable: col.sortable === true,
-			sortAs: isSortType(col.sortAs) ? col.sortAs : null,
-		}]
-	})
-	if (columns.length === 0) return null
-	const rawRows = Array.isArray(doc.rows) ? doc.rows : []
-	const rows = rawRows.flatMap((entry, index): TableBlockRow[] => {
-		if (typeof entry !== 'object' || entry === null) return []
-		const row = entry as Record<string, unknown>
-		const rawCells = typeof row.cells === 'object' && row.cells !== null ? row.cells as Record<string, unknown> : {}
-		const cells: Record<string, TableBlockCell> = {}
-		for (const column of columns) {
-			const cell = rawCells[column.id]
-			if (typeof cell !== 'object' || cell === null) continue
-			const { text, link, content } = cell as Record<string, unknown>
-			cells[column.id] = {
-				text: typeof text === 'string' ? text : null,
-				link: typeof link === 'string' && link !== '' ? link : null,
-				content: parseCellContent(content),
-			}
-		}
-		return [{ id: typeof row.id === 'string' && row.id !== '' ? row.id : `r${index}`, cells }]
-	})
-	return { columns, rows }
-}
+import { Badge } from '../components/Badge'
+import { Table, TableBody, TableCell, type TableDensity, TableHead, TableHeader, TableRow, type TableSortDirection } from '../components/Table'
+import { Icon, type IconName, iconRegistryM } from '../icons'
+import { normalizeTableBlockData, type TableBlockCell, type TableBlockColumn, type TableBlockRow, type TableCellLeaf, tableCellPlainText, tableColumnAlign } from './table-block-data'
 
 const collator = new Intl.Collator('cs', { sensitivity: 'base', numeric: true })
 
@@ -129,11 +23,13 @@ const parseDate = (text: string): number => {
 	return Number.isNaN(parsed) ? Number.NaN : parsed
 }
 
+// Sorting derives from the column kind — `number` and `date` compare parsed values, the rest the
+// Czech collator over the plain-text projection.
 const compareRows = (a: TableBlockRow, b: TableBlockRow, column: TableBlockColumn): number => {
 	const textA = tableCellPlainText(a.cells[column.id])
 	const textB = tableCellPlainText(b.cells[column.id])
-	if (column.sortAs === 'number' || column.sortAs === 'date') {
-		const parse = column.sortAs === 'number' ? parseNumeric : parseDate
+	if (column.kind === 'number' || column.kind === 'date') {
+		const parse = column.kind === 'number' ? parseNumeric : parseDate
 		const numA = parse(textA)
 		const numB = parse(textB)
 		const aInvalid = Number.isNaN(numA)
@@ -159,13 +55,22 @@ interface SortState {
 	direction: TableSortDirection
 }
 
-const leafClass = (leaf: TableCellLeaf): string | undefined => {
-	const classes = [leaf.isBold && 'font-bold', leaf.isItalic && 'italic', leaf.isUnderlined && 'underline'].filter(Boolean)
+const leafClass = (leaf: TableCellLeaf, linked: boolean): string | undefined => {
+	const classes = [
+		leaf.isBold && 'font-bold',
+		leaf.isItalic && 'italic',
+		leaf.isUnderlined && 'underline',
+		linked && 'text-npi-text-link hover:underline',
+	].filter(Boolean)
 	return classes.length > 0 ? classes.join(' ') : undefined
 }
 
-/** Renders a cell's content — rich lines (marks + line breaks) when present, plain text otherwise. */
-export function TableCellContent({ cell }: { cell: TableBlockCell | undefined }) {
+/**
+ * Renders a cell's content — rich lines (marks, line breaks, text-range links) when present, plain
+ * text otherwise. `suppressLinks` skips leaf anchors when the whole cell is already wrapped in one
+ * (nested `<a>` is invalid HTML); the link styling stays.
+ */
+export function TableCellContent({ cell, suppressLinks }: { cell: TableBlockCell | undefined; suppressLinks?: boolean }) {
 	if (!cell?.content) return <>{cell?.text}</>
 	return (
 		<>
@@ -173,11 +78,44 @@ export function TableCellContent({ cell }: { cell: TableBlockCell | undefined })
 			{cell.content.map((line, lineIndex) => (
 				<span key={lineIndex}>
 					{lineIndex > 0 && <br />}
-					{line.map((leaf, leafIndex) => <span key={leafIndex} className={leafClass(leaf)}>{leaf.text}</span>)}
+					{line.map((leaf, leafIndex) =>
+						leaf.link && !suppressLinks
+							? <a key={leafIndex} href={leaf.link} className={leafClass(leaf, true)}>{leaf.text}</a>
+							: <span key={leafIndex} className={leafClass(leaf, !!leaf.link)}>{leaf.text}</span>)}
 				</span>
 			))}
 		</>
 	)
+}
+
+/**
+ * Full visual of one body cell by its COLUMN's kind — an icon alone, the text chipped in a Badge
+ * (tone per cell, neutral by default), a number with the column's unit suffixed, or plain/rich
+ * text — optionally wrapped in the cell-level link. Shared by the public renderer and the
+ * editor's read-only preview. Inside a Badge chip, text-range links are suppressed (the chip is
+ * one unit; link it via the cell link).
+ */
+export function TableCellVisual({ cell, column }: { cell: TableBlockCell | undefined; column?: TableBlockColumn }) {
+	if (!cell) return null
+	const kind = column?.kind
+	let inner: React.ReactNode
+	if (kind === 'icon') {
+		const icon = cell.icon && cell.icon in iconRegistryM ? (cell.icon as IconName) : null
+		if (!icon) return null
+		inner = <Icon name={icon} className="inline-block size-4 shrink-0 align-middle" />
+	} else if (kind === 'badge') {
+		if (tableCellPlainText(cell) === '') return null
+		inner = <Badge tone={cell.badge ?? 'neutral'}><TableCellContent cell={cell} suppressLinks /></Badge>
+	} else {
+		const unit = kind === 'number' && column?.unit && tableCellPlainText(cell) !== '' ? column.unit : null
+		inner = (
+			<>
+				<TableCellContent cell={cell} suppressLinks={!!cell.link} />
+				{unit && <>{' '}{unit}</>}
+			</>
+		)
+	}
+	return cell.link ? <a href={cell.link} className="hover:underline">{inner}</a> : inner
 }
 
 /**
@@ -212,7 +150,7 @@ export function TableBlock({ data, density, title, staticHeader }: TableBlockPro
 					{grid.columns.map(column => (
 						<TableHead
 							key={column.id}
-							align={column.align ?? 'left'}
+							align={tableColumnAlign(column)}
 							sortable={!staticHeader && column.sortable === true}
 							sortDirection={sort?.columnId === column.id ? sort.direction : null}
 							onSort={() => cycleSort(column.id)}
@@ -228,10 +166,8 @@ export function TableBlock({ data, density, title, staticHeader }: TableBlockPro
 						{grid.columns.map(column => {
 							const cell = row.cells[column.id]
 							return (
-								<TableCell key={column.id} align={column.align ?? 'left'} link={!!cell?.link}>
-									{cell?.link
-										? <a href={cell.link} className="hover:underline"><TableCellContent cell={cell} /></a>
-										: <TableCellContent cell={cell} />}
+								<TableCell key={column.id} align={tableColumnAlign(column)} link={!!cell?.link}>
+									<TableCellVisual cell={cell} column={column} />
 								</TableCell>
 							)
 						})}

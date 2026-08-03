@@ -2,9 +2,6 @@
 
 import { uic } from '../utils/uic'
 
-export const badgeTones = ['success', 'error', 'warning', 'info', 'informative', 'neutral', 'neutral-solid'] as const
-export type BadgeTone = (typeof badgeTones)[number]
-
 export const Badge = uic('span', {
 	baseClass: 'inline-flex items-center rounded-npi-xxs px-[10px] py-npi-1 font-npi-sans text-[0.75rem] leading-[1.3] font-semibold',
 	variants: {

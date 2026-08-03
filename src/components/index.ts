@@ -8,7 +8,8 @@ export {
 	type AccordionVariant,
 	accordionVariants,
 } from './Accordion'
-export { Badge, type BadgeProps, type BadgeTone, badgeTones } from './Badge'
+export { Badge, type BadgeProps } from './Badge'
+export { type BadgeTone, badgeTones } from './badge-tones'
 export { Banner, type BannerAction, type BannerIndicator, bannerIndicators, type BannerProps, type BannerTone, bannerTones } from './Banner'
 export { BigNumber, type BigNumberProps, type BigNumberSize, bigNumberSizes } from './BigNumber'
 export { Breadcrumbs, type BreadcrumbsItem, type BreadcrumbsProps } from './Breadcrumbs'
