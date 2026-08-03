@@ -50,6 +50,10 @@ export {
 	type TableBlockRow,
 	type TableBlockSortType,
 	tableBlockSortTypes,
+	TableCellContent,
+	type TableCellLeaf,
+	type TableCellLine,
+	tableCellPlainText,
 } from './TableBlock'
 export { TabsBlock, type TabsBlockProps, type TabsBlockTab, tabsBlockTabFallbackTitle, type TabsBlockVariant, tabsBlockVariants } from './TabsBlock'
 export { TabsEndBlock, TabsStartBlock } from './TabsMarkerBlocks'

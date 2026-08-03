@@ -13,14 +13,26 @@ export interface TableBlockColumn {
 	sortable?: boolean | null
 	/** How cell values compare when the visitor sorts this column. Default `text`. */
 	sortAs?: TableBlockSortType | null
-	/** Optional CSS width for the column (`'160px'`, `'20%'`). */
-	width?: string | null
 }
 
+/** One formatted text run inside a cell. Mark keys mirror the rich-text leaf convention. */
+export interface TableCellLeaf {
+	text: string
+	isBold?: boolean
+	isItalic?: boolean
+	isUnderlined?: boolean
+}
+
+/** One visual line of a cell — cells support soft line breaks (Shift+Enter in the editor). */
+export type TableCellLine = TableCellLeaf[]
+
 export interface TableBlockCell {
+	/** Plain-text projection of `content`, kept in sync by the editor; sorting compares this. */
 	text?: string | null
 	/** Resolved href snapshot — renders the cell as a link in link-blue. */
 	link?: string | null
+	/** Rich content (marks + line breaks). When absent, `text` renders as-is. */
+	content?: TableCellLine[] | null
 }
 
 export interface TableBlockRow {
@@ -36,6 +48,29 @@ export interface TableBlockData {
 
 const isAlign = (v: unknown): v is TableAlign => v === 'left' || v === 'center' || v === 'right'
 const isSortType = (v: unknown): v is TableBlockSortType => v === 'text' || v === 'number' || v === 'date'
+
+const parseCellContent = (value: unknown): TableCellLine[] | null => {
+	if (!Array.isArray(value)) return null
+	const lines = value.flatMap((line): TableCellLine[] => {
+		if (!Array.isArray(line)) return []
+		return [line.flatMap((leaf): TableCellLeaf[] => {
+			if (typeof leaf !== 'object' || leaf === null) return []
+			const { text, isBold, isItalic, isUnderlined } = leaf as Record<string, unknown>
+			if (typeof text !== 'string') return []
+			return [{
+				text,
+				...(isBold === true ? { isBold: true } : {}),
+				...(isItalic === true ? { isItalic: true } : {}),
+				...(isUnderlined === true ? { isUnderlined: true } : {}),
+			}]
+		})]
+	})
+	return lines.length > 0 ? lines : null
+}
+
+/** Plain-text projection of a cell — what sorting compares and what the editor mirrors into `text`. */
+export const tableCellPlainText = (cell: TableBlockCell | undefined): string =>
+	cell?.content ? cell.content.map(line => line.map(leaf => leaf.text).join('')).join('\n') : cell?.text ?? ''
 
 // Tolerant parse of the stored JSON document (`WebsiteBlock.tableData`) into a clean grid. Never
 // throws on malformed input — unknown keys are dropped, missing ids fall back to positional ones
@@ -53,7 +88,6 @@ export function normalizeTableBlockData(value: unknown): TableBlockData | null {
 			align: isAlign(col.align) ? col.align : null,
 			sortable: col.sortable === true,
 			sortAs: isSortType(col.sortAs) ? col.sortAs : null,
-			width: typeof col.width === 'string' && col.width !== '' ? col.width : null,
 		}]
 	})
 	if (columns.length === 0) return null
@@ -66,10 +100,11 @@ export function normalizeTableBlockData(value: unknown): TableBlockData | null {
 		for (const column of columns) {
 			const cell = rawCells[column.id]
 			if (typeof cell !== 'object' || cell === null) continue
-			const { text, link } = cell as Record<string, unknown>
+			const { text, link, content } = cell as Record<string, unknown>
 			cells[column.id] = {
 				text: typeof text === 'string' ? text : null,
 				link: typeof link === 'string' && link !== '' ? link : null,
+				content: parseCellContent(content),
 			}
 		}
 		return [{ id: typeof row.id === 'string' && row.id !== '' ? row.id : `r${index}`, cells }]
@@ -95,8 +130,8 @@ const parseDate = (text: string): number => {
 }
 
 const compareRows = (a: TableBlockRow, b: TableBlockRow, column: TableBlockColumn): number => {
-	const textA = a.cells[column.id]?.text ?? ''
-	const textB = b.cells[column.id]?.text ?? ''
+	const textA = tableCellPlainText(a.cells[column.id])
+	const textB = tableCellPlainText(b.cells[column.id])
 	if (column.sortAs === 'number' || column.sortAs === 'date') {
 		const parse = column.sortAs === 'number' ? parseNumeric : parseDate
 		const numA = parse(textA)
@@ -122,6 +157,27 @@ export interface TableBlockProps {
 interface SortState {
 	columnId: string
 	direction: TableSortDirection
+}
+
+const leafClass = (leaf: TableCellLeaf): string | undefined => {
+	const classes = [leaf.isBold && 'font-bold', leaf.isItalic && 'italic', leaf.isUnderlined && 'underline'].filter(Boolean)
+	return classes.length > 0 ? classes.join(' ') : undefined
+}
+
+/** Renders a cell's content — rich lines (marks + line breaks) when present, plain text otherwise. */
+export function TableCellContent({ cell }: { cell: TableBlockCell | undefined }) {
+	if (!cell?.content) return <>{cell?.text}</>
+	return (
+		<>
+			{/* Content is display data without stable ids; index keys are fine for a read-only render. */}
+			{cell.content.map((line, lineIndex) => (
+				<span key={lineIndex}>
+					{lineIndex > 0 && <br />}
+					{line.map((leaf, leafIndex) => <span key={leafIndex} className={leafClass(leaf)}>{leaf.text}</span>)}
+				</span>
+			))}
+		</>
+	)
 }
 
 /**
@@ -157,7 +213,6 @@ export function TableBlock({ data, density, title, staticHeader }: TableBlockPro
 						<TableHead
 							key={column.id}
 							align={column.align ?? 'left'}
-							width={column.width ?? undefined}
 							sortable={!staticHeader && column.sortable === true}
 							sortDirection={sort?.columnId === column.id ? sort.direction : null}
 							onSort={() => cycleSort(column.id)}
@@ -175,8 +230,8 @@ export function TableBlock({ data, density, title, staticHeader }: TableBlockPro
 							return (
 								<TableCell key={column.id} align={column.align ?? 'left'} link={!!cell?.link}>
 									{cell?.link
-										? <a href={cell.link} className="hover:underline">{cell.text}</a>
-										: cell?.text}
+										? <a href={cell.link} className="hover:underline"><TableCellContent cell={cell} /></a>
+										: <TableCellContent cell={cell} />}
 								</TableCell>
 							)
 						})}
