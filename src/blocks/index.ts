@@ -10,7 +10,15 @@ export { ArticleTemplate, type ArticleTemplateProps } from './ArticleTemplate'
 export { BannerBlock, type BannerBlockIndicator, type BannerBlockProps, type BannerBlockTone } from './BannerBlock'
 export { BigNumberBlock, type BigNumberBlockProps, type BigNumberBlockSize } from './BigNumberBlock'
 export { BlockColumns, type BlockColumnsMode, type BlockColumnsProps, type BlockColumnsRatio, blockColumnsRatios } from './BlockColumns'
-export { ButtonBlock, type ButtonBlockProps, type ButtonBlockVariant } from './ButtonBlock'
+export {
+	type ButtonBlockAction,
+	ButtonBlock,
+	type ButtonBlockModal,
+	type ButtonBlockModalAction,
+	type ButtonBlockModalActionKind,
+	type ButtonBlockProps,
+	type ButtonBlockVariant,
+} from './ButtonBlock'
 export { CardBlock, type CardBlockAspect, cardBlockAspects, type CardBlockProps } from './CardBlock'
 export { CardOfferBlock, type CardOfferBlockDisplay, type CardOfferBlockMetaItem, type CardOfferBlockProps } from './CardOfferBlock'
 export { ColumnBlock } from './ColumnBlock'
