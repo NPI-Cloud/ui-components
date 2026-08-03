@@ -8,7 +8,8 @@ import { Icon, type IconName } from '../icons'
 export interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'size'> {
 	/** Label rendered above the input. */
 	label?: ReactNode
-	/** Renders a red asterisk after the label (purely visual; pair with the native `required` attribute for semantics). */
+	/** Marks the field required: renders the red asterisk AND sets the native `required`
+	 * attribute, so browser form validation enforces it. */
 	required?: boolean
 	/** Suppresses the asterisk while keeping `required` semantics — for forms
 	 * where a whole step is required and per-field indicators would be noise. */
@@ -123,6 +124,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
 			>
 				<input
 					ref={ref}
+					required={required}
 					id={id}
 					type={effectiveType}
 					disabled={disabled}
