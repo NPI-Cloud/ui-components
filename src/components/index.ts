@@ -24,7 +24,7 @@ export {
 } from './CardOffer'
 export { Carousel, type CarouselProps } from './Carousel'
 export { CarouselControls, type CarouselControlsProps } from './CarouselControls'
-export { Checkbox, type CheckboxProps, type CheckboxSize, checkboxSizes } from './Checkbox'
+export { Checkbox, type CheckboxProps, type CheckboxSize, checkboxSizes, CheckboxVisual, type CheckboxVisualProps } from './Checkbox'
 export { CookieBanner, type CookieBannerMode, cookieBannerModes, type CookieBannerProps, type CookieCategory } from './CookieBanner'
 export { Counter, type CounterProps } from './Counter'
 export {
@@ -172,7 +172,7 @@ export {
 	profileCardSocialPlatforms,
 } from './ProfileCard'
 export { type ProgressStep, ProgressSteps, type ProgressStepsProps, type ProgressStepStatus, progressStepStatuses } from './ProgressSteps'
-export { Radio, type RadioProps, type RadioSize, radioSizes } from './Radio'
+export { Radio, type RadioProps, type RadioSize, radioSizes, RadioVisual, type RadioVisualProps } from './Radio'
 export { Rating, type RatingProps } from './Rating'
 export { Scrollbar, type ScrollbarDirection, scrollbarDirections, type ScrollbarProps } from './Scrollbar'
 export { SearchBar, type SearchBarProps } from './SearchBar'

@@ -53,6 +53,29 @@ const RadioDot = uic('span', {
 // between control and label per the Figma "Radio S" frame.
 const labelSize: Record<RadioSize, TextSize> = { s: 'm', m: 'l' }
 
+const radioBoxClass = 'rounded-full border border-npi-blue bg-npi-bg-white transition-colors aria-disabled:border-npi-gray-700'
+const radioDotClass = 'opacity-0 aria-checked:opacity-100 aria-disabled:bg-npi-gray-700'
+
+export interface RadioVisualProps {
+	checked?: boolean
+	disabled?: boolean
+	size?: RadioSize
+	className?: string
+}
+
+/**
+ * Embeddable radio visual — the circle + dot, with no `<input>`/`<label>`. For rows that are
+ * themselves interactive (dropdown options, multi-select entries), where nesting a real input would
+ * hijack the wrapper's click/focus semantics. The form control (`Radio`) renders the same look via
+ * its peer-styled input; this component mirrors those checked/disabled states through props instead.
+ */
+export const RadioVisual = ({ checked, disabled, size = 'm', className }: RadioVisualProps) => (
+	<RadioBox size={size} aria-disabled={disabled} className={twMerge(clsx(radioBoxClass, className))}>
+		<RadioDot size={size} aria-checked={checked} aria-disabled={disabled} className={radioDotClass} />
+	</RadioBox>
+)
+RadioVisual.displayName = 'RadioVisual'
+
 export interface RadioProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size' | 'type'> {
 	/** Visual size — `s` (16px) for compact/complex forms, `m` (24px, default) for standalone use */
 	size?: RadioSize
