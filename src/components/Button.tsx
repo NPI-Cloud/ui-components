@@ -86,10 +86,13 @@ export type ButtonProps =
 		/** Anchor attributes — only meaningful together with `href` (the button renders as a link). */
 		target?: React.HTMLAttributeAnchorTarget
 		rel?: string
+		/** Busy state: keeps the variant's colors (unlike `disabled`'s gray), shows a spinner
+		 * before the label and blocks clicks. Communicated via `aria-busy` + `aria-disabled`. */
+		loading?: boolean
 	}
 
 export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonProps>(
-	({ label, iconBefore, iconAfter, className, variant, href, inverted, ...props }, ref) => {
+	({ label, iconBefore, iconAfter, className, variant, href, inverted, loading, ...props }, ref) => {
 		const resolvedInverted = useInverted(inverted)
 		const isIcon = variant === 'icon'
 		// An icon-only button renders no text, so it needs an accessible name. Fall back to `label`
@@ -99,14 +102,24 @@ export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPr
 		const iconSize = isSmall ? ('s' as const) : ('m' as const)
 		const iconClass = isSmall ? 'size-4' : ICON_SIZE
 
+		const spinner = loading
+			? (
+				<svg aria-hidden viewBox="0 0 24 24" fill="none" className={`${isSmall ? 'size-4' : 'size-5'} animate-spin`}>
+					<circle cx="12" cy="12" r="9" stroke="currentColor" strokeOpacity="0.3" strokeWidth="3" />
+					<path d="M12 3a9 9 0 0 1 9 9" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+				</svg>
+			)
+			: null
+
 		const inner = isIcon
 			? (() => {
+				if (spinner) return spinner
 				const name = iconBefore ?? iconAfter
 				return name ? <Icon name={name} className={ICON_SIZE} /> : null
 			})()
 			: (
 				<>
-					{iconBefore && <Icon name={iconBefore} size={iconSize} className={iconClass} />}
+					{spinner ?? (iconBefore && <Icon name={iconBefore} size={iconSize} className={iconClass} />)}
 					{label && <span>{label}</span>}
 					{iconAfter && <Icon name={iconAfter} size={iconSize} className={iconClass} />}
 				</>
@@ -129,9 +142,17 @@ export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPr
 				ref={ref as React.Ref<HTMLButtonElement>}
 				variant={variant}
 				inverted={resolvedInverted}
-				className={className}
+				className={loading ? `pointer-events-none ${className ?? ''}` : className}
 				{...props}
 				aria-label={resolvedAriaLabel}
+				aria-busy={loading || undefined}
+				aria-disabled={loading || props['aria-disabled']}
+				onClickCapture={loading
+					? e => {
+						e.preventDefault()
+						e.stopPropagation()
+					}
+					: props.onClickCapture}
 			>
 				{inner}
 			</ButtonRoot>
