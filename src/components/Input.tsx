@@ -10,6 +10,9 @@ export interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 
 	label?: ReactNode
 	/** Renders a red asterisk after the label (purely visual; pair with the native `required` attribute for semantics). */
 	required?: boolean
+	/** Suppresses the asterisk while keeping `required` semantics — for forms
+	 * where a whole step is required and per-field indicators would be noise. */
+	hideRequiredIndicator?: boolean
 	/** Tooltip text exposed via the info icon next to the label. */
 	helperText?: string
 	/** Error message rendered below the input. When set, the input gets a red border. */
@@ -24,6 +27,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
 	const {
 		label,
 		required = false,
+		hideRequiredIndicator = false,
 		helperText,
 		error,
 		iconAfter,
@@ -85,7 +89,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
 				>
 					<span>
 						{label}
-						{required && <span className={clsx('ml-[0.25em]', disabled ? 'text-npi-text-secondary' : 'text-npi-status-error')}>*</span>}
+						{required && !hideRequiredIndicator && <span className={clsx('ml-[0.25em]', disabled ? 'text-npi-text-secondary' : 'text-npi-status-error')}>*</span>}
 					</span>
 					{helperText && (
 						<span
