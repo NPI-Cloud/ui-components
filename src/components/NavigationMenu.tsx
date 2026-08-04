@@ -609,6 +609,36 @@ function NavigationMenuDrawerAccordion({ label, rowClass, liClass, className, ch
 	)
 }
 
+/**
+ * Resting / hover / focus styling of a top-level menu item. Shared by `NavigationMenuItem` and by
+ * `NavigationMenuLanguageSwitcher`, whose trigger must be visually indistinguishable from a
+ * regular menu item.
+ */
+function menuItemClass(
+	{ isIconOnly, isIconWithLabel, indent = 0, selected, className }: {
+		isIconOnly?: boolean
+		isIconWithLabel?: boolean
+		indent?: 0 | 1
+		selected?: boolean
+		className?: string
+	},
+): string {
+	return twMerge(
+		clsx(
+			'group inline-flex h-npi-6 items-center text-[1rem] leading-[1.5]',
+			'rounded-npi-xxs focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-npi-blue-light',
+			'bg-transparent cursor-pointer',
+			isIconOnly && 'size-6 justify-center gap-0',
+			!isIconOnly && (isIconWithLabel ? 'gap-npi-2 font-normal' : 'gap-[2px] font-bold'),
+			indent === 1 && 'pl-npi-4',
+			selected
+				? 'text-npi-blue-dark'
+				: 'text-npi-blue hover:text-npi-blue-dark data-[state=open]:text-npi-blue-dark',
+			className,
+		),
+	)
+}
+
 type NavigationMenuItemAnchor = AnchorHTMLAttributes<HTMLAnchorElement> & { as?: 'a' }
 type NavigationMenuItemButton = ButtonHTMLAttributes<HTMLButtonElement> & { as: 'button' }
 
@@ -745,20 +775,7 @@ export const NavigationMenuItem = forwardRef<HTMLElement, NavigationMenuItemProp
 	// Named profile / account-style rows (icon + label without a badge) use regular weight and an 8px
 	// gap — distinct from the bold, tight-gap label-only menu items. Matches Figma (`Jméno` spec).
 	const isIconWithLabel = !!icon && !!label && trailing !== 'badge'
-	const baseClass = twMerge(
-		clsx(
-			'group inline-flex h-npi-6 items-center text-[1rem] leading-[1.5]',
-			'rounded-npi-xxs focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-npi-blue-light',
-			'bg-transparent cursor-pointer',
-			isIconOnly && 'size-6 justify-center gap-0',
-			!isIconOnly && (isIconWithLabel ? 'gap-npi-2 font-normal' : 'gap-[2px] font-bold'),
-			indent === 1 && 'pl-npi-4',
-			state === 'select'
-				? 'text-npi-blue-dark'
-				: 'text-npi-blue hover:text-npi-blue-dark data-[state=open]:text-npi-blue-dark',
-			className,
-		),
-	)
+	const baseClass = menuItemClass({ isIconOnly, isIconWithLabel, indent, selected: state === 'select', className })
 
 	const labelNode = label && (
 		<span
@@ -905,6 +922,100 @@ export const NavigationMenuItem = forwardRef<HTMLElement, NavigationMenuItemProp
 	)
 })
 NavigationMenuItem.displayName = 'NavigationMenuItem'
+
+export interface NavigationMenuLanguage {
+	/** Visible name of the language as authored ("English", "Deutsch", "Čeština"). */
+	label: string
+	/** Where the entry navigates — that language's homepage. */
+	href: string
+	/** The language being browsed. Its label becomes the trigger; its entry is marked in the panel. */
+	current?: boolean
+}
+
+export interface NavigationMenuLanguageSwitcherProps extends HTMLAttributes<HTMLElement> {
+	/** All languages of the site, default language included. Empty renders nothing. */
+	languages: NavigationMenuLanguage[]
+	/** Accessible name of the switcher (the visible trigger text is the current language). */
+	label?: string
+}
+
+/**
+ * Language picker for the items bar. The trigger is styled exactly like a top-level
+ * `NavigationMenuItem` (label + chevron, same typography / hover / focus) and shows the language
+ * currently being browsed; the panel lists every language as a plain link to its homepage.
+ *
+ * Place it as the last child of `NavigationMenuItems` — it pushes itself to the right end of the
+ * bar. Inside `NavigationMenuDrawer` (and standalone) it degrades to a plain labelled group of
+ * links, which is also how it renders at mobile.
+ */
+export const NavigationMenuLanguageSwitcher = forwardRef<HTMLElement, NavigationMenuLanguageSwitcherProps>(
+	({ languages, label = 'Jazyk', className, ...props }, ref) => {
+		const insideItems = useContext(InsideItemsContext)
+		const insideDrawer = useContext(InsideDrawerContext)
+
+		if (languages.length === 0) return null
+		const current = languages.find(language => language.current) ?? languages[0]
+
+		const entries = (
+			<ul className="flex flex-col gap-npi-2">
+				{languages.map(language => (
+					<NavigationSubnavItem key={language.href} href={language.href} state={language === current ? 'select' : 'default'}>
+						{language.label}
+					</NavigationSubnavItem>
+				))}
+			</ul>
+		)
+
+		// Drawer (and standalone): a plain group of links at the end of the stack — no popover, no
+		// panel chrome, matching how the drawer flattens every other dropdown.
+		if (insideDrawer || !insideItems) {
+			return (
+				<nav
+					ref={ref as React.Ref<HTMLElement>}
+					aria-label={label}
+					className={twMerge(clsx('flex flex-col gap-npi-2 py-npi-4', className))}
+					{...props}
+				>
+					<span className="font-bold text-[1rem] leading-[1.5] text-npi-text-primary">{label}</span>
+					{entries}
+				</nav>
+			)
+		}
+
+		return (
+			<RadixNavMenu.Item asChild>
+				{/* `ml-auto` parks the switcher at the right end of the items bar, past the menu items. */}
+				<li className={twMerge(clsx('relative ml-auto flex', className))}>
+					<RadixNavMenu.Trigger asChild>
+						<button
+							ref={ref as React.Ref<HTMLButtonElement>}
+							type="button"
+							aria-label={label}
+							className={menuItemClass({})}
+							{...(props as ButtonHTMLAttributes<HTMLButtonElement>)}
+						>
+							<span className="relative whitespace-nowrap">{current.label}</span>
+							<Icon
+								name="arrowDoluSmall"
+								className="size-6 shrink-0 transition-transform group-hover:-rotate-180 group-focus-visible:-rotate-180 group-data-[state=open]:-rotate-180"
+								aria-hidden="true"
+							/>
+						</button>
+					</RadixNavMenu.Trigger>
+					{/* Right-anchored (the trigger sits at the bar's right edge, so a left-anchored panel
+					    would hang off the layout). Top offset matches the List's bottom padding, like the
+					    narrow subnavs. */}
+					<RadixNavMenu.Content className="absolute right-0 top-[calc(100%+var(--spacing-npi-6))] z-20">
+						<div className="min-w-[200px] rounded-npi-xs bg-npi-white p-npi-6 shadow-npi-m">
+							{entries}
+						</div>
+					</RadixNavMenu.Content>
+				</li>
+			</RadixNavMenu.Item>
+		)
+	},
+)
+NavigationMenuLanguageSwitcher.displayName = 'NavigationMenuLanguageSwitcher'
 
 export interface NavigationSubnavProps extends HTMLAttributes<HTMLDivElement> {
 	/** `wide` = 1064px panel, up to 4 columns, optional Promo card. `narrow` = 320px panel, single column. */
@@ -1306,12 +1417,20 @@ export interface NavigationProps extends Omit<HTMLAttributes<HTMLElement>, 'chil
 	/** Primary CTA — appears in the bar (desktop) and as a regular item in the drawer (mobile). */
 	cta?: NavigationCta
 	items: NavigationItem[]
+	/** Language versions of the site (default language included). Fewer than two = no switcher. */
+	languages?: NavigationMenuLanguage[]
+	/** Accessible name / drawer heading of the language switcher. */
+	languagesLabel?: string
 }
 
 export const Navigation = forwardRef<HTMLElement, NavigationProps>((props, ref) => {
-	const { siteSwitcher, brand, menuStyle = 'spacing', search, cta, items, ...rest } = props
+	const { siteSwitcher, brand, menuStyle = 'spacing', search, cta, items, languages, languagesLabel, ...rest } = props
 	const itemNodes = items.map((item, index) => <NavigationConfiguredItem key={index} item={item} />)
 	const switcher = siteSwitcher && <NavigationMenuSiteSwitcher {...siteSwitcher} />
+	// A single language is the plain monolingual site — nothing to switch to, so no switcher.
+	const languageSwitcher = languages && languages.length > 1
+		? <NavigationMenuLanguageSwitcher languages={languages} label={languagesLabel} />
+		: null
 
 	return (
 		<NavigationMenu ref={ref} menuStyle={menuStyle} {...rest}>
@@ -1342,8 +1461,14 @@ export const Navigation = forwardRef<HTMLElement, NavigationProps>((props, ref) 
 			</NavigationMenuBar>
 			{/* Skip the menu bars entirely when there are no items — otherwise the desktop
 			    `NavigationMenuItems` row renders as an empty 32px (pt-npi-2 + pb-npi-6) strip below
-			    the brand bar, which reads as an unexplained gap above the page content. */}
-			{itemNodes.length > 0 && <NavigationMenuItems>{itemNodes}</NavigationMenuItems>}
+			    the brand bar, which reads as an unexplained gap above the page content. A site with
+			    language versions still gets the bar: the switcher lives in it. */}
+			{(itemNodes.length > 0 || languageSwitcher) && (
+				<NavigationMenuItems>
+					{itemNodes}
+					{languageSwitcher}
+				</NavigationMenuItems>
+			)}
 			<NavigationMenuDrawer>
 				{search && (
 					<NavigationMenuSearch
@@ -1356,6 +1481,7 @@ export const Navigation = forwardRef<HTMLElement, NavigationProps>((props, ref) 
 				)}
 				{itemNodes.length > 0 && <NavigationMenuItems>{itemNodes}</NavigationMenuItems>}
 				{cta && <NavigationMenuItem label={cta.label} href={cta.href ?? '#'} onClick={cta.onClick} />}
+				{languageSwitcher}
 			</NavigationMenuDrawer>
 		</NavigationMenu>
 	)
