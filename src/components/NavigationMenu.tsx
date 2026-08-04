@@ -952,18 +952,40 @@ export interface NavigationMenuLanguageSwitcherProps extends HTMLAttributes<HTML
 }
 
 /**
- * Language picker for the items bar. The trigger is styled exactly like a top-level
- * `NavigationMenuItem` (label + chevron, same typography / hover / focus) and shows the language
- * currently being browsed; the panel lists every language as a plain link to its homepage.
+ * Language picker for the navigation's FIRST row (the brand bar with logo, site name and search) —
+ * per the Figma spec it sits at the bar's right edge, styled exactly like a top-level
+ * `NavigationMenuItem` trigger (label + chevron); the panel drops right-anchored below it and lists
+ * every language as a plain link to its homepage. It opens on click (a deliberate switch, unlike
+ * the hover menus) and closes on outside click / Escape.
  *
- * Place it as the last child of `NavigationMenuItems` — it pushes itself to the right end of the
- * bar. Inside `NavigationMenuDrawer` (and standalone) it degrades to a plain labelled group of
- * links, which is also how it renders at mobile.
+ * Inside `NavigationMenuDrawer` it degrades to a plain labelled group of links, matching how the
+ * drawer flattens every other dropdown. Desktop-only in the bar — the drawer covers mobile.
  */
 export const NavigationMenuLanguageSwitcher = forwardRef<HTMLElement, NavigationMenuLanguageSwitcherProps>(
 	({ languages, label = 'Jazyk', className, ...props }, ref) => {
-		const insideItems = useContext(InsideItemsContext)
 		const insideDrawer = useContext(InsideDrawerContext)
+		const [open, setOpen] = useState(false)
+		const wrapRef = useRef<HTMLDivElement | null>(null)
+
+		// Close on outside pointerdown / Escape. Listeners bind to the node's ownerDocument so the
+		// dropdown also closes correctly when the header renders inside an iframe (portaled previews).
+		useEffect(() => {
+			if (!open) return
+			const doc = wrapRef.current?.ownerDocument
+			if (!doc) return
+			const onPointerDown = (event: PointerEvent) => {
+				if (!wrapRef.current?.contains(event.target as Node)) setOpen(false)
+			}
+			const onKeyDown = (event: KeyboardEvent) => {
+				if (event.key === 'Escape') setOpen(false)
+			}
+			doc.addEventListener('pointerdown', onPointerDown)
+			doc.addEventListener('keydown', onKeyDown)
+			return () => {
+				doc.removeEventListener('pointerdown', onPointerDown)
+				doc.removeEventListener('keydown', onKeyDown)
+			}
+		}, [open])
 
 		if (languages.length === 0) return null
 		const current = languages.find(language => language.current) ?? languages[0]
@@ -978,9 +1000,8 @@ export const NavigationMenuLanguageSwitcher = forwardRef<HTMLElement, Navigation
 			</ul>
 		)
 
-		// Drawer (and standalone): a plain group of links at the end of the stack — no popover, no
-		// panel chrome, matching how the drawer flattens every other dropdown.
-		if (insideDrawer || !insideItems) {
+		// Drawer: a plain group of links at the end of the stack — no popover, no panel chrome.
+		if (insideDrawer) {
 			return (
 				<nav
 					ref={ref as React.Ref<HTMLElement>}
@@ -995,35 +1016,33 @@ export const NavigationMenuLanguageSwitcher = forwardRef<HTMLElement, Navigation
 		}
 
 		return (
-			<RadixNavMenu.Item asChild>
-				{/* `ml-auto` parks the switcher at the right end of the items bar, past the menu items. */}
-				<li className={twMerge(clsx('relative ml-auto flex', className))}>
-					<RadixNavMenu.Trigger asChild>
-						<button
-							ref={ref as React.Ref<HTMLButtonElement>}
-							type="button"
-							aria-label={label}
-							className={menuItemClass({})}
-							{...(props as ButtonHTMLAttributes<HTMLButtonElement>)}
-						>
-							<span className="relative whitespace-nowrap">{current.label}</span>
-							<Icon
-								name="arrowDoluSmall"
-								className="size-6 shrink-0 transition-transform group-hover:-rotate-180 group-focus-visible:-rotate-180 group-data-[state=open]:-rotate-180"
-								aria-hidden="true"
-							/>
-						</button>
-					</RadixNavMenu.Trigger>
-					{/* Right-anchored (the trigger sits at the bar's right edge, so a left-anchored panel
-					    would hang off the layout). Top offset matches the List's bottom padding, like the
-					    narrow subnavs. */}
-					<RadixNavMenu.Content className="absolute right-0 top-[calc(100%+var(--spacing-npi-6))] z-20">
-						<div className="min-w-[200px] rounded-npi-xs bg-npi-white p-npi-6 shadow-npi-m">
-							{entries}
-						</div>
-					</RadixNavMenu.Content>
-				</li>
-			</RadixNavMenu.Item>
+			<div ref={wrapRef} className={twMerge(clsx('relative flex items-center max-npi-desktop:hidden', className))}>
+				<button
+					ref={ref as React.Ref<HTMLButtonElement>}
+					type="button"
+					aria-label={label}
+					aria-haspopup="true"
+					aria-expanded={open}
+					data-state={open ? 'open' : 'closed'}
+					onClick={() => setOpen(value => !value)}
+					className={menuItemClass({})}
+					{...(props as ButtonHTMLAttributes<HTMLButtonElement>)}
+				>
+					<span className="relative whitespace-nowrap">{current.label}</span>
+					<Icon
+						name="arrowDoluSmall"
+						className="size-6 shrink-0 transition-transform group-data-[state=open]:-rotate-180"
+						aria-hidden="true"
+					/>
+				</button>
+				{/* Right-anchored — the trigger sits at the bar's right edge, so a left-anchored panel
+				    would hang off the layout. Same panel chrome as the narrow subnavs. */}
+				{open && (
+					<div className="absolute right-0 top-[calc(100%+var(--spacing-npi-2))] z-20 min-w-[200px] rounded-npi-xs bg-npi-white p-npi-6 shadow-npi-m">
+						{entries}
+					</div>
+				)}
+			</div>
 		)
 	},
 )
@@ -1469,16 +1488,15 @@ export const Navigation = forwardRef<HTMLElement, NavigationProps>((props, ref) 
 						<Button variant="primary" label={cta.label} href={cta.href} onClick={cta.onClick} className="min-w-0!" />
 					</NavigationMenuActions>
 				)}
+				{languageSwitcher}
 				<NavigationMenuMobileToggle />
 			</NavigationMenuBar>
 			{/* Skip the menu bars entirely when there are no items — otherwise the desktop
 			    `NavigationMenuItems` row renders as an empty 32px (pt-npi-2 + pb-npi-6) strip below
-			    the brand bar, which reads as an unexplained gap above the page content. A site with
-			    language versions still gets the bar: the switcher lives in it. */}
-			{(itemNodes.length > 0 || languageSwitcher) && (
+			    the brand bar, which reads as an unexplained gap above the page content. */}
+			{itemNodes.length > 0 && (
 				<NavigationMenuItems>
 					{itemNodes}
-					{languageSwitcher}
 				</NavigationMenuItems>
 			)}
 			<NavigationMenuDrawer>
