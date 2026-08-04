@@ -7,7 +7,7 @@ export { ApplePodcasts, Info, Kalendar, Podcast, Spotify, Stahnout, Tym, Video, 
 export * from './RenderBlock'
 export * from './spacing'
 export * from './story.types'
-export { type MapStyleRule, type MapStyler, NPI_MAP_LAND_COLOR, NPI_MAP_STYLE } from './utils/map-style'
+export { NPI_MAP_LAND_COLOR } from './utils/map-style'
 export {
 	buildTileSrc,
 	computeMosaic,

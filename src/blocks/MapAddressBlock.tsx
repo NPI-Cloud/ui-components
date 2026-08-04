@@ -16,11 +16,6 @@ export interface MapAddressBlockProps {
 	longitude?: number | null
 	/** Null = the component's street-level default. */
 	zoom?: number | null
-	/**
-	 * False in the editor canvas: the map renders as a picture, so a click selects the block instead
-	 * of booting (and billing) a live Google map.
-	 */
-	interactive?: boolean
 }
 
 // Placeholder address, shown while the editor has not filled the block in yet — a blank card would
@@ -29,7 +24,7 @@ const PLACEHOLDER_STREET = 'Senovážné náměstí 872/25'
 const PLACEHOLDER_CITY = 'Praha 1'
 
 /** Maps the sparse `WebsiteBlock` columns onto `MapAddress`. Every input is nullable — the form enforces nothing. */
-export function MapAddressBlock({ name, street, city, zip, country, email, phone, phoneNote, latitude, longitude, zoom, interactive }: MapAddressBlockProps) {
+export function MapAddressBlock({ name, street, city, zip, country, email, phone, phoneNote, latitude, longitude, zoom }: MapAddressBlockProps) {
 	// A pin needs both halves; one alone would silently place the map in the Gulf of Guinea.
 	const center = typeof latitude === 'number' && typeof longitude === 'number' ? { lat: latitude, lng: longitude } : null
 
@@ -48,7 +43,6 @@ export function MapAddressBlock({ name, street, city, zip, country, email, phone
 			phone={phoneProp}
 			center={center}
 			zoom={zoom}
-			interactive={interactive}
 		/>
 	)
 }

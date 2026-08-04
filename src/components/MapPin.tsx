@@ -1,9 +1,8 @@
 // The NPI map pin — npi-blue teardrop with a hollow white circle in the bulb (Figma 7295:3234 "Pin").
 //
-// Three surfaces have to draw the SAME pin or the swap from the static facade to the live Google map
-// visibly jumps: the decorative pin on a map-less `MapAddress`, the facade's projected marker, and
-// the live map's `google.maps.Marker` icon. The React component covers the first; the baked data URI
-// covers the other two (both need a plain image URL, not a component).
+// Two surfaces draw the same pin: the decorative pin on a map-less `MapAddress` (the React
+// component) and `StaticMap`'s projected marker (the baked data URI — an <img> needs a plain URL,
+// not a component).
 
 /** Teardrop body. Copied verbatim from Figma; the flip transform below hangs the point downwards. */
 const PIN_PATH_D =
@@ -22,7 +21,7 @@ const pinSvg = (fill: string): string =>
 	+ `<circle cx="14.7536" cy="14.7531" r="8.6305" fill="white"/>`
 	+ `</svg>`
 
-/** The pin as an inline SVG data URI, for surfaces that take an image URL (facade markers, Maps-JS marker icons). */
+/** The pin as an inline SVG data URI, for surfaces that take an image URL (`StaticMap`'s markers). */
 export const MAP_PIN_DATA_URI = `data:image/svg+xml;utf8,${encodeURIComponent(pinSvg(NPI_BLUE))}`
 
 /**

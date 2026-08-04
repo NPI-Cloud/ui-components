@@ -1,21 +1,23 @@
 'use client'
 
 import { clsx } from 'clsx'
-import { forwardRef, lazy, type ReactNode, Suspense, useState } from 'react'
+import { forwardRef, type ReactNode } from 'react'
 import { twMerge } from 'tailwind-merge'
 import { Icon } from '../icons'
 import type { LatLng } from '../utils/static-map'
-import { type FacadeMarker, MapFacade } from './MapFacade'
 import { MapPin } from './MapPin'
-import { useMapsConfig } from './map-config'
+import { StaticMap, type StaticMapMarker } from './StaticMap'
 import { Image, Link } from './ui-primitives'
 
-// Lazy so neither the Maps JS loader nor the canvas code lands in the initial bundle — a pageview
-// that never activates the map must not pay for it in bytes or in Dynamic Maps loads.
-const GoogleMapCanvas = lazy(() => import('./GoogleMapCanvas'))
+/** Zoom of the static map. Street level: the block answers "where is this address". */
+const DEFAULT_ZOOM = 15
 
-/** Zoom of the live map, and therefore of the static facade that stands in for it. Street level: the block answers "where is this address". */
-const LIVE_ZOOM = 15
+/**
+ * Google Maps destination for the pin. The documented Maps URLs API (`search/?api=1&query=`) drops a
+ * marker on the coordinates and lets Google pick the zoom — it takes no zoom parameter, so the
+ * block's zoom stays a property of the picture only.
+ */
+const googleMapsUrl = ({ lat, lng }: LatLng): string => `https://www.google.com/maps/search/?api=1&query=${lat}%2C${lng}`
 
 export interface MapAddressLocation {
 	/** Street and house number, e.g. "Senovážné náměstí 25". */
@@ -45,20 +47,15 @@ export interface MapAddressProps extends Omit<React.HTMLAttributes<HTMLElement>,
 	/** Phone number (string or `{ number, note }`) — rendered with the receiver icon, link-coloured number. */
 	phone?: string | MapAddressPhone
 	/**
-	 * Coordinates of the pin. With them the map box becomes a real Google map: a cached static preview
-	 * that boots the live, pannable map on click. Without them it stays a flat panel with a decorative
-	 * centre pin — which is also what you get if the host injected no `MapsConfigProvider`.
+	 * Coordinates of the pin. With them the map box shows cached Google tiles and links to Google Maps
+	 * in a new tab. Without them it stays a flat panel with a decorative centre pin — which is also
+	 * what you get if the host injected no `MapsConfigProvider`.
 	 */
 	center?: LatLng | null
-	/** Overrides the street-level default zoom (15). Applies to the preview and the live map alike. */
+	/** Overrides the street-level default zoom (15) of the rendered picture. */
 	zoom?: number | null
-	/**
-	 * Set false to render the map as a picture that never activates — the editor canvas uses this so a
-	 * click selects the block instead of booting (and billing) a live map.
-	 */
-	interactive?: boolean
-	/** Accessible name of the activation control. */
-	activateLabel?: string
+	/** Accessible name of the link that opens the pin in Google Maps. */
+	mapLinkLabel?: string
 	/**
 	 * URL of a static map image rendered inside the map container as the background. An escape hatch
 	 * for a map that is not Google's — ignored once `center` is set.
@@ -88,9 +85,8 @@ export interface MapAddressProps extends Omit<React.HTMLAttributes<HTMLElement>,
 // below the map on narrow containers and overlaid on the map's left edge from the `@npi-tablet` (768px)
 // container breakpoint up. No manual orientation — it adapts to the space it's given.
 const wrapperClass = 'relative flex w-full flex-col items-stretch gap-npi-6 @npi-tablet:block'
-// `relative` + a size that does not depend on children is what makes the facade → live-map swap
-// seamless: both layers are absolutely positioned inside this box, so activating one cannot reflow
-// the page.
+// `relative` + a size that does not depend on children: the map fills this box absolutely, so tiles
+// arriving (or failing) never reflow the page.
 const mapClass = 'relative w-full overflow-hidden rounded-npi-s bg-npi-bg-light'
 // Full-width in flow below the map when narrow; from @npi-tablet up it becomes an absolute overlay
 // inset 24px from the map's top-left (Figma 7292:748 — 302px card), shrunk to its content so it stays
@@ -105,8 +101,7 @@ export const MapAddress = forwardRef<HTMLElement, MapAddressProps>((props, ref) 
 		phone,
 		center,
 		zoom,
-		interactive = true,
-		activateLabel = 'Zobrazit mapu',
+		mapLinkLabel = 'Otevřít v Mapách Google (nové okno)',
 		mapImageSrc,
 		mapAlt = '',
 		mapSlot,
@@ -117,40 +112,27 @@ export const MapAddress = forwardRef<HTMLElement, MapAddressProps>((props, ref) 
 		...rest
 	} = props
 
-	const { apiKey } = useMapsConfig()
-	const [isLive, setIsLive] = useState(false)
-
 	const phoneObj: MapAddressPhone | undefined = typeof phone === 'string' ? { number: phone } : phone
 
 	const cityLine = address.zip ? `${address.zip} ${address.city}` : address.city
 
-	const liveZoom = zoom ?? LIVE_ZOOM
-	// One pin, on the address itself. `id` is stable so the live map does not rebuild on re-render.
-	const markers: FacadeMarker[] = center ? [{ id: 'address', lat: center.lat, lng: center.lng }] : []
-	// Activating costs a Dynamic Maps load, so only offer it when there is a key to load with and the
-	// host actually wants interaction (the editor canvas does not).
-	const canActivate = Boolean(center && apiKey && interactive)
+	const mapZoom = zoom ?? DEFAULT_ZOOM
+	// One pin, on the address itself.
+	const markers: StaticMapMarker[] = center ? [{ id: 'address', lat: center.lat, lng: center.lng }] : []
 
+	// The picture is inert; the coordinates are what makes it clickable, and they take the visitor to
+	// Google Maps in a new tab rather than booting a pannable map here.
 	const mapNode = mapSlot ?? (center
 		? (
-			<>
-				{/* The facade deliberately stays mounted UNDER the live map: the Maps canvas is opaque once
-				    painted, so during its ~300–800 ms load the visitor keeps seeing the preview instead of
-				    a blank box. */}
-				<MapFacade
-					center={center}
-					liveZoom={liveZoom}
-					markers={markers}
-					active={isLive}
-					onActivate={canActivate ? () => setIsLive(true) : undefined}
-					label={activateLabel}
-				/>
-				{isLive && apiKey && (
-					<Suspense fallback={null}>
-						<GoogleMapCanvas center={center} zoom={liveZoom} markers={markers} apiKey={apiKey} className="absolute inset-0 size-full" />
-					</Suspense>
-				)}
-			</>
+			<Link
+				href={googleMapsUrl(center)}
+				target="_blank"
+				rel="noopener noreferrer"
+				aria-label={mapLinkLabel}
+				className="absolute inset-0 block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-npi-blue"
+			>
+				<StaticMap center={center} zoom={mapZoom} markers={markers} />
+			</Link>
 		)
 		: mapImageSrc
 		? (

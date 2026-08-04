@@ -1,15 +1,12 @@
-// Environment-agnostic helpers for the Google Static Maps facade — the preview that stands in for a
-// live Maps-JS map until the visitor actually interacts with it.
+// Environment-agnostic helpers for the Google Static Maps picture rendered by `StaticMap`.
 //
-// The preview has two layers:
-//   1. A MARKERLESS base rendered at the LIVE zoom for full detail. A single Static Maps image caps
-//      at 640 logical px per side, so a container wider/taller than that is covered by a MOSAIC of
-//      tiles laid out in the DOM (`computeMosaic`). Each tile is shown at its native size, so it is
-//      crisp on both standard and retina screens and the mosaic reproduces the live map's extent
-//      AND detail — the swap to the live map is invisible.
-//   2. Per-marker icons as DOM elements, positioned by web-mercator math (`pinPercent`) at the live
-//      zoom. Identical icon, position and anchor to the Maps-JS marker, and they do not scale with
-//      the base image.
+// The picture has two layers:
+//   1. A MARKERLESS base rendered at the requested zoom for full detail. A single Static Maps image
+//      caps at 640 logical px per side, so a container wider/taller than that is covered by a MOSAIC
+//      of tiles laid out in the DOM (`computeMosaic`). Each tile is shown at its native size, so it
+//      is crisp on both standard and retina screens.
+//   2. Per-marker icons as DOM elements, positioned by web-mercator math (`pinPercent`) at the same
+//      zoom, so they do not scale with the base image.
 //
 // Keep this module DOM-free and Node-free: it is imported by the browser (build tile srcs, place
 // pins) and mirrored by the worker proxy that talks to maps.googleapis.com.
@@ -69,13 +66,13 @@ export type MosaicTile = {
 // multi-tile mosaic those land mid-map at the seams, so each tile is requested this many logical px
 // TALLER and that bottom strip is clipped off — removing the baked credit without losing any of the
 // intended map area. A single credit is restored over the whole mosaic instead (Google's terms
-// require the attribution to stay visible — see `MapFacade`).
+// require the attribution to stay visible — see `StaticMap`).
 const ATTRIBUTION_CROP = 24
 
 /**
  * Lay out the smallest grid of tiles (each ≤ 640 logical px) that covers the container at `zoom`,
- * centered on `center`. At the live zoom 1 CSS px == 1 world px, so each tile's CSS box size equals
- * its requested logical size and the mosaic reproduces the live map's extent and detail exactly.
+ * centered on `center`. 1 CSS px == 1 world px at the requested zoom, so each tile's CSS box size
+ * equals its requested logical size and the mosaic reproduces the intended extent and detail exactly.
  * The grid is centered on `center` and may overspill the container by up to one tile fraction,
  * which the container clips.
  */

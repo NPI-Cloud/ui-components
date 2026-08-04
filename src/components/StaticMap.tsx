@@ -8,42 +8,31 @@ import { buildTileSrc, computeMosaic, type LatLng, pinPercent, snapMapSize } fro
 import { MAP_PIN_DATA_URI, MAP_PIN_HEIGHT, MAP_PIN_WIDTH } from './MapPin'
 import { useMapsConfig } from './map-config'
 
-export type FacadeMarker = { id: string; lat: number; lng: number; iconUrl?: string | null }
+export type StaticMapMarker = { id: string; lat: number; lng: number; iconUrl?: string | null }
 
-export interface MapFacadeProps {
+export interface StaticMapProps {
 	center: LatLng
-	/**
-	 * Zoom of the live map this facade stands in for. The base is rendered at this zoom (full detail)
-	 * and markers are projected at it, so activating the live map changes nothing on screen. A
-	 * mismatch here is the single most visible porting bug — the pins jump on click.
-	 */
-	liveZoom: number
-	markers: readonly FacadeMarker[]
-	/** True once the live map is mounted on top: the facade stays rendered underneath but stops taking clicks. */
-	active: boolean
-	/** Called on click / Enter. Omit to render a non-interactive picture (editor canvas, no API key). */
-	onActivate?: () => void
-	/** Accessible name of the activation button. */
-	label: string
+	/** Zoom the tiles are rendered at and the markers are projected at — the two must agree or the pins sit off their addresses. */
+	zoom: number
+	markers: readonly StaticMapMarker[]
 	className?: string
 }
 
 /**
- * The static stand-in for a live Google map: a mosaic of cached Static Maps tiles with DOM markers
- * on top, rendered as a `<button>` so keyboard and screen-reader activation come for free.
+ * A map as a picture: a mosaic of cached Static Maps tiles with DOM markers on top.
  *
- * It exists to keep the Dynamic Maps SKU off the bill for the overwhelming majority of visitors who
- * never touch the map, and to keep ~500 kB of Maps JS out of the critical path. See
- * `docs/map-facade-inspiration.md` for the full cost model.
+ * It carries no Maps JS and never becomes pannable — a visitor who wants to explore is sent to
+ * Google Maps in a new tab instead. That keeps the Dynamic Maps SKU off the bill entirely and
+ * ~500 kB of Maps JS out of the page.
  */
-export function MapFacade({ center, liveZoom, markers, active, onActivate, label, className }: MapFacadeProps) {
+export function StaticMap({ center, zoom, markers, className }: StaticMapProps) {
 	const { staticMapEndpoint } = useMapsConfig()
-	const ref = useRef<HTMLElement | null>(null)
+	const ref = useRef<HTMLDivElement | null>(null)
 	const [size, setSize] = useState<{ width: number; height: number } | null>(null)
 	const [failed, setFailed] = useState(false)
 
 	// useLayoutEffect, not useEffect: measure before paint so the tiles are requested in the same
-	// frame the box appears, otherwise the facade flashes empty on first render.
+	// frame the box appears, otherwise the map flashes empty on first render.
 	useLayoutEffect(() => {
 		const element = ref.current
 		if (!element) return
@@ -68,14 +57,18 @@ export function MapFacade({ center, liveZoom, markers, active, onActivate, label
 	// measured size. The ≤ 16 px difference is absorbed by the container's clip. The src is built
 	// here, inside the guard, so there is no "what if there's no endpoint" branch further down.
 	const tiles = size && staticMapEndpoint && !failed
-		? computeMosaic(snapMapSize(size.width), snapMapSize(size.height), center, liveZoom).map(tile => ({
+		? computeMosaic(snapMapSize(size.width), snapMapSize(size.height), center, zoom).map(tile => ({
 			...tile,
 			src: buildTileSrc({ endpoint: staticMapEndpoint, center: tile.center, zoom: tile.zoom, width: tile.reqWidth, height: tile.reqHeight }),
 		}))
 		: []
 
-	const content = (
-		<>
+	return (
+		<div
+			ref={ref}
+			className={twMerge(clsx('absolute inset-0 size-full overflow-hidden', className))}
+			style={{ background: NPI_MAP_LAND_COLOR }}
+		>
 			{tiles.map(tile => (
 				<span
 					key={`${tile.leftPx}:${tile.topPx}`}
@@ -98,7 +91,7 @@ export function MapFacade({ center, liveZoom, markers, active, onActivate, label
 			))}
 
 			{/* Google's terms require the attribution to stay visible. It is clipped off every tile, so
-			    restore exactly one over the whole mosaic, styled like the live map's own credit. */}
+			    restore exactly one over the whole mosaic, styled like Google's own credit. */}
 			{tiles.length > 0 && (
 				<span className="pointer-events-none absolute bottom-0 right-0 whitespace-nowrap bg-white/70 px-1 py-px font-npi-sans text-[10px] leading-[1.2] text-npi-gray-700">
 					Map data ©Google
@@ -107,7 +100,7 @@ export function MapFacade({ center, liveZoom, markers, active, onActivate, label
 
 			{size
 				&& markers.map(marker => {
-					const position = pinPercent({ lat: marker.lat, lng: marker.lng }, center, liveZoom, size.width, size.height)
+					const position = pinPercent({ lat: marker.lat, lng: marker.lng }, center, zoom, size.width, size.height)
 					return (
 						<img
 							key={marker.id}
@@ -121,32 +114,6 @@ export function MapFacade({ center, liveZoom, markers, active, onActivate, label
 						/>
 					)
 				})}
-		</>
-	)
-
-	const boxClass = twMerge(clsx('absolute inset-0 size-full overflow-hidden border-none p-0', active && 'pointer-events-none', className))
-
-	// Without `onActivate` there is nothing to activate, so render a plain box rather than a button
-	// that announces itself as interactive to assistive tech and then does nothing.
-	if (!onActivate) {
-		return (
-			<div ref={ref as React.Ref<HTMLDivElement>} className={boxClass} style={{ background: NPI_MAP_LAND_COLOR }}>
-				{content}
-			</div>
-		)
-	}
-
-	return (
-		<button
-			ref={ref as React.Ref<HTMLButtonElement>}
-			type="button"
-			onClick={onActivate}
-			disabled={active}
-			aria-label={label}
-			className={twMerge(boxClass, 'cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-npi-blue')}
-			style={{ background: NPI_MAP_LAND_COLOR }}
-		>
-			{content}
-		</button>
+		</div>
 	)
 }
