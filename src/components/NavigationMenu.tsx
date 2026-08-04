@@ -949,6 +949,9 @@ export interface NavigationMenuLanguageSwitcherProps extends HTMLAttributes<HTML
 	languages: NavigationMenuLanguage[]
 	/** Accessible name of the switcher (the visible trigger text is the current language). */
 	label?: string
+	/** Fires when the dropdown opens/closes — hosts that reserve space for the panel (the admin
+	 * preview frame) listen here instead of sniffing DOM state. */
+	onOpenChange?: (open: boolean) => void
 }
 
 /**
@@ -962,10 +965,14 @@ export interface NavigationMenuLanguageSwitcherProps extends HTMLAttributes<HTML
  * drawer flattens every other dropdown. Desktop-only in the bar — the drawer covers mobile.
  */
 export const NavigationMenuLanguageSwitcher = forwardRef<HTMLElement, NavigationMenuLanguageSwitcherProps>(
-	({ languages, label = 'Jazyk', className, ...props }, ref) => {
+	({ languages, label = 'Jazyk', className, onOpenChange, ...props }, ref) => {
 		const insideDrawer = useContext(InsideDrawerContext)
-		const [open, setOpen] = useState(false)
+		const [open, setOpenState] = useState(false)
 		const wrapRef = useRef<HTMLDivElement | null>(null)
+		const setOpen = (next: boolean) => {
+			if (next !== open) onOpenChange?.(next)
+			setOpenState(next)
+		}
 
 		// Close on outside pointerdown / Escape. Listeners bind to the node's ownerDocument so the
 		// dropdown also closes correctly when the header renders inside an iframe (portaled previews).
@@ -973,11 +980,15 @@ export const NavigationMenuLanguageSwitcher = forwardRef<HTMLElement, Navigation
 			if (!open) return
 			const doc = wrapRef.current?.ownerDocument
 			if (!doc) return
+			const close = () => {
+				setOpenState(false)
+				onOpenChange?.(false)
+			}
 			const onPointerDown = (event: PointerEvent) => {
-				if (!wrapRef.current?.contains(event.target as Node)) setOpen(false)
+				if (!wrapRef.current?.contains(event.target as Node)) close()
 			}
 			const onKeyDown = (event: KeyboardEvent) => {
-				if (event.key === 'Escape') setOpen(false)
+				if (event.key === 'Escape') close()
 			}
 			doc.addEventListener('pointerdown', onPointerDown)
 			doc.addEventListener('keydown', onKeyDown)
@@ -985,7 +996,7 @@ export const NavigationMenuLanguageSwitcher = forwardRef<HTMLElement, Navigation
 				doc.removeEventListener('pointerdown', onPointerDown)
 				doc.removeEventListener('keydown', onKeyDown)
 			}
-		}, [open])
+		}, [open, onOpenChange])
 
 		if (languages.length === 0) return null
 		const current = languages.find(language => language.current) ?? languages[0]
@@ -1023,15 +1034,18 @@ export const NavigationMenuLanguageSwitcher = forwardRef<HTMLElement, Navigation
 					aria-label={label}
 					aria-haspopup="true"
 					aria-expanded={open}
-					data-state={open ? 'open' : 'closed'}
-					onClick={() => setOpen(value => !value)}
+					// Deliberately NOT the menu dropdowns' `data-state=open` — consumers that reserve
+					// space for open panels (the admin preview frame) must size the two differently,
+					// and CSS `:has()` can only tell them apart by distinct attributes.
+					{...(open ? { 'data-language-open': '' } : {})}
+					onClick={() => setOpen(!open)}
 					className={menuItemClass({})}
 					{...(props as ButtonHTMLAttributes<HTMLButtonElement>)}
 				>
 					<span className="relative whitespace-nowrap">{current.label}</span>
 					<Icon
 						name="arrowDoluSmall"
-						className="size-6 shrink-0 transition-transform group-data-[state=open]:-rotate-180"
+						className="size-6 shrink-0 transition-transform group-aria-expanded:-rotate-180"
 						aria-hidden="true"
 					/>
 				</button>
