@@ -3,6 +3,7 @@
 import { clsx } from 'clsx'
 import { forwardRef, type HTMLAttributes, type ReactNode } from 'react'
 import { twMerge } from 'tailwind-merge'
+import { Icon } from '../icons'
 import { InvertedContext } from '../utils/inverted-context'
 
 export const stickyBarTones = ['light', 'inverted'] as const
@@ -27,6 +28,15 @@ export interface StickyBarProps extends HTMLAttributes<HTMLElement> {
 	 * visible element (full-width); on desktop it sits at the end of the row next to `children`.
 	 */
 	action?: ReactNode
+	/**
+	 * When provided, a close (×) button is rendered at the end of the row and this fires on click.
+	 * Omit it for a permanent bar — the affordance and the space it takes only exist when the
+	 * consumer can actually dismiss the bar. Unlike `children`, the close button stays visible on
+	 * mobile so a dismissible bar can always be dismissed.
+	 */
+	onDismiss?: () => void
+	/** Override the close button aria-label (default: "Zavřít"). */
+	dismissLabel?: string
 }
 
 // Bar background spans the full viewport width and sticks to one edge of the scroll parent.
@@ -58,12 +68,20 @@ const contextClass = 'hidden min-w-0 flex-1 items-center gap-npi-6 @npi-tablet:f
 // `flex flex-col` (default `items-stretch`) stretches the child button to the bar width on mobile.
 const actionClass = 'flex w-full flex-col @npi-tablet:w-auto'
 
+// Close (×): rendered at every viewport width — a bar the visitor may dismiss must stay
+// dismissible on mobile, where `children` are hidden and only the action shows.
+const dismissButtonClass = 'inline-flex size-6 shrink-0 cursor-pointer items-center justify-center '
+	+ 'outline-none transition-opacity hover:opacity-70 '
+	+ 'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current'
+
 export const StickyBar = forwardRef<HTMLElement, StickyBarProps>(({
 	tone = 'light',
 	position = 'bottom',
 	className,
 	children,
 	action,
+	onDismiss,
+	dismissLabel = 'Zavřít',
 	...props
 }, ref) => {
 	return (
@@ -78,6 +96,11 @@ export const StickyBar = forwardRef<HTMLElement, StickyBarProps>(({
 				<div className={innerClass}>
 					{children != null && <div className={contextClass}>{children}</div>}
 					{action != null && <div className={actionClass}>{action}</div>}
+					{onDismiss != null && (
+						<button type="button" onClick={onDismiss} aria-label={dismissLabel} className={dismissButtonClass}>
+							<Icon name="zavrit" aria-hidden="true" className="size-6" />
+						</button>
+					)}
 				</div>
 			</InvertedContext.Provider>
 		</aside>
