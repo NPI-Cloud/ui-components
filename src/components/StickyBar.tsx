@@ -53,7 +53,10 @@ const toneClass: Record<StickyBarTone, string> = {
 
 const positionClass: Record<StickyBarPosition, string> = {
 	bottom: 'bottom-0',
-	top: 'top-0',
+	// A pinned top bar sits above the header chrome that scrolls away beneath it — the navigation's
+	// brand row carries z-40 (its shadow-bleed fix), so the bar needs one step more. z-[45] keeps it
+	// under the overlay layer (dropdowns, tooltips, pickers at z-50).
+	top: 'top-0 z-[45]',
 }
 
 // Inner layout is centered at the NPI 1064px layout width to match the website's content column.
