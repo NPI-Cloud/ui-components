@@ -170,12 +170,15 @@ export const NavigationMenu = forwardRef<HTMLElement, NavigationMenuProps>(
 							clsx(
 								// At mobile the header is a normal flex column with its own background; `data-[mobile-open]`
 								// grows it to viewport height so the absolutely-positioned drawer has room to render.
+								// A top-pinned announcement bar above the header eats the first `--npi-top-bar-height`
+								// pixels of the viewport (0 when there is none), so the open drawer only claims what's
+								// left — otherwise its last rows would sit below the fold with the page scroll locked.
 								// Inside auto-sizing iframes (showcase) `100dvh` is circular with the iframe's scrollHeight,
 								// so we floor the min-height at 40rem (~typical mobile viewport).
 								// At desktop the header dissolves via `display: contents` so its children (site switcher,
 								// brand bar, items) become direct siblings of the page wrapper. That lets the items bar
 								// sticky-pin to the actual viewport while the bars above scroll away.
-								'relative flex flex-col font-npi-sans data-[mobile-open]:min-h-[max(40rem,100dvh)] npi-desktop:contents',
+								'relative flex flex-col font-npi-sans data-[mobile-open]:min-h-[max(40rem,calc(100dvh_-_var(--npi-top-bar-height,0px)))] npi-desktop:contents',
 								navigationMenuBackgroundClass(menuStyle),
 								className,
 							),
@@ -498,7 +501,10 @@ export const NavigationMenuItems = forwardRef<
 	// Drop the shadow only once the bar leaves its in-flow position and pins to the viewport top.
 	// A zero-height sentinel just before the bar is observed: when it leaves the viewport top, the
 	// bar is stuck. Works inside iframes too because IntersectionObserver uses the element's own
-	// document viewport by default.
+	// document viewport by default. The sentinel is shifted up by the sticky offset
+	// (`--npi-top-bar-height`, see the Root below) with `position: relative`, which moves the
+	// observed box without touching layout — so it crosses the viewport edge at exactly the scroll
+	// position where the bar pins, however tall the announcement bar above it currently is.
 	useEffect(() => {
 		const sentinel = sentinelRef.current
 		if (!sentinel) return
@@ -526,7 +532,7 @@ export const NavigationMenuItems = forwardRef<
 
 	return (
 		<>
-			<div ref={sentinelRef} aria-hidden className="max-npi-desktop:hidden h-0" />
+			<div ref={sentinelRef} aria-hidden className="max-npi-desktop:hidden relative h-0 top-[calc(-1*var(--npi-top-bar-height,0px))]" />
 			<RadixNavMenu.Root
 				ref={ref}
 				aria-label="Hlavní navigace"
@@ -534,12 +540,18 @@ export const NavigationMenuItems = forwardRef<
 				className={twMerge(
 					clsx(
 						// Full-width sticky bar at desktop: parent header dissolves via `npi-desktop:contents`,
-						// so this Root becomes a direct sibling of the page wrapper and `top-0` resolves against
-						// the actual viewport. Background + z-index keep page content from showing through.
+						// so this Root becomes a direct sibling of the page wrapper and the sticky offset resolves
+						// against the actual viewport. Background + z-index keep page content from showing through.
+						// The offset is `--npi-top-bar-height`, an optional contract with the embedding app: a page
+						// that pins an announcement bar (`StickyBar position="top"`) to the viewport top publishes
+						// the bar's live height in that property on the document root, and the menu pins directly
+						// below it instead of sliding underneath. Unset (no bar, or the visitor dismissed it) the
+						// `0px` fallback pins the menu at the very top — the fallback is mandatory, an undefined
+						// var would compute to `top: auto` and the bar would not stick at all.
 						// `data-[stuck]` toggles the drop shadow only once the bar pins to the viewport top
 						// (driven by an IntersectionObserver on the sentinel above). Dark, semi-transparent
 						// shadow so it stays visible above light AND dark page surfaces.
-						'relative flex w-full justify-center max-npi-desktop:hidden npi-desktop:sticky npi-desktop:top-0 npi-desktop:z-30 npi-desktop:transition-shadow',
+						'relative flex w-full justify-center max-npi-desktop:hidden npi-desktop:sticky npi-desktop:top-[var(--npi-top-bar-height,0px)] npi-desktop:z-30 npi-desktop:transition-shadow',
 						navigationMenuBackgroundClass(menuStyle),
 						menuStyle === 'shadow' ? navigationMenuShadowClass : navigationMenuStuckShadowClass,
 						className,
