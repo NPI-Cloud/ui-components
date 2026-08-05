@@ -46,6 +46,8 @@ export interface MapAddressProps extends Omit<React.HTMLAttributes<HTMLElement>,
 	email?: string
 	/** Phone number (string or `{ number, note }`) — rendered with the receiver icon, link-coloured number. */
 	phone?: string | MapAddressPhone
+	/** Second phone contact — rendered as another receiver-icon row below the first. */
+	secondaryPhone?: string | MapAddressPhone
 	/**
 	 * Coordinates of the pin. With them the map box shows cached Google tiles and links to Google Maps
 	 * in a new tab. Without them it stays a flat panel with a decorative centre pin — which is also
@@ -99,6 +101,7 @@ export const MapAddress = forwardRef<HTMLElement, MapAddressProps>((props, ref) 
 		address,
 		email,
 		phone,
+		secondaryPhone,
 		center,
 		zoom,
 		mapLinkLabel = 'Otevřít v Mapách Google (nové okno)',
@@ -112,7 +115,9 @@ export const MapAddress = forwardRef<HTMLElement, MapAddressProps>((props, ref) 
 		...rest
 	} = props
 
-	const phoneObj: MapAddressPhone | undefined = typeof phone === 'string' ? { number: phone } : phone
+	const phoneRows = [phone, secondaryPhone]
+		.map(p => (typeof p === 'string' ? { number: p } : p))
+		.filter((p): p is MapAddressPhone => p !== undefined)
 
 	const cityLine = address.zip ? `${address.zip} ${address.city}` : address.city
 
@@ -210,8 +215,8 @@ export const MapAddress = forwardRef<HTMLElement, MapAddressProps>((props, ref) 
 						</div>
 					)}
 
-					{phoneObj && (
-						<div className="flex items-start gap-npi-2">
+					{phoneRows.map((phoneObj, i) => (
+						<div key={i} className="flex items-start gap-npi-2">
 							<Icon name="telefon" size="m" className="size-npi-6 shrink-0 text-npi-blue" aria-hidden />
 							<div className="flex flex-col items-start">
 								<Link
@@ -227,7 +232,7 @@ export const MapAddress = forwardRef<HTMLElement, MapAddressProps>((props, ref) 
 								)}
 							</div>
 						</div>
-					)}
+					))}
 
 					{actions && (
 						<div className="mt-npi-2 flex flex-wrap items-center gap-npi-3">

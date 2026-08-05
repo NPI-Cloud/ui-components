@@ -11,6 +11,9 @@ export interface MapAddressBlockProps {
 	phone?: string | null
 	/** Secondary line under the phone number, e.g. "sekretariát". */
 	phoneNote?: string | null
+	/** Second phone contact, rendered as another phone row below the first. */
+	secondaryPhone?: string | null
+	secondaryPhoneNote?: string | null
 	/** Pin position. Both are needed for a map — either one missing leaves the flat panel with a decorative pin. */
 	latitude?: number | null
 	longitude?: number | null
@@ -24,11 +27,14 @@ const PLACEHOLDER_STREET = 'Senovážné náměstí 872/25'
 const PLACEHOLDER_CITY = 'Praha 1'
 
 /** Maps the sparse `WebsiteBlock` columns onto `MapAddress`. Every input is nullable — the form enforces nothing. */
-export function MapAddressBlock({ name, street, city, zip, country, email, phone, phoneNote, latitude, longitude, zoom }: MapAddressBlockProps) {
+export function MapAddressBlock({ name, street, city, zip, country, email, phone, phoneNote, secondaryPhone, secondaryPhoneNote, latitude, longitude, zoom }: MapAddressBlockProps) {
 	// A pin needs both halves; one alone would silently place the map in the Gulf of Guinea.
 	const center = typeof latitude === 'number' && typeof longitude === 'number' ? { lat: latitude, lng: longitude } : null
 
 	const phoneProp: MapAddressPhone | undefined = phone ? { number: phone, ...(phoneNote ? { note: phoneNote } : {}) } : undefined
+	const secondaryPhoneProp: MapAddressPhone | undefined = secondaryPhone
+		? { number: secondaryPhone, ...(secondaryPhoneNote ? { note: secondaryPhoneNote } : {}) }
+		: undefined
 
 	return (
 		<MapAddress
@@ -41,6 +47,7 @@ export function MapAddressBlock({ name, street, city, zip, country, email, phone
 			}}
 			email={email || undefined}
 			phone={phoneProp}
+			secondaryPhone={secondaryPhoneProp}
 			center={center}
 			zoom={zoom}
 		/>
