@@ -10,6 +10,8 @@ export interface TagGroupItem {
 	label: string
 	/** Link target — renders the tag as an anchor */
 	href?: string
+	/** Open `href` in a new tab — external links by convention */
+	newTab?: boolean
 	/** Click handler when the tag acts as a button (ignored when `href` is set) */
 	onClick?: () => void
 }
@@ -34,7 +36,7 @@ export const TagGroup = forwardRef<HTMLUListElement, TagGroupProps>(({ items, si
 		<ul ref={ref} role="list" className={twMerge(clsx('flex flex-wrap items-start gap-npi-2', className))} {...props}>
 			{items.map((item, i) => (
 				<li key={i} className="flex">
-					<Tag label={item.label} size={size} inverted={inverted} href={item.href} onClick={item.onClick} />
+					<Tag label={item.label} size={size} inverted={inverted} href={item.href} newTab={item.newTab} onClick={item.onClick} />
 				</li>
 			))}
 		</ul>

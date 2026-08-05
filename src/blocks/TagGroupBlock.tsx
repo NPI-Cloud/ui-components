@@ -4,6 +4,8 @@ export interface TagGroupBlockItem {
 	/** Visible tag text, counts included ("Webinář (243)"). */
 	label?: string | null
 	href?: string | null
+	/** Open the link in a new tab — external links by convention. */
+	newTab?: boolean | null
 }
 
 export interface TagGroupBlockProps {
@@ -25,7 +27,7 @@ export function TagGroupBlock({ items }: TagGroupBlockProps) {
 	const resolved: TagGroupItem[] = (items ?? [])
 		.filter((item): item is TagGroupBlockItem & { label: string } => Boolean(item.label))
 		// A row without a link renders as a plain (non-anchor) tag rather than a dead `#` link.
-		.map(item => ({ label: item.label, href: item.href || undefined }))
+		.map(item => ({ label: item.label, href: item.href || undefined, newTab: item.newTab ?? undefined }))
 
 	if (items == null) return <TagGroup items={placeholderItems} />
 	if (resolved.length === 0) return null

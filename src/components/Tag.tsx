@@ -47,10 +47,12 @@ export interface TagProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonElem
 	removeLabel?: string
 	/** When provided, renders the tag as an anchor element instead of a button */
 	href?: string
+	/** Open `href` in a new tab (`target="_blank"` + `rel="noopener noreferrer"`); ignored without `href` */
+	newTab?: boolean
 }
 
 export const Tag = forwardRef<HTMLButtonElement | HTMLAnchorElement, TagProps>(
-	({ label, size = 'M', iconBefore, iconAfter, inverted = false, onRemove, removeLabel = 'Odebrat', href, className, ...props }, ref) => {
+	({ label, size = 'M', iconBefore, iconAfter, inverted = false, onRemove, removeLabel = 'Odebrat', href, newTab = false, className, ...props }, ref) => {
 		const showIconBefore = iconBefore != null && size === 'M'
 		const showRemove = onRemove != null && size === 'M' && !href
 		const showIconAfter = iconAfter != null && size === 'M' && !showRemove
@@ -87,7 +89,13 @@ export const Tag = forwardRef<HTMLButtonElement | HTMLAnchorElement, TagProps>(
 		if (href) {
 			return (
 				<TagRoot asChild size={size} inverted={inverted} className={className}>
-					<Link ref={ref as React.Ref<HTMLAnchorElement>} href={href} {...(props as React.AnchorHTMLAttributes<HTMLAnchorElement>)}>
+					<Link
+						ref={ref as React.Ref<HTMLAnchorElement>}
+						href={href}
+						target={newTab ? '_blank' : undefined}
+						rel={newTab ? 'noopener noreferrer' : undefined}
+						{...(props as React.AnchorHTMLAttributes<HTMLAnchorElement>)}
+					>
 						{inner}
 					</Link>
 				</TagRoot>
