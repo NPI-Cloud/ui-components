@@ -25,6 +25,8 @@ export interface CardOfferBlockProps {
 	href?: string | null
 	ctaLabel?: string | null
 	ctaUrl?: string | null
+	/** Icon before the CTA label (an iconRegistryM key). Unset keeps the CardOffer default ('stahnout'). */
+	ctaIcon?: string | null
 }
 
 const DEFAULT_META_ICON: IconName = 'stitek'
@@ -33,7 +35,7 @@ const toIconName = (name: string | null | undefined): IconName =>
 	name && name in iconRegistryM ? (name as IconName) : DEFAULT_META_ICON
 
 export function CardOfferBlock(
-	{ label, title, description, statusTag, display, meta, imageUrl, imageAlt, href, ctaLabel, ctaUrl }: CardOfferBlockProps,
+	{ label, title, description, statusTag, display, meta, imageUrl, imageAlt, href, ctaLabel, ctaUrl, ctaIcon }: CardOfferBlockProps,
 ) {
 	const metaItems: CardOfferMetaItem[] = (meta ?? []).flatMap(item => {
 		const text = item?.text?.trim()
@@ -42,7 +44,9 @@ export function CardOfferBlock(
 	})
 
 	const label_ = ctaLabel?.trim()
-	const actions = label_ ? [{ label: label_, href: ctaUrl ?? undefined }] : undefined
+	// Unset icon stays undefined so CardOffer applies its own default; an unknown key falls back too.
+	const ctaIconName = ctaIcon && ctaIcon in iconRegistryM ? (ctaIcon as IconName) : undefined
+	const actions = label_ ? [{ label: label_, href: ctaUrl ?? undefined, iconBefore: ctaIconName }] : undefined
 
 	// Cover only renders @md up (CardOffer hides it on narrow cards, where the navy rule shows instead).
 	const visual = imageUrl
