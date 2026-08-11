@@ -13,6 +13,12 @@ export type BannerTone = (typeof bannerTones)[number]
 export const bannerIndicators = ['video', 'podcast', 'gallery'] as const
 export type BannerIndicator = (typeof bannerIndicators)[number]
 
+/**
+ * Which of the banner's two CTA looks an action draws. Defaults to the slot it sits in (primary
+ * action → filled, secondary action → outline); set it to render a slot in the other look.
+ */
+export type BannerActionVariant = 'primary' | 'secondary'
+
 export interface BannerAction {
 	/** Visible label */
 	label: string
@@ -20,6 +26,13 @@ export interface BannerAction {
 	href?: string
 	/** Click handler — required when `href` is absent */
 	onClick?: (event: React.MouseEvent<HTMLElement>) => void
+	/** Overrides the look the slot would otherwise use */
+	variant?: BannerActionVariant
+	/** Icon drawn before / after the label */
+	iconBefore?: IconName
+	iconAfter?: IconName
+	/** Open the destination in a new browser tab (only meaningful with `href`) */
+	newTab?: boolean
 }
 
 export interface BannerProps extends Omit<React.HTMLAttributes<HTMLElement>, 'title'> {
@@ -106,20 +119,33 @@ function BannerActionButton({
 	inverted,
 }: {
 	action: BannerAction
-	variant: 'primary' | 'secondary'
+	variant: BannerActionVariant
 	inverted: boolean
 }) {
-	const className = twMerge(actionBaseClass, actionVariantClass[variant][inverted ? 'inverted' : 'default'])
+	const className = twMerge(actionBaseClass, actionVariantClass[action.variant ?? variant][inverted ? 'inverted' : 'default'])
+	const content = (
+		<>
+			{action.iconBefore && <Icon name={action.iconBefore} className="size-6 shrink-0" />}
+			{action.label}
+			{action.iconAfter && <Icon name={action.iconAfter} className="size-6 shrink-0" />}
+		</>
+	)
 	if (action.href) {
 		return (
-			<Link href={action.href} onClick={action.onClick} className={className}>
-				{action.label}
+			<Link
+				href={action.href}
+				onClick={action.onClick}
+				target={action.newTab ? '_blank' : undefined}
+				rel={action.newTab ? 'noopener noreferrer' : undefined}
+				className={className}
+			>
+				{content}
 			</Link>
 		)
 	}
 	return (
 		<button type="button" onClick={action.onClick} className={className}>
-			{action.label}
+			{content}
 		</button>
 	)
 }

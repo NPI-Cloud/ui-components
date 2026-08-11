@@ -4,6 +4,8 @@ import { Image, Link } from '../components/ui-primitives'
 import { clsx } from 'clsx'
 import { Heading } from '../components/Heading'
 import { Text } from '../components/Text'
+import { Icon } from '../icons'
+import { type BlockCta, toIconName } from './BlockCta'
 
 export const heroSizes = ['homepage11', 'homepage75', 'subpage21', 'subpage11'] as const
 export type HeroSize = (typeof heroSizes)[number]
@@ -13,14 +15,9 @@ export interface HeroBlockProps {
 	heading?: string | null
 	/** Description/perex paragraph under the heading */
 	subtitle?: string | null
-	/** Primary CTA label */
-	ctaLabel?: string | null
-	/** Primary CTA URL */
-	ctaUrl?: string | null
-	/** Optional secondary CTA label */
-	secondaryCtaLabel?: string | null
-	/** Optional secondary CTA URL */
-	secondaryCtaUrl?: string | null
+	/** Authored calls to action. Each renders only when it carries both a label and a destination. */
+	primaryCta?: BlockCta | null
+	secondaryCta?: BlockCta | null
 	/** Image relation as it comes from Contember (manyHasOne Image) */
 	image?: { url?: string | null } | null
 	imageAlt?: string | null
@@ -48,21 +45,43 @@ const sizeConfig: Record<HeroSize, { gridCols: string; visualAspect: string }> =
 	subpage11: { gridCols: '@npi-tablet:grid-cols-2', visualAspect: 'aspect-[16/9]' },
 }
 
+// The hero draws its CTAs in its own two looks; anything else the author picked falls back to the
+// look of the slot the CTA sits in.
+const ctaClass = (cta: BlockCta, slot: 'primary' | 'secondary'): string =>
+	(cta.variant === 'primary' || cta.variant === 'secondary' ? cta.variant : slot) === 'primary' ? primaryCtaClass : secondaryCtaClass
+
+// A CTA label with no URL would render a dead link, so a CTA only counts when it has both.
+const HeroCta = ({ cta, slot }: { cta: BlockCta | null | undefined; slot: 'primary' | 'secondary' }) => {
+	const label = cta?.label?.trim()
+	if (!cta || !label || !cta.url) return null
+	const iconBefore = toIconName(cta.iconBefore)
+	const iconAfter = toIconName(cta.iconAfter)
+	return (
+		<Link
+			href={cta.url}
+			target={cta.newTab ? '_blank' : undefined}
+			rel={cta.newTab ? 'noopener noreferrer' : undefined}
+			className={clsx(ctaClass(cta, slot), 'gap-npi-2')}
+		>
+			{iconBefore && <Icon name={iconBefore} className="size-6 shrink-0" />}
+			{label}
+			{iconAfter && <Icon name={iconAfter} className="size-6 shrink-0" />}
+		</Link>
+	)
+}
+
 export function HeroBlock({
 	heading,
 	subtitle,
-	ctaLabel,
-	ctaUrl,
-	secondaryCtaLabel,
-	secondaryCtaUrl,
+	primaryCta,
+	secondaryCta,
 	image,
 	imageAlt,
 	heroSize,
 	hideVisual,
 	priority,
 }: HeroBlockProps) {
-	// A CTA label with no URL would render a dead link, so a CTA only counts when it has both.
-	const hasCta = (ctaLabel && ctaUrl) || (secondaryCtaLabel && secondaryCtaUrl)
+	const hasCta = Boolean((primaryCta?.label && primaryCta.url) || (secondaryCta?.label && secondaryCta.url))
 	const config = sizeConfig[heroSize ?? 'homepage11']
 	const imageUrl = image?.url
 	// Without a visual the text would otherwise keep the (often 50/50) split dictated by `heroSize`,
@@ -77,16 +96,8 @@ export function HeroBlock({
 				{subtitle && <Text variant="l">{subtitle}</Text>}
 				{hasCta && (
 					<div className="flex w-full flex-col gap-npi-4 @npi-tablet:w-auto @npi-tablet:flex-row">
-						{ctaLabel && ctaUrl && (
-							<Link href={ctaUrl} className={primaryCtaClass}>
-								{ctaLabel}
-							</Link>
-						)}
-						{secondaryCtaLabel && secondaryCtaUrl && (
-							<Link href={secondaryCtaUrl} className={secondaryCtaClass}>
-								{secondaryCtaLabel}
-							</Link>
-						)}
+						<HeroCta cta={primaryCta} slot="primary" />
+						<HeroCta cta={secondaryCta} slot="secondary" />
 					</div>
 				)}
 			</div>

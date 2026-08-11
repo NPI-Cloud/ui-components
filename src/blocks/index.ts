@@ -10,6 +10,7 @@ export { ArticleTemplate, type ArticleTemplateProps } from './ArticleTemplate'
 export { BannerBlock, type BannerBlockIndicator, type BannerBlockProps, type BannerBlockTone } from './BannerBlock'
 export { BigNumberBlock, type BigNumberBlockProps, type BigNumberBlockSize } from './BigNumberBlock'
 export { BlockColumns, type BlockColumnsMode, type BlockColumnsProps, type BlockColumnsRatio, blockColumnsRatios } from './BlockColumns'
+export { type BlockCta } from './BlockCta'
 export {
 	type ButtonBlockAction,
 	ButtonBlock,

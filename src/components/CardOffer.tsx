@@ -23,10 +23,16 @@ export interface CardOfferAction {
 	label: string
 	/** Icon rendered before the label (defaults to `'stahnout'`) */
 	iconBefore?: IconName
+	/** Icon rendered after the label */
+	iconAfter?: IconName
 	/** Navigation target — renders the CTA as `<Link>` */
 	href?: string
 	/** Click handler */
 	onClick?: (event: React.MouseEvent<HTMLElement>) => void
+	/** Button look — defaults to the card's small tertiary link */
+	variant?: React.ComponentProps<typeof Button>['variant']
+	/** Open the destination in a new browser tab (only meaningful with `href`) */
+	newTab?: boolean
 }
 
 export interface CardOfferProps extends Omit<React.HTMLAttributes<HTMLElement>, 'title'> {
@@ -123,10 +129,13 @@ export const CardOffer = forwardRef<HTMLElement, CardOfferProps>(({
 			{actions.map((action, i) => (
 				<Button
 					key={i}
-					variant="tertiary-s"
+					variant={action.variant ?? 'tertiary-s'}
 					label={action.label}
 					iconBefore={action.iconBefore ?? 'stahnout'}
+					iconAfter={action.iconAfter}
 					href={action.href}
+					target={action.newTab ? '_blank' : undefined}
+					rel={action.newTab ? 'noopener noreferrer' : undefined}
 					onClick={action.onClick}
 				/>
 			))}
