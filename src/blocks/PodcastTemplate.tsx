@@ -42,7 +42,7 @@ export function PodcastTemplate(
 			<div className="flex flex-col">
 				<ContentTemplateMeta author={author} date={date} />
 				{hasPlatforms && (
-					<div className="mt-npi-8 flex flex-col gap-npi-4">
+					<div className="mt-npi-8 mb-npi-4 flex flex-col gap-npi-4">
 						<Text variant="l">Přehrajte si podcast na platformách</Text>
 						<div className="flex flex-wrap items-center gap-npi-6">
 							{platforms.map(platform => (
