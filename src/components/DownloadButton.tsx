@@ -103,6 +103,8 @@ export const DownloadButton = forwardRef<HTMLDivElement, DownloadButtonProps>(
 			else if (ref) ref.current = node
 		}
 
+		// Files live on S3 (cross-origin), where browsers ignore the `download` attribute and navigate to
+		// the file instead — so both anchors open in a new tab to keep the current page in place.
 		// Single-variant: render as a direct anchor download link.
 		if (!isMulti) {
 			const variant = variants[0]
@@ -112,6 +114,8 @@ export const DownloadButton = forwardRef<HTMLDivElement, DownloadButtonProps>(
 					<Link
 						href={variant.url}
 						{...(download ? { download: variant.fileName ?? '' } : {})}
+						target="_blank"
+						rel="noopener noreferrer"
 						onClick={() => onSelect?.(variant)}
 						className={`inline-flex items-center gap-npi-2 font-npi-sans font-bold text-[1rem] leading-[1.5] text-npi-blue hover:text-npi-blue-hover active:text-npi-blue-hover transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-npi-blue-light rounded-npi-xxs ${
 							className ?? ''
@@ -152,6 +156,8 @@ export const DownloadButton = forwardRef<HTMLDivElement, DownloadButtonProps>(
 								<Link
 									href={v.url}
 									{...(download ? { download: v.fileName ?? '' } : {})}
+									target="_blank"
+									rel="noopener noreferrer"
 									onClick={() => {
 										onSelect?.(v)
 										setOpen(false)
