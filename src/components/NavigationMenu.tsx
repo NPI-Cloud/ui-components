@@ -38,6 +38,9 @@ export type NavigationSubnavVariant = (typeof navigationSubnavVariants)[number]
 export const navigationPromoVariants = ['icon', 'cover'] as const
 export type NavigationPromoVariant = (typeof navigationPromoVariants)[number]
 
+export const navigationLayouts = ['default', 'compact'] as const
+export type NavigationLayout = (typeof navigationLayouts)[number]
+
 export type NavigationMenuStyle = 'spacing' | 'shadow' | 'greyBackground'
 
 // The `shadow` menu style per Figma is a soft unoffset halo (0 0 16px #F0F0F0). Expressed as
@@ -53,12 +56,15 @@ function navigationMenuBackgroundClass(menuStyle: NavigationMenuStyle) {
 	return menuStyle === 'greyBackground' ? 'bg-npi-gray-50' : 'bg-npi-white'
 }
 
+export type NavigationMenuItemsPlacement = 'row' | 'bar'
+
 /**
- * Signals to nested `NavigationMenuItem`s that they live inside the Radix NavigationMenu.Root
- * rendered by `NavigationMenuItems`. When `true`, items render as Radix Trigger/Link so hover
- * and focus open/close the associated Subnav; when `false` they render as plain `<Link>` / `<button>`.
+ * Which Radix NavigationMenu.Root — if any — a nested `NavigationMenuItem` lives in. Set, items
+ * render as Radix Trigger/Link so hover and focus open/close the associated Subnav; `null` (outside
+ * `NavigationMenuItems`) they render as plain `<Link>` / `<button>`. The value is the Root's
+ * placement, which decides which edge a narrow Subnav anchors to.
  */
-const InsideItemsContext = createContext(false)
+const InsideItemsContext = createContext<NavigationMenuItemsPlacement | null>(null)
 
 /**
  * Target element where wide Subnavs portal themselves so they can span the full nav layout width
@@ -274,10 +280,17 @@ export const NavigationMenuSiteSwitcher = forwardRef<HTMLDivElement, NavigationM
 )
 NavigationMenuSiteSwitcher.displayName = 'NavigationMenuSiteSwitcher'
 
-export interface NavigationMenuBarProps extends HTMLAttributes<HTMLDivElement> {}
+export interface NavigationMenuBarProps extends HTMLAttributes<HTMLDivElement> {
+	/**
+	 * Which header layout the bar is part of. In `compact` the bar carries the menu items itself, so
+	 * it also takes over the separation the items row provides in `default` — the `shadow` menu style
+	 * casts its halo here at every width instead of only at mobile.
+	 */
+	layout?: NavigationLayout
+}
 
 export const NavigationMenuBar = forwardRef<HTMLDivElement, NavigationMenuBarProps>(
-	({ className, children, ...props }, ref) => {
+	({ className, layout = 'default', children, ...props }, ref) => {
 		const menuStyle = useContext(NavigationMenuStyleContext)
 		return (
 			// Outer wrapper provides the full-bleed backdrop so the bar still has its own background
@@ -293,7 +306,7 @@ export const NavigationMenuBar = forwardRef<HTMLDivElement, NavigationMenuBarPro
 					clsx(
 						'flex w-full justify-center npi-desktop:relative npi-desktop:z-40',
 						navigationMenuBackgroundClass(menuStyle),
-						menuStyle === 'shadow' && navigationMenuMobileShadowClass,
+						menuStyle === 'shadow' && (layout === 'compact' ? navigationMenuShadowClass : navigationMenuMobileShadowClass),
 						className,
 					),
 				)}
@@ -486,12 +499,19 @@ export const NavigationMenuDrawer = forwardRef<HTMLDivElement, NavigationMenuDra
 )
 NavigationMenuDrawer.displayName = 'NavigationMenuDrawer'
 
-export type NavigationMenuItemsProps = React.ComponentPropsWithoutRef<typeof RadixNavMenu.Root>
+export type NavigationMenuItemsProps = React.ComponentPropsWithoutRef<typeof RadixNavMenu.Root> & {
+	/**
+	 * Where the items live. `row` (default) is the sticky bar of its own below the brand bar;
+	 * `bar` renders them inline inside `NavigationMenuBar`, right-aligned next to the brand
+	 * (the compact header). Ignored inside `NavigationMenuDrawer`, which always stacks them.
+	 */
+	placement?: NavigationMenuItemsPlacement
+}
 
 export const NavigationMenuItems = forwardRef<
 	React.ElementRef<typeof RadixNavMenu.Root>,
 	NavigationMenuItemsProps
->(({ className, children, ...props }, ref) => {
+>(({ className, placement = 'row', children, ...props }, ref) => {
 	const insideDrawer = useContext(InsideDrawerContext)
 	const menuStyle = useContext(NavigationMenuStyleContext)
 	const [widePortalEl, setWidePortalEl] = useState<HTMLDivElement | null>(null)
@@ -530,6 +550,39 @@ export const NavigationMenuItems = forwardRef<
 		)
 	}
 
+	// Inside the brand bar (compact header): the items are one more flex child of the bar's content
+	// column, pushed to its right edge. No background, no sticky pinning and no full-bleed width —
+	// the bar around them already provides all three.
+	if (placement === 'bar') {
+		return (
+			<RadixNavMenu.Root
+				ref={ref}
+				aria-label="Hlavní navigace"
+				className={twMerge(clsx('flex min-w-0 max-npi-desktop:hidden npi-desktop:ml-auto', className))}
+				{...props}
+			>
+				<InsideItemsContext.Provider value="bar">
+					<WidePortalContext.Provider value={widePortalEl}>
+						{/* The items sit vertically centered in the 96px bar, so a panel anchored to an item would
+						    open 36px above the bar's bottom edge. Publishing the remaining distance as the subnav
+						    gap drops the narrow panels from the bar's bottom edge — the line the wide ones (which
+						    anchor to the bar itself) already use. */}
+						<RadixNavMenu.List className="flex items-center gap-npi-8 [--npi-subnav-gap:2.25rem]">
+							{children}
+						</RadixNavMenu.List>
+						{/* Wide-subnav portal target. Deliberately NOT positioned relative to this Root: the bar is
+						    the nearest positioned ancestor at desktop, so the target spans the full bleed width and
+						    centers the panel on the layout, exactly as in the two-row layout. */}
+						<div
+							ref={setWidePortalEl}
+							className="pointer-events-none absolute inset-x-0 top-full z-20 flex justify-center"
+						/>
+					</WidePortalContext.Provider>
+				</InsideItemsContext.Provider>
+			</RadixNavMenu.Root>
+		)
+	}
+
 	return (
 		<>
 			<div ref={sentinelRef} aria-hidden className="max-npi-desktop:hidden relative h-0 top-[calc(-1*var(--npi-top-bar-height,0px))]" />
@@ -559,7 +612,7 @@ export const NavigationMenuItems = forwardRef<
 				)}
 				{...props}
 			>
-				<InsideItemsContext.Provider value={true}>
+				<InsideItemsContext.Provider value="row">
 					<WidePortalContext.Provider value={widePortalEl}>
 						<RadixNavMenu.List className="mx-auto flex w-full max-w-npi-layout items-center gap-npi-8 px-npi-6 pt-npi-4 pb-npi-6">
 							{children}
@@ -874,9 +927,17 @@ export const NavigationMenuItem = forwardRef<HTMLElement, NavigationMenuItemProp
 						{href != null && <Link ref={hybridLinkRef} href={href} tabIndex={-1} aria-hidden className="hidden" />}
 						{
 							/* Content has no visual styling — the Subnav child places itself (narrow: anchored here; wide: portals to nav root).
-						    top offset matches the List's bottom `pb-npi-6` so narrow panels align with wide ones (which anchor to the List's bottom). */
+						    The top offset defaults to the List's bottom `pb-npi-6` so narrow panels align with wide ones (which anchor to the
+						    List's bottom); a layout that centers the items in a taller bar publishes its own `--npi-subnav-gap` instead.
+						    Items in the bar are flush with the layout's right edge, so their narrow panels grow leftwards from the trigger —
+						    left-anchored they would hang off the page. */
 						}
-						<RadixNavMenu.Content className="absolute left-0 top-[calc(100%+var(--spacing-npi-6))] z-20">
+						<RadixNavMenu.Content
+							className={clsx(
+								'absolute top-[calc(100%+var(--npi-subnav-gap,var(--spacing-npi-6)))] z-20',
+								insideItems === 'bar' ? 'right-0' : 'left-0',
+							)}
+						>
 							{children}
 						</RadixNavMenu.Content>
 					</li>
@@ -1455,6 +1516,13 @@ export interface NavigationProps extends Omit<HTMLAttributes<HTMLElement>, 'chil
 	/** Top dark bar with NPI sites. Hidden when omitted. */
 	siteSwitcher?: NavigationMenuSiteSwitcherProps
 	brand: NavigationBrand
+	/**
+	 * Desktop shape of the header. `default` gives the items a sticky row of their own below the
+	 * brand bar. `compact` puts everything on one row — items right-aligned next to the brand — and
+	 * drops `search` / `cta` from the bar (a site that needs them stays on `default`). Mobile is the
+	 * same drawer either way, `search` / `cta` included.
+	 */
+	layout?: NavigationLayout
 	/** Visual separation between the menu chrome and page content. */
 	menuStyle?: NavigationMenuStyle
 	/** Search input — when provided, appears in the bar (desktop) and the drawer (mobile). */
@@ -1469,7 +1537,8 @@ export interface NavigationProps extends Omit<HTMLAttributes<HTMLElement>, 'chil
 }
 
 export const Navigation = forwardRef<HTMLElement, NavigationProps>((props, ref) => {
-	const { siteSwitcher, brand, menuStyle = 'spacing', search, cta, items, languages, languagesLabel, ...rest } = props
+	const { siteSwitcher, brand, menuStyle = 'spacing', layout = 'default', search, cta, items, languages, languagesLabel, ...rest } = props
+	const compact = layout === 'compact'
 	const itemNodes = items.map((item, index) => <NavigationConfiguredItem key={index} item={item} />)
 	const switcher = siteSwitcher && <NavigationMenuSiteSwitcher {...siteSwitcher} />
 	// A single language is the plain monolingual site — nothing to switch to, so no switcher.
@@ -1480,14 +1549,14 @@ export const Navigation = forwardRef<HTMLElement, NavigationProps>((props, ref) 
 	return (
 		<NavigationMenu ref={ref} menuStyle={menuStyle} {...rest}>
 			{switcher}
-			<NavigationMenuBar>
+			<NavigationMenuBar layout={layout}>
 				<NavigationMenuBrand
 					logoSrc={brand.logoSrc}
 					title={brand.title}
 					href={brand.href}
 					logoAlt={brand.logoAlt}
 				/>
-				{search && (
+				{!compact && search && (
 					<NavigationMenuSearch
 						label={search.label}
 						placeholder={search.placeholder}
@@ -1497,10 +1566,15 @@ export const Navigation = forwardRef<HTMLElement, NavigationProps>((props, ref) 
 						className="max-npi-desktop:hidden"
 					/>
 				)}
-				{cta && (
+				{!compact && cta && (
 					<NavigationMenuActions className="max-npi-desktop:hidden">
 						<Button variant="primary" label={cta.label} href={cta.href} onClick={cta.onClick} className="min-w-0!" />
 					</NavigationMenuActions>
+				)}
+				{compact && itemNodes.length > 0 && (
+					<NavigationMenuItems placement="bar">
+						{itemNodes}
+					</NavigationMenuItems>
 				)}
 				{languageSwitcher}
 				<NavigationMenuMobileToggle />
@@ -1508,7 +1582,7 @@ export const Navigation = forwardRef<HTMLElement, NavigationProps>((props, ref) 
 			{/* Skip the menu bars entirely when there are no items — otherwise the desktop
 			    `NavigationMenuItems` row renders as an empty 32px (pt-npi-2 + pb-npi-6) strip below
 			    the brand bar, which reads as an unexplained gap above the page content. */}
-			{itemNodes.length > 0 && (
+			{!compact && itemNodes.length > 0 && (
 				<NavigationMenuItems>
 					{itemNodes}
 				</NavigationMenuItems>
