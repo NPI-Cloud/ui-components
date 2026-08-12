@@ -63,8 +63,17 @@ const socialLabelMap: Record<ProfileCardSocialPlatform, string> = {
 	facebook: 'Facebook',
 }
 
-function deriveInitials(name: string): string {
-	const parts = name.trim().split(/\s+/).filter(part => /\p{L}/u.test(part))
+/**
+ * First + last letter of the person's name, with academic titles stripped: everything after the
+ * first comma is a suffix title (", Ph.D.", ", MBA") and any dot-terminated token is a prefix
+ * title ("Mgr.", "doc.", "prof."). A name made of nothing but titles keeps them, so the avatar
+ * never falls back to the silhouette just because the name was written unusually.
+ */
+export function deriveInitials(name: string): string {
+	const beforeSuffixTitles = name.split(',')[0]!
+	const words = beforeSuffixTitles.trim().split(/\s+/).filter(part => /\p{L}/u.test(part))
+	const withoutPrefixTitles = words.filter(part => !part.endsWith('.'))
+	const parts = withoutPrefixTitles.length > 0 ? withoutPrefixTitles : words
 	if (parts.length === 0) return ''
 	if (parts.length === 1) return parts[0]!.slice(0, 1).toUpperCase()
 	return (parts[0]![0]! + parts[parts.length - 1]![0]!).toUpperCase()

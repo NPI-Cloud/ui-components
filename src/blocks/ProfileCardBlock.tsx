@@ -15,6 +15,8 @@ export interface ProfileCardBlockProps {
 	avatarAlt?: string | null
 	email?: string | null
 	phone?: string | null
+	/** Editor-authored initials for the avatar; empty falls back to deriving them from `name`. */
+	initials?: string | null
 	size?: ProfileCardBlockSize | null
 	orientation?: ProfileCardBlockOrientation | null
 }
@@ -28,6 +30,7 @@ export function ProfileCardBlock({
 	avatarAlt,
 	email,
 	phone,
+	initials,
 	size,
 	orientation,
 }: ProfileCardBlockProps) {
@@ -39,6 +42,7 @@ export function ProfileCardBlock({
 			avatarAlt={avatarAlt || undefined}
 			email={email || undefined}
 			phone={phone || undefined}
+			initials={initials || undefined}
 			size={size ? sizeMap[size] : 'M'}
 			orientation={orientation || 'horizontal'}
 		/>
