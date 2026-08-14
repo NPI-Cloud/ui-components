@@ -18,7 +18,15 @@ import { TestimonialBlock } from './TestimonialBlock'
 // page — they must look identical, so neither side hand-rolls its own. Block types beyond plain
 // paragraphs (heading, lists, testimonial, media, card, …) all render here via the design system.
 
-type SlateText = { text: string; isBold?: boolean; isItalic?: boolean; isUnderline?: boolean }
+type SlateText = {
+	text: string
+	isBold?: boolean
+	isItalic?: boolean
+	isUnderline?: boolean
+	// Migration-emitted pair (mutually exclusive) — deliberately not the `is*` prefix bindx marks use.
+	superscript?: true
+	subscript?: true
+}
 type SlateElement = { type: string; children: SlateNode[]; [attr: string]: unknown }
 type SlateNode = SlateText | SlateElement
 
@@ -64,6 +72,8 @@ function renderLeaf(leaf: SlateText, key: number): ReactNode {
 	if (leaf.isBold) content = <strong>{content}</strong>
 	if (leaf.isItalic) content = <em>{content}</em>
 	if (leaf.isUnderline) content = <u>{content}</u>
+	if (leaf.superscript) content = <sup>{content}</sup>
+	if (leaf.subscript) content = <sub>{content}</sub>
 	return <Fragment key={key}>{content}</Fragment>
 }
 
@@ -123,6 +133,27 @@ function renderNode(node: SlateNode, key: number, references: RichTextReferences
 			// the surface — 40px padding, 24px radius per design. First/last child margins are zeroed
 			// so the padding alone frames the content (headings carry a 48px section margin).
 			return <div key={key} className="rounded-npi-m bg-npi-bg-light p-npi-10 [&>:first-child]:mt-0 [&>:last-child]:mb-0">{children}</div>
+		case 'table':
+			// Migrated rvp.cz table (`table > tableRow > tableCell > blocks`). No cell outlines per
+			// the no-thin-borders rule — zebra row tint + cell padding structure the grid; the
+			// wrapper's own horizontal scroll keeps wide tables from stretching the page.
+			return (
+				<div key={key} className="overflow-x-auto rounded-npi-s">
+					<table className="w-full border-collapse text-left">
+						<tbody>{children}</tbody>
+					</table>
+				</div>
+			)
+		case 'tableRow':
+			return <tr key={key} className="odd:bg-npi-bg-light">{children}</tr>
+		case 'tableCell': {
+			// Cell blocks are ordinary paragraphs — the cell padding frames them, so their
+			// outer article-rhythm margins are zeroed at the edges.
+			const cellClassName = 'px-npi-4 py-npi-2 align-top [&>:first-child]:mt-0 [&>:last-child]:mb-0'
+			return node.header === true
+				? <th key={key} className={`${cellClassName} font-bold`}>{children}</th>
+				: <td key={key} className={cellClassName}>{children}</td>
+		}
 		case 'testimonial': {
 			// Text rides inline on the node; the avatar is resolved from the referenced Image.
 			const avatar = typeof node.referenceId === 'string' ? references[node.referenceId] : undefined
@@ -215,7 +246,7 @@ function renderNode(node: SlateNode, key: number, references: RichTextReferences
 // Embedded media/widget blocks sit at the 48px article rhythm (`npi-12`) from their neighbours.
 // Text elements (paragraph / heading / list) carry their own collapsing margins; these don't, so
 // the top-level map frames them. The gap collapses with adjacent text margins to the larger value.
-const SPACED_BLOCK_TYPES = new Set(['testimonial', 'media', 'profileCard', 'card', 'bigNumber', 'button', 'download', 'calloutBox', 'accordion'])
+const SPACED_BLOCK_TYPES = new Set(['testimonial', 'media', 'profileCard', 'card', 'bigNumber', 'button', 'download', 'calloutBox', 'accordion', 'table'])
 
 export function RichTextView({ value, references = {} }: { value: unknown; references?: RichTextReferences }) {
 	const parsed: unknown = typeof value === 'string' ? safeJsonParse(value) : value
