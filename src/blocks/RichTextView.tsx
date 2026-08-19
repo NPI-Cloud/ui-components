@@ -54,11 +54,13 @@ function toDownloadVariants(raw: unknown): DownloadVariant[] {
 }
 
 /**
- * Resolved block references, keyed by `referenceId`. Reference-backed blocks (e.g. the testimonial
- * avatar) keep their relations out of the JSON, so the renderer needs the resolved values handed in
- * — `Content.references` mapped to `{ url, alt }` for the avatar `Image`.
+ * Resolved block references, keyed by `referenceId`. Reference-backed nodes keep their relations
+ * out of the JSON, so the renderer needs the resolved values handed in — `Content.references`
+ * mapped to `{ url, alt }` for an image slot, and to `{ href }` for a link (`anchor`) reference,
+ * resolved for the site doing the rendering. An anchor whose reference resolves to no href falls
+ * back to the node's own `href` snapshot.
  */
-export type RichTextReferences = Record<string, { url?: string | null; alt?: string | null }>
+export type RichTextReferences = Record<string, { url?: string | null; alt?: string | null; href?: string | null }>
 
 const isText = (node: SlateNode): node is SlateText => typeof (node as SlateText).text === 'string'
 
@@ -97,8 +99,11 @@ function renderNode(node: SlateNode, key: number, references: RichTextReferences
 		case 'listItem':
 			return <li key={key}>{children}</li>
 		case 'anchor': {
-			// An anchor with no href would render a dead `#` link, so fall back to plain text.
-			const href = node.href as string | undefined
+			// The reference (when present and resolvable) is the truth about where the link goes; the
+			// node's `href` is the authoring-time snapshot. An anchor with neither would render a dead
+			// `#` link, so it falls back to plain text.
+			const resolved = typeof node.referenceId === 'string' ? references[node.referenceId]?.href : undefined
+			const href = resolved || (node.href as string | undefined)
 			if (!href) return <Fragment key={key}>{children}</Fragment>
 			return (
 				<Link key={key} href={href} className="text-npi-blue underline">
