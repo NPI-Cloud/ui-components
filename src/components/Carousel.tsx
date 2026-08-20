@@ -30,6 +30,17 @@ export interface CarouselProps extends Omit<React.HTMLAttributes<HTMLElement>, '
 	slideLabel?: (index: number) => string
 }
 
+// Distance between two neighbouring snap positions: slide width plus the track gap. Slides are
+// uniform, so the offset delta of the first two covers them all; a single slide never scrolls.
+const slideStride = (vp: HTMLDivElement): number => {
+	const track = vp.firstElementChild
+	const first = track?.children.item(0)
+	const second = track?.children.item(1)
+	return first instanceof HTMLElement && second instanceof HTMLElement
+		? second.offsetLeft - first.offsetLeft
+		: vp.clientWidth
+}
+
 export const Carousel = forwardRef<HTMLElement, CarouselProps>(
 	({
 		children,
@@ -66,7 +77,7 @@ export const Carousel = forwardRef<HTMLElement, CarouselProps>(
 		const scrollToIndex = useCallback((index: number) => {
 			const vp = viewportRef.current
 			if (!vp) return
-			vp.scrollTo({ left: vp.clientWidth * index, behavior: 'smooth' })
+			vp.scrollTo({ left: slideStride(vp) * index, behavior: 'smooth' })
 		}, [])
 
 		const goTo = useCallback((index: number) => {
@@ -87,8 +98,9 @@ export const Carousel = forwardRef<HTMLElement, CarouselProps>(
 			const onScroll = () => {
 				if (timer) clearTimeout(timer)
 				timer = setTimeout(() => {
-					if (vp.clientWidth === 0) return
-					const index = Math.max(0, Math.min(total - 1, Math.round(vp.scrollLeft / vp.clientWidth)))
+					const stride = slideStride(vp)
+					if (stride === 0) return
+					const index = Math.max(0, Math.min(total - 1, Math.round(vp.scrollLeft / stride)))
 					emit(index)
 				}, 120)
 			}
@@ -110,12 +122,34 @@ export const Carousel = forwardRef<HTMLElement, CarouselProps>(
 				<div
 					ref={viewportRef}
 					className={twMerge(clsx(
-						'w-full overflow-x-auto overflow-y-hidden snap-x snap-mandatory',
+						'self-stretch overflow-x-auto overflow-y-hidden snap-x snap-mandatory',
 						'[scrollbar-width:none] [&::-webkit-scrollbar]:hidden',
+						// The mask below makes this box a stacking context, so its shadow-headroom padding would sit
+						// ABOVE later siblings in hit-testing and swallow clicks on the controls (and on content around
+						// the carousel). pointer-events pass through the box itself; the track re-enables them, so
+						// wheel/touch scrolling over the slides still reaches this scroller by bubbling.
+						'pointer-events-none',
+						// Headroom for slide content shadows (shadow-npi-m reaches ~25px above, ~70px below and ~45px
+						// beside a card): the vertical padding and the widened box (-mx, matched by the track's px so
+						// slides keep the layout width) keep the shadows inside the scrollport's clip, fading naturally
+						// instead of being cut at the content edge. 24px matches the page's `px-npi-6` gutter, so the
+						// box never overflows the viewport on mobile. The horizontal padding lives on the TRACK, not
+						// here — end padding of a scroll container is excluded from its scrollable overflow, which
+						// would leave the last slide's snap position unreachable. `scroll-pl` keeps snap positions on
+						// the inset content edge, and the track gap keeps the neighbouring slide's shadow out of the
+						// widened zone at rest.
+						'pt-8 -mt-8 pb-20 -mb-20 -mx-npi-6 scroll-pl-npi-6',
+						// Belt and suspenders for the shadow's faint tail at the scrollport's side edges: fade the
+						// outermost 16px out instead of hard-clipping. Cards rest 24px in, so only shadows are faded.
+						'[mask-image:linear-gradient(to_right,transparent,#000_16px,#000_calc(100%-16px),transparent)]',
 						viewportClassName,
 					))}
 				>
-					<div className="flex">
+					{/* px restores the 24px gutters the viewport's -mx removed (and sizes the w-full slides back to
+					    the layout width). The slides overflow this fixed-width block, so the right padding never
+					    lands after the LAST slide — the trailing ::after spacer extends the scrollable overflow so
+					    the last slide's snap position stays reachable. */}
+					<div className="flex gap-npi-16 px-npi-6 pointer-events-auto after:w-npi-6 after:shrink-0 after:content-['']">
 						{slides.map((slide, i) => (
 							<div
 								key={i}
