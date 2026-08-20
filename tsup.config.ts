@@ -5,7 +5,9 @@ import { defineConfig } from 'tsup'
 // package preserves the React Server Components boundaries the source defines — bundling would
 // hoist one directive over the whole library and wrongly mark every server component as client.
 export default defineConfig({
-	entry: ['src/**/*.{ts,tsx}', '!src/**/*.d.ts'],
+	// Tests stay out of the entry globs — they'd ship compiled into `dist`, and the dts pass would
+	// have to resolve test-only devDeps the standalone package doesn't carry.
+	entry: ['src/**/*.{ts,tsx}', '!src/**/*.d.ts', '!src/**/*.test.{ts,tsx}'],
 	format: ['esm'],
 	// The package tsconfig is `composite` for the monorepo's project references, which a
 	// standalone dts emit can't satisfy (it demands every file be listed). Override those flags
