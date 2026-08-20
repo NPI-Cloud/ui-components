@@ -6,6 +6,7 @@ import { forwardRef, Fragment } from 'react'
 import { twMerge } from 'tailwind-merge'
 import { Icon, type IconName } from '../icons'
 import { Button } from './Button'
+import type { CtaTracking } from './cta-tracking'
 import { DownloadButton, type DownloadVariant } from './DownloadButton'
 import { Heading, type HeadingLevel } from './Heading'
 import { Tag } from './Tag'
@@ -48,6 +49,8 @@ export interface CardLink {
 export interface CardCta extends CardLink {
 	/** Optional icon rendered before the label (defaults to `stahnout` download icon) */
 	iconBefore?: IconName
+	/** Authored `cta_click` measurement — when set, a click pushes it to the GTM dataLayer. */
+	tracking?: CtaTracking | null
 }
 
 export interface CardProps extends Omit<React.HTMLAttributes<HTMLElement>, 'title'> {
@@ -95,7 +98,7 @@ export interface CardProps extends Omit<React.HTMLAttributes<HTMLElement>, 'titl
 	 * Downloadable file rendered in the tertiary-CTA slot. Takes precedence over `cta` —
 	 * single variant downloads directly; multiple variants open a format dropdown.
 	 */
-	download?: { label?: string; variants: DownloadVariant[] }
+	download?: { label?: string; variants: DownloadVariant[]; tracking?: CtaTracking | null }
 	/** Additional content rendered after the description (extra tags, custom CTAs, etc.) */
 	children?: React.ReactNode
 }
@@ -260,7 +263,7 @@ export const Card = forwardRef<HTMLElement, CardProps>(({
 					{download && download.variants.length > 0
 						? (
 							<div className="relative z-10">
-								<DownloadButton label={download.label ?? cta?.label ?? 'Stáhnout'} variants={download.variants} />
+								<DownloadButton label={download.label ?? cta?.label ?? 'Stáhnout'} variants={download.variants} tracking={download.tracking} />
 							</div>
 						)
 						: cta && (
@@ -270,6 +273,7 @@ export const Card = forwardRef<HTMLElement, CardProps>(({
 									label={cta.label}
 									iconBefore={cta.iconBefore ?? 'stahnout'}
 									href={cta.href}
+									tracking={cta.tracking}
 								/>
 							</div>
 						)}

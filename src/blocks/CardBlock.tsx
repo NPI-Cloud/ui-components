@@ -2,6 +2,7 @@
 
 import { Image } from '../components/ui-primitives'
 import { Card, type CardAspect, type CardIndicator } from '../components/Card'
+import type { CtaTracking } from '../components/cta-tracking'
 import type { DownloadVariant } from '../components/DownloadButton'
 
 // Persisted as enum keys in the schema (slashes aren't valid PG enum identifiers); map back to component values.
@@ -40,6 +41,8 @@ export interface CardBlockProps {
 	ctaUrl?: string | null
 	/** Optional downloadable file variants — when set, the tertiary slot renders a DownloadButton with the format dropdown */
 	download?: { label?: string | null; variants: DownloadVariant[] } | null
+	/** Authored `cta_click` measurement of the tertiary CTA / download — when set, a click pushes it to the GTM dataLayer. */
+	ctaTracking?: CtaTracking | null
 }
 
 // ISO date (YYYY-MM-DD) → cs locale "23. 5. 2026". Falls back to raw input on invalid date.
@@ -74,6 +77,7 @@ export function CardBlock(
 		ctaLabel,
 		ctaUrl,
 		download,
+		ctaTracking,
 	}: CardBlockProps,
 ) {
 	const visual = imageUrl
@@ -98,10 +102,10 @@ export function CardBlock(
 	// Explicit 'none' wins; otherwise show the visual area whenever the user has opted into one via aspect/indicator/image.
 	// (Indicator on an aspected-but-imageless card renders a dark blue placeholder so the badge stays visible.)
 	const hasVisualIntent = aspect !== 'none' && Boolean(resolvedAspect || indicator || imageUrl)
-	const cta = ctaLabel ? { label: ctaLabel, href: ctaUrl ?? undefined } : undefined
+	const cta = ctaLabel ? { label: ctaLabel, href: ctaUrl ?? undefined, tracking: ctaTracking } : undefined
 	const tag = tagLabel ? { label: tagLabel, href: tagUrl ?? undefined } : undefined
 	const downloadProp = download && download.variants.length > 0
-		? { label: download.label ?? ctaLabel ?? undefined, variants: download.variants }
+		? { label: download.label ?? ctaLabel ?? undefined, variants: download.variants, tracking: ctaTracking }
 		: undefined
 	return (
 		<Card

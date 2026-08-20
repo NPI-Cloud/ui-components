@@ -35,6 +35,7 @@ const toBannerAction = (cta: BlockCta | null | undefined): BannerAction | undefi
 		iconBefore: toIconName(cta?.iconBefore),
 		iconAfter: toIconName(cta?.iconAfter),
 		newTab: cta?.newTab ?? false,
+		tracking: cta?.tracking,
 	}
 }
 

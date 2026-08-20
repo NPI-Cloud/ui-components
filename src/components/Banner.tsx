@@ -5,6 +5,7 @@ import { clsx } from 'clsx'
 import { forwardRef } from 'react'
 import { twMerge } from 'tailwind-merge'
 import { Icon, type IconName } from '../icons'
+import { type CtaTracking, pushCtaClick } from './cta-tracking'
 import { Text } from './Text'
 
 export const bannerTones = ['light', 'white', 'dark'] as const
@@ -33,6 +34,8 @@ export interface BannerAction {
 	iconAfter?: IconName
 	/** Open the destination in a new browser tab (only meaningful with `href`) */
 	newTab?: boolean
+	/** Authored `cta_click` measurement — when set, a click pushes it to the GTM dataLayer. */
+	tracking?: CtaTracking | null
 }
 
 export interface BannerProps extends Omit<React.HTMLAttributes<HTMLElement>, 'title'> {
@@ -123,6 +126,10 @@ function BannerActionButton({
 	inverted: boolean
 }) {
 	const className = twMerge(actionBaseClass, actionVariantClass[action.variant ?? variant][inverted ? 'inverted' : 'default'])
+	const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+		pushCtaClick(action.tracking)
+		action.onClick?.(event)
+	}
 	const content = (
 		<>
 			{action.iconBefore && <Icon name={action.iconBefore} className="size-6 shrink-0" />}
@@ -134,7 +141,7 @@ function BannerActionButton({
 		return (
 			<Link
 				href={action.href}
-				onClick={action.onClick}
+				onClick={handleClick}
 				target={action.newTab ? '_blank' : undefined}
 				rel={action.newTab ? 'noopener noreferrer' : undefined}
 				className={className}
@@ -144,7 +151,7 @@ function BannerActionButton({
 		)
 	}
 	return (
-		<button type="button" onClick={action.onClick} className={className}>
+		<button type="button" onClick={handleClick} className={className}>
 			{content}
 		</button>
 	)

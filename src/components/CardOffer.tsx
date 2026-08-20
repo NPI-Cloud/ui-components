@@ -6,6 +6,7 @@ import { forwardRef, type ReactNode } from 'react'
 import { twMerge } from 'tailwind-merge'
 import { Icon, type IconName } from '../icons'
 import { Button } from './Button'
+import type { CtaTracking } from './cta-tracking'
 import { Heading } from './Heading'
 import { Text } from './Text'
 
@@ -33,6 +34,8 @@ export interface CardOfferAction {
 	variant?: React.ComponentProps<typeof Button>['variant']
 	/** Open the destination in a new browser tab (only meaningful with `href`) */
 	newTab?: boolean
+	/** Authored `cta_click` measurement — when set, a click pushes it to the GTM dataLayer. */
+	tracking?: CtaTracking | null
 }
 
 export interface CardOfferProps extends Omit<React.HTMLAttributes<HTMLElement>, 'title'> {
@@ -137,6 +140,7 @@ export const CardOffer = forwardRef<HTMLElement, CardOfferProps>(({
 					target={action.newTab ? '_blank' : undefined}
 					rel={action.newTab ? 'noopener noreferrer' : undefined}
 					onClick={action.onClick}
+					tracking={action.tracking}
 				/>
 			))}
 		</div>

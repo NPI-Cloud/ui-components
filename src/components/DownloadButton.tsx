@@ -2,6 +2,7 @@
 
 import { Link } from './ui-primitives'
 import { forwardRef, useEffect, useId, useRef, useState } from 'react'
+import { type CtaTracking, pushCtaClick } from './cta-tracking'
 import { Icon } from '../icons'
 
 export interface DownloadVariant {
@@ -27,6 +28,8 @@ export interface DownloadButtonProps {
 	download?: boolean
 	/** Called with the picked variant when the user activates one (useful for analytics or custom handling) */
 	onSelect?: (variant: DownloadVariant) => void
+	/** Authored `cta_click` measurement — when set, activating any variant pushes it to the GTM dataLayer. */
+	tracking?: CtaTracking | null
 	/** Additional class applied to the trigger button */
 	className?: string
 }
@@ -59,7 +62,7 @@ function formatLabel(v: DownloadVariant): string {
 }
 
 export const DownloadButton = forwardRef<HTMLDivElement, DownloadButtonProps>(
-	({ label = 'Stáhnout', variants, download = true, onSelect, className }, ref) => {
+	({ label = 'Stáhnout', variants, download = true, onSelect, tracking, className }, ref) => {
 		const isMulti = variants.length > 1
 		const [open, setOpen] = useState(false)
 		const containerRef = useRef<HTMLDivElement>(null)
@@ -116,7 +119,10 @@ export const DownloadButton = forwardRef<HTMLDivElement, DownloadButtonProps>(
 						{...(download ? { download: variant.fileName ?? '' } : {})}
 						target="_blank"
 						rel="noopener noreferrer"
-						onClick={() => onSelect?.(variant)}
+						onClick={() => {
+							pushCtaClick(tracking)
+							onSelect?.(variant)
+						}}
 						className={`inline-flex items-center gap-npi-2 font-npi-sans font-bold text-[1rem] leading-[1.5] text-npi-blue hover:text-npi-blue-hover active:text-npi-blue-hover transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-npi-blue-light rounded-npi-xxs ${
 							className ?? ''
 						}`}
@@ -159,6 +165,7 @@ export const DownloadButton = forwardRef<HTMLDivElement, DownloadButtonProps>(
 									target="_blank"
 									rel="noopener noreferrer"
 									onClick={() => {
+										pushCtaClick(tracking)
 										onSelect?.(v)
 										setOpen(false)
 									}}
