@@ -2,6 +2,7 @@
 
 import { Image, Link } from '../components/ui-primitives'
 import { clsx } from 'clsx'
+import { pushCtaClick } from '../components/cta-tracking'
 import { Heading } from '../components/Heading'
 import { Text } from '../components/Text'
 import { Icon } from '../icons'
@@ -61,6 +62,7 @@ const HeroCta = ({ cta, slot }: { cta: BlockCta | null | undefined; slot: 'prima
 			href={cta.url}
 			target={cta.newTab ? '_blank' : undefined}
 			rel={cta.newTab ? 'noopener noreferrer' : undefined}
+			onClick={() => pushCtaClick(cta.tracking)}
 			className={clsx(ctaClass(cta, slot), 'gap-npi-2')}
 		>
 			{iconBefore && <Icon name={iconBefore} className="size-6 shrink-0" />}

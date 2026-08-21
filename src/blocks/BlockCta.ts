@@ -1,3 +1,4 @@
+import type { CtaTracking } from '../components/cta-tracking'
 import { type IconName, iconRegistryM } from '../icons'
 import type { ButtonBlockVariant } from './ButtonBlock'
 
@@ -15,6 +16,8 @@ export interface BlockCta {
 	iconAfter?: string | null
 	/** Open the destination in a new browser tab. */
 	newTab?: boolean | null
+	/** Authored `cta_click` measurement — when set, a click pushes it to the GTM dataLayer. */
+	tracking?: CtaTracking | null
 }
 
 export const toIconName = (raw: string | null | undefined): IconName | undefined => (raw && raw in iconRegistryM ? (raw as IconName) : undefined)

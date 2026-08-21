@@ -2,6 +2,7 @@
 
 import { Link } from './ui-primitives'
 import { forwardRef } from 'react'
+import { type CtaTracking, pushCtaClick } from './cta-tracking'
 import { Icon, type IconName } from '../icons'
 import { useInverted } from '../utils/inverted-context'
 import { uic } from '../utils/uic'
@@ -89,10 +90,16 @@ export type ButtonProps =
 		/** Busy state: keeps the variant's colors (unlike `disabled`'s gray), shows a spinner
 		 * before the label and blocks clicks. Communicated via `aria-busy` + `aria-disabled`. */
 		loading?: boolean
+		/** Authored `cta_click` measurement — when set, a click pushes it to the GTM dataLayer. */
+		tracking?: CtaTracking | null
 	}
 
 export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonProps>(
-	({ label, iconBefore, iconAfter, className, variant, href, inverted, loading, ...props }, ref) => {
+	({ label, iconBefore, iconAfter, className, variant, href, inverted, loading, tracking, onClick, ...props }, ref) => {
+		const handleClick: React.MouseEventHandler<HTMLButtonElement & HTMLAnchorElement> = e => {
+			pushCtaClick(tracking)
+			onClick?.(e)
+		}
 		const resolvedInverted = useInverted(inverted)
 		const isIcon = variant === 'icon'
 		// An icon-only button renders no text, so it needs an accessible name. Fall back to `label`
@@ -130,7 +137,7 @@ export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPr
 		if (href && !props.disabled) {
 			return (
 				<ButtonRoot asChild variant={variant} inverted={resolvedInverted} className={className}>
-					<Link ref={ref as React.Ref<HTMLAnchorElement>} href={href} {...(props as React.AnchorHTMLAttributes<HTMLAnchorElement>)} aria-label={resolvedAriaLabel}>
+					<Link ref={ref as React.Ref<HTMLAnchorElement>} href={href} {...(props as React.AnchorHTMLAttributes<HTMLAnchorElement>)} onClick={handleClick} aria-label={resolvedAriaLabel}>
 						{inner}
 					</Link>
 				</ButtonRoot>
@@ -144,6 +151,7 @@ export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPr
 				inverted={resolvedInverted}
 				className={loading ? `pointer-events-none ${className ?? ''}` : className}
 				{...props}
+				onClick={handleClick}
 				aria-label={resolvedAriaLabel}
 				aria-busy={loading || undefined}
 				aria-disabled={loading || props['aria-disabled']}

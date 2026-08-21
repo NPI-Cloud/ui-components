@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Button } from '../components/Button'
+import type { CtaTracking } from '../components/cta-tracking'
 import { Modal } from '../components/Modal'
 import { type IconName, iconRegistryM } from '../icons'
 import { normalizeRichContent, TextBlock, type TextBlockRichContent } from './TextBlock'
@@ -43,6 +44,8 @@ export interface ButtonBlockProps {
 	/** `link` (the default) navigates to `url`; `modal` opens `modal` instead. */
 	action?: ButtonBlockAction | null
 	modal?: ButtonBlockModal | null
+	/** Authored `cta_click` measurement — when set, a click pushes it to the GTM dataLayer. */
+	tracking?: CtaTracking | null
 }
 
 const variantMap: Record<ButtonBlockVariant, 'primary' | 'secondary' | 'tertiary' | 'tertiary-s' | 'icon'> = {
@@ -55,7 +58,7 @@ const variantMap: Record<ButtonBlockVariant, 'primary' | 'secondary' | 'tertiary
 
 const toIconName = (raw: string | null | undefined): IconName | undefined => raw && raw in iconRegistryM ? raw as IconName : undefined
 
-export function ButtonBlock({ label, url, newTab, variant, inverted, disabled, iconBefore, iconAfter, action, modal }: ButtonBlockProps) {
+export function ButtonBlock({ label, url, newTab, variant, inverted, disabled, iconBefore, iconAfter, action, modal, tracking }: ButtonBlockProps) {
 	const [modalOpen, setModalOpen] = useState(false)
 	const opensModal = action === 'modal'
 	const closeModal = () => setModalOpen(false)
@@ -74,6 +77,7 @@ export function ButtonBlock({ label, url, newTab, variant, inverted, disabled, i
 				disabled={disabled ?? false}
 				iconBefore={toIconName(iconBefore)}
 				iconAfter={toIconName(iconAfter)}
+				tracking={tracking}
 			/>
 			{opensModal && (
 				<Modal

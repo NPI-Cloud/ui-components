@@ -2,6 +2,7 @@
 
 import { Image } from '../components/ui-primitives'
 import { CardOffer, type CardOfferAction, type CardOfferDisplay, type CardOfferMetaItem } from '../components/CardOffer'
+import type { CtaTracking } from '../components/cta-tracking'
 import { iconRegistryM, type IconName } from '../icons'
 import type { ButtonBlockVariant } from './ButtonBlock'
 
@@ -34,6 +35,8 @@ export interface CardOfferBlockProps {
 	ctaVariant?: ButtonBlockVariant | null
 	/** Open the CTA destination in a new browser tab. */
 	ctaNewTab?: boolean | null
+	/** Authored `cta_click` measurement of the CTA — when set, a click pushes it to the GTM dataLayer. */
+	ctaTracking?: CtaTracking | null
 }
 
 const variantMap: Record<ButtonBlockVariant, NonNullable<CardOfferAction['variant']>> = {
@@ -50,7 +53,7 @@ const toIconName = (name: string | null | undefined): IconName =>
 	name && name in iconRegistryM ? (name as IconName) : DEFAULT_META_ICON
 
 export function CardOfferBlock(
-	{ label, title, description, statusTag, display, meta, imageUrl, imageAlt, href, ctaLabel, ctaUrl, ctaIcon, ctaIconAfter, ctaVariant, ctaNewTab }:
+	{ label, title, description, statusTag, display, meta, imageUrl, imageAlt, href, ctaLabel, ctaUrl, ctaIcon, ctaIconAfter, ctaVariant, ctaNewTab, ctaTracking }:
 		CardOfferBlockProps,
 ) {
 	const metaItems: CardOfferMetaItem[] = (meta ?? []).flatMap(item => {
@@ -71,6 +74,7 @@ export function CardOfferBlock(
 			iconAfter: ctaIconAfterName,
 			variant: ctaVariant ? variantMap[ctaVariant] : undefined,
 			newTab: ctaNewTab ?? false,
+			tracking: ctaTracking,
 		}]
 		: undefined
 

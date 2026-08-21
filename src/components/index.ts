@@ -14,6 +14,7 @@ export { Banner, type BannerAction, type BannerIndicator, bannerIndicators, type
 export { BigNumber, type BigNumberProps, type BigNumberSize, bigNumberSizes } from './BigNumber'
 export { Breadcrumbs, type BreadcrumbsItem, type BreadcrumbsProps } from './Breadcrumbs'
 export { Button, type ButtonProps, buttonVariants } from './Button'
+export { type CtaTracking, type CtaTrackingInput, pushCtaClick, resolveCtaTracking } from './cta-tracking'
 export { Card, type CardAspect, cardAspects, type CardIndicator, cardIndicators, type CardProps } from './Card'
 export {
 	CardOffer,
