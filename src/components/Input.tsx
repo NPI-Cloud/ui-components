@@ -1,7 +1,7 @@
 'use client'
 
 import { clsx } from 'clsx'
-import { type FocusEvent, forwardRef, type InputHTMLAttributes, type PointerEvent, type ReactNode, useRef, useState } from 'react'
+import { type FocusEvent, forwardRef, type InputHTMLAttributes, type PointerEvent, type ReactNode, useId, useRef, useState } from 'react'
 import { twMerge } from 'tailwind-merge'
 import { Icon, type IconName } from '../icons'
 
@@ -35,12 +35,17 @@ export const Input = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
 		disabled = false,
 		className,
 		type = 'text',
-		id,
+		id: idProp,
 		onFocus,
 		onBlur,
 		onPointerDown,
 		...rest
 	} = props
+
+	// Without a fallback the label's htmlFor and the error's aria-describedby both resolve to
+	// undefined, so an Input rendered without an explicit id had no associated label at all.
+	const reactId = useId()
+	const id = idProp ?? `input-${reactId}`
 
 	const isPassword = type === 'password'
 	const [revealed, setRevealed] = useState(false)
