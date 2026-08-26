@@ -1,6 +1,7 @@
 'use client'
 
 import { Image } from '../components/ui-primitives'
+import type { BadgeTone } from '../components/badge-tones'
 import { Card, type CardAspect, type CardIndicator } from '../components/Card'
 import type { CtaTracking } from '../components/cta-tracking'
 import type { DownloadVariant } from '../components/DownloadButton'
@@ -36,6 +37,8 @@ export interface CardBlockProps {
 	indicator?: CardIndicator | null
 	tagLabel?: string | null
 	tagUrl?: string | null
+	/** Renders the tag as a status badge in this tone instead of the outlined link tag. */
+	tagTone?: BadgeTone | null
 	href?: string | null
 	ctaLabel?: string | null
 	ctaUrl?: string | null
@@ -72,6 +75,7 @@ export function CardBlock(
 		clampDescription,
 		indicator,
 		tagLabel,
+		tagTone,
 		tagUrl,
 		href,
 		ctaLabel,
@@ -103,7 +107,7 @@ export function CardBlock(
 	// (Indicator on an aspected-but-imageless card renders a dark blue placeholder so the badge stays visible.)
 	const hasVisualIntent = aspect !== 'none' && Boolean(resolvedAspect || indicator || imageUrl)
 	const cta = ctaLabel ? { label: ctaLabel, href: ctaUrl ?? undefined, tracking: ctaTracking } : undefined
-	const tag = tagLabel ? { label: tagLabel, href: tagUrl ?? undefined } : undefined
+	const tag = tagLabel ? { label: tagLabel, href: tagUrl ?? undefined, tone: tagTone ?? undefined } : undefined
 	const downloadProp = download && download.variants.length > 0
 		? { label: download.label ?? ctaLabel ?? undefined, variants: download.variants, tracking: ctaTracking }
 		: undefined

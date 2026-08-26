@@ -5,6 +5,8 @@ import { clsx } from 'clsx'
 import { forwardRef, Fragment } from 'react'
 import { twMerge } from 'tailwind-merge'
 import { Icon, type IconName } from '../icons'
+import { Badge } from './Badge'
+import type { BadgeTone } from './badge-tones'
 import { Button } from './Button'
 import type { CtaTracking } from './cta-tracking'
 import { DownloadButton, type DownloadVariant } from './DownloadButton'
@@ -90,8 +92,11 @@ export interface CardProps extends Omit<React.HTMLAttributes<HTMLElement>, 'titl
 	 * `title` is used as the link's accessible label when `href` is set.
 	 */
 	visualOnly?: boolean
-	/** Optional clickable tag rendered after the description (independent click target) */
-	tag?: CardLink
+	/**
+	 * Optional tag rendered after the description. Without `tone` it's the outlined blue `Tag`
+	 * (a click target when `href` is set); with `tone` it's a status `Badge` in that tone.
+	 */
+	tag?: CardLink & { tone?: BadgeTone }
 	/** Optional tertiary CTA / download rendered at the bottom (independent click target) */
 	cta?: CardCta
 	/**
@@ -257,7 +262,7 @@ export const Card = forwardRef<HTMLElement, CardProps>(({
 					{description && <Text variant="l" className={clampDescription ? descriptionClampClassMap[clampDescription] : undefined}>{description}</Text>}
 					{tag && (
 						<div className="relative z-10">
-							<Tag size="S" label={tag.label} href={tag.href} />
+							{tag.tone ? <Badge tone={tag.tone}>{tag.label}</Badge> : <Tag size="S" label={tag.label} href={tag.href} />}
 						</div>
 					)}
 					{download && download.variants.length > 0
