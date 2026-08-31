@@ -66,6 +66,12 @@ export interface CardOfferProps extends Omit<React.HTMLAttributes<HTMLElement>, 
 	href?: string
 	/** `card` (white surface + shadow, default) or `row` — the "řádkový výpis" list line without card chrome. */
 	display?: CardOfferDisplay
+	/**
+	 * Stretch the card to the full height of its grid cell instead of shrinking to its content, so a
+	 * row of cards ends on one baseline and the CTAs line up. Only meaningful inside a grid; the
+	 * listing blocks set it, a standalone card does not.
+	 */
+	fillHeight?: boolean
 }
 
 // Container-query driven layout matching the three Figma sizes:
@@ -105,6 +111,7 @@ export const CardOffer = forwardRef<HTMLElement, CardOfferProps>(({
 	visual,
 	href,
 	display = 'card',
+	fillHeight = false,
 	className,
 	...props
 }, ref) => {
@@ -147,12 +154,13 @@ export const CardOffer = forwardRef<HTMLElement, CardOfferProps>(({
 	)
 
 	return (
-		<div className="@container w-full">
+		<div className={clsx('@container w-full', fillHeight && 'h-full')}>
 			<article
 				ref={ref}
 				className={twMerge(
 					clsx(
 						rootClass,
+						fillHeight && 'h-full',
 						display === 'card' && cardChromeClass,
 						href && 'cursor-pointer',
 						className,
@@ -194,7 +202,7 @@ export const CardOffer = forwardRef<HTMLElement, CardOfferProps>(({
 					)}
 					{/* Without metadata there is no right column — tag, description and CTAs flow under the title. */}
 					{!hasMeta && (
-						<div className="flex flex-col items-start gap-npi-3">
+						<div className={clsx('flex flex-col items-start gap-npi-3', fillHeight && 'mt-auto')}>
 							{statusTagNode && <span className="@md:hidden">{statusTagNode}</span>}
 							{description && <Text variant="m" className="line-clamp-4 @md:hidden">{description}</Text>}
 							{actionButtons}

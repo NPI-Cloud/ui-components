@@ -21,6 +21,8 @@ export interface CardOfferBlockProps {
 	description?: string | null
 	statusTag?: string | null
 	display?: CardOfferBlockDisplay | null
+	/** Stretch the card to its grid cell's height so a row of cards ends on one baseline. */
+	fillHeight?: boolean
 	meta?: CardOfferBlockMetaItem[] | null
 	imageUrl?: string | null
 	imageAlt?: string | null
@@ -53,7 +55,7 @@ const toIconName = (name: string | null | undefined): IconName =>
 	name && name in iconRegistryM ? (name as IconName) : DEFAULT_META_ICON
 
 export function CardOfferBlock(
-	{ label, title, description, statusTag, display, meta, imageUrl, imageAlt, href, ctaLabel, ctaUrl, ctaIcon, ctaIconAfter, ctaVariant, ctaNewTab, ctaTracking }:
+	{ label, title, description, statusTag, display, fillHeight, meta, imageUrl, imageAlt, href, ctaLabel, ctaUrl, ctaIcon, ctaIconAfter, ctaVariant, ctaNewTab, ctaTracking }:
 		CardOfferBlockProps,
 ) {
 	const metaItems: CardOfferMetaItem[] = (meta ?? []).flatMap(item => {
@@ -94,6 +96,7 @@ export function CardOfferBlock(
 			visual={visual}
 			href={href ?? undefined}
 			display={display ?? undefined}
+			fillHeight={fillHeight}
 		/>
 	)
 }
