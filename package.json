@@ -29,7 +29,7 @@
 		"LICENSE"
 	],
 	"scripts": {
-		"build": "tsup"
+		"build": "tsup && tsc -p tsconfig.build.json"
 	},
 	"publishConfig": {
 		"access": "public",
@@ -69,6 +69,6 @@
 		"react": "19.2.5",
 		"react-dom": "19.2.5",
 		"tsup": "8.5.1",
-		"typescript": "6.0.2"
+		"typescript": "7.0.2"
 	}
 }

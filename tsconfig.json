@@ -16,7 +16,10 @@
 		// `bun` for the co-located *.test.ts files. Naming any type package here turns OFF automatic
 		// @types inclusion, so anything else this package needs must be referenced explicitly.
 		"types": ["bun"],
-		"outDir": "./dist"
+		// The publish build owns `dist` (tsup's JavaScript + `tsconfig.build.json`'s declarations,
+		// laid out as the package's `exports` expects). Keep the workspace build's own declaration
+		// output apart so the two never write into the same tree.
+		"outDir": "./dist-types"
 	},
 	"include": ["src"]
 }

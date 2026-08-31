@@ -9,16 +9,9 @@ export default defineConfig({
 	// have to resolve test-only devDeps the standalone package doesn't carry.
 	entry: ['src/**/*.{ts,tsx}', '!src/**/*.d.ts', '!src/**/*.test.{ts,tsx}'],
 	format: ['esm'],
-	// The package tsconfig is `composite` for the monorepo's project references, which a
-	// standalone dts emit can't satisfy (it demands every file be listed). Override those flags
-	// for the publish build so tsup emits declarations straight from the entry globs.
-	dts: {
-		compilerOptions: {
-			composite: false,
-			incremental: false,
-			ignoreDeprecations: '6.0',
-		},
-	},
+	// No `dts` here: tsup's declaration pass runs on the TypeScript JavaScript compiler API, which
+	// TypeScript 7 no longer ships. Declarations come from `tsc -p tsconfig.build.json` instead (see
+	// the package's `build` script), which runs after this and writes into the same `dist`.
 	bundle: false,
 	sourcemap: true,
 	clean: true,

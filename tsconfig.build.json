@@ -1,0 +1,19 @@
+// Declaration emit for the published package. `tsconfig.json` describes this package as a member of
+// the monorepo's project-reference graph (composite, emitting under `dist/src/`); the publish build
+// is standalone and has to land `index.d.ts` at the root of `dist`, next to the JavaScript tsup
+// writes. Kept as a separate config so the public mirror — where this directory is the whole repo —
+// builds with the same file the monorepo uses.
+{
+	"extends": "./tsconfig.json",
+	"compilerOptions": {
+		// A standalone emit is not part of any reference graph, so it neither needs nor can satisfy
+		// `composite` (which demands every input file be listed explicitly).
+		"composite": false,
+		"incremental": false,
+		// Without this, `composite`'s default puts the output under `dist/src/`.
+		"rootDir": "./src",
+		"outDir": "./dist"
+	},
+	// Tests are bun-only and would ship their declarations into `dist`.
+	"exclude": ["src/**/*.test.ts", "src/**/*.test.tsx"]
+}
