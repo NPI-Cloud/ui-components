@@ -46,6 +46,8 @@ export { MapBlock, type MapBlockMode, type MapBlockProps, type MapBlockRegion } 
 export { MediaBlock, type MediaBlockAspect, mediaBlockAspects, type MediaBlockFit, mediaBlockFits, type MediaBlockProps } from './MediaBlock'
 export { type NavCardBlockBackground, NavCardBlock, type NavCardBlockProps, type NavCardBlockSize } from './NavCardBlock'
 export { NotFoundPage, type NotFoundPageProps, type NotFoundPageTheme, notFoundPageThemes } from './NotFoundPage'
+export { type OrgEmployeeItem, OrgEmployeesBlock, type OrgEmployeesBlockProps } from './OrgEmployeesBlock'
+export { OrgStructureAccordionBlock, type OrgStructureAccordionBlockProps, type OrgStructureAccordionUnit } from './OrgStructureAccordionBlock'
 export { type PodcastPlatformIcon, type PodcastPlatformLink, PodcastTemplate, type PodcastTemplateProps } from './PodcastTemplate'
 export { ProfileCardBlock, type ProfileCardBlockOrientation, type ProfileCardBlockProps, type ProfileCardBlockSize } from './ProfileCardBlock'
 export { RichTextView, type RichTextReferences } from './RichTextView'
