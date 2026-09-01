@@ -38,13 +38,14 @@ export function StaticMap({ center, zoom, markers, className }: StaticMapProps) 
 		if (!element) return
 
 		const measure = (): void => {
-			const rect = element.getBoundingClientRect()
-			if (!rect.width || !rect.height) return
-			setSize(previous => {
-				const width = Math.round(rect.width)
-				const height = Math.round(rect.height)
-				return previous && previous.width === width && previous.height === height ? previous : { width, height }
-			})
+			// Layout size, not getBoundingClientRect: the box can sit inside a CSS `zoom`ed (or
+			// transform-scaled) ancestor — the web-builder canvas shrinks itself that way — where the
+			// rect reports the smaller on-screen size. Tiles are laid out in layout px inside the box,
+			// so measuring the rect there covers only the zoom-fraction and leaves bare strips.
+			const width = element.offsetWidth
+			const height = element.offsetHeight
+			if (!width || !height) return
+			setSize(previous => (previous && previous.width === width && previous.height === height ? previous : { width, height }))
 		}
 
 		measure()
