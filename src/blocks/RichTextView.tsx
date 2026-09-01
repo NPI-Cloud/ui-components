@@ -236,6 +236,8 @@ function renderNode(node: SlateNode, key: number, references: RichTextReferences
 					url={asString(node.url) || undefined}
 					variant={asButtonVariant(node.variant)}
 					inverted={Boolean(node.inverted)}
+					iconBefore={asString(node.iconBefore) || undefined}
+					iconAfter={asString(node.iconAfter) || undefined}
 				/>
 			)
 		case 'download': {
