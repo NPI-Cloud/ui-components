@@ -14,7 +14,7 @@
 // Part of both the browser cache key and the edge cache key (sent as `?r=`), so bumping it busts
 // both. Bump on ANY change to how tiles render — tile size math, zoom handling, or the map style in
 // `map-style.ts` (which the worker bakes into the upstream request).
-export const STATIC_MAP_RENDER_VERSION = '1'
+export const STATIC_MAP_RENDER_VERSION = '2'
 
 /** Static Maps API hard cap: 640 logical px per side (`scale=2` doubles the device px, not the extent). */
 export const MAX_STATIC_SIZE = 640
