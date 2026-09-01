@@ -48,6 +48,11 @@ const EXTENSION_LABELS: Record<string, string> = {
 	zip: 'ZIP',
 	csv: 'CSV',
 	txt: 'TXT',
+	png: 'PNG',
+	jpg: 'JPG',
+	jpeg: 'JPEG',
+	webp: 'WebP',
+	svg: 'SVG',
 }
 
 function formatLabel(v: DownloadVariant): string {
