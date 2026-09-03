@@ -76,3 +76,44 @@ describe('RichTextView table rendering', () => {
 		expect(html).toContain('<sup><strong>2</strong></sup>')
 	})
 })
+
+// Editor-authored shape: inline cell text, a header row (`headerScope: 'table'`), a header
+// column cell (`headerScope: 'row'`) and column alignment (`justify`).
+const editorTableDocument = {
+	children: [
+		{
+			type: 'table',
+			children: [
+				{
+					type: 'tableRow',
+					headerScope: 'table',
+					children: [
+						{ type: 'tableCell', children: [{ text: 'Veličina' }] },
+						{ type: 'tableCell', justify: 'center', children: [{ text: 'Jednotka' }] },
+					],
+				},
+				{
+					type: 'tableRow',
+					children: [
+						{ type: 'tableCell', headerScope: 'row', children: [{ text: 'Obsah vody' }] },
+						{ type: 'tableCell', justify: 'center', children: [{ text: 'm' }, { text: '2', superscript: true }] },
+					],
+				},
+			],
+		},
+	],
+}
+
+describe('RichTextView editor-authored table', () => {
+	test('header row and header column render as <th>, alignment as a text class, inline text as-is', () => {
+		const html = renderToStaticMarkup(<RichTextView value={editorTableDocument} />)
+		expect(html.match(/<th/g)?.length).toBe(3)
+		expect(html.match(/<td/g)?.length).toBe(1)
+		expect(html.match(/scope="col"/g)?.length).toBe(2)
+		expect(html.match(/scope="row"/g)?.length).toBe(1)
+		expect(html.match(/text-center/g)?.length).toBe(2)
+		expect(html).toContain('m<sup>2</sup>')
+		// A non-breaking space survives as the character itself.
+		expect(html).toContain('Obsah vody')
+	})
+})

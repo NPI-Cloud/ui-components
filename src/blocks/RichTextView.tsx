@@ -79,6 +79,22 @@ function renderLeaf(leaf: SlateText, key: number): ReactNode {
 	return <Fragment key={key}>{content}</Fragment>
 }
 
+const TABLE_CELL_JUSTIFY: Record<string, string> = { center: 'text-center', end: 'text-right' }
+
+// Header cells are marked two ways and both count: `header: true` on the cell (rvp.cz migration)
+// or the editor's `headerScope` (`'row'` on a row's first cell; `'table'` on the row → `headerRow`).
+// Cell blocks are ordinary paragraphs — the cell padding frames them, so their outer
+// article-rhythm margins are zeroed at the edges. `justify` aligns the cell's text.
+function renderTableCell(node: SlateElement, key: number, headerRow: boolean, references: RichTextReferences): ReactNode {
+	const children = (Array.isArray(node.children) ? node.children : []).map((child, i) => renderNode(child, i, references))
+	const justify = typeof node.justify === 'string' ? TABLE_CELL_JUSTIFY[node.justify] : undefined
+	const cellClassName = `px-npi-4 py-npi-2 align-top [&>:first-child]:mt-0 [&>:last-child]:mb-0${justify ? ` ${justify}` : ''}`
+	const header = node.header === true || node.headerScope === 'row' || headerRow
+	return header
+		? <th key={key} scope={node.headerScope === 'row' ? 'row' : 'col'} className={`${cellClassName} font-bold`}>{children}</th>
+		: <td key={key} className={cellClassName}>{children}</td>
+}
+
 function renderNode(node: SlateNode, key: number, references: RichTextReferences): ReactNode {
 	if (isText(node)) return renderLeaf(node, key)
 	// Element nodes come from free-form JSON and can lack `children` — render them empty, don't crash.
@@ -149,16 +165,16 @@ function renderNode(node: SlateNode, key: number, references: RichTextReferences
 					</table>
 				</div>
 			)
-		case 'tableRow':
-			return <tr key={key} className="odd:bg-npi-bg-light">{children}</tr>
-		case 'tableCell': {
-			// Cell blocks are ordinary paragraphs — the cell padding frames them, so their
-			// outer article-rhythm margins are zeroed at the edges.
-			const cellClassName = 'px-npi-4 py-npi-2 align-top [&>:first-child]:mt-0 [&>:last-child]:mb-0'
-			return node.header === true
-				? <th key={key} className={`${cellClassName} font-bold`}>{children}</th>
-				: <td key={key} className={cellClassName}>{children}</td>
+		case 'tableRow': {
+			// A header row (`headerScope: 'table'`) turns every cell into a `<th>`; the cells are
+			// rendered here rather than through the generic recursion so they can see the row.
+			const headerRow = node.headerScope === 'table'
+			const cells = (Array.isArray(node.children) ? node.children : []).map((cell, i) =>
+				isText(cell) ? renderLeaf(cell, i) : renderTableCell(cell, i, headerRow, references))
+			return <tr key={key} className="odd:bg-npi-bg-light">{cells}</tr>
 		}
+		case 'tableCell':
+			return renderTableCell(node, key, false, references)
 		case 'testimonial': {
 			// Text rides inline on the node; the avatar is resolved from the referenced Image.
 			const avatar = typeof node.referenceId === 'string' ? references[node.referenceId] : undefined
