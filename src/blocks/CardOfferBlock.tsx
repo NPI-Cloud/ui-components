@@ -29,7 +29,7 @@ export interface CardOfferBlockProps {
 	href?: string | null
 	ctaLabel?: string | null
 	ctaUrl?: string | null
-	/** Icon before the CTA label (an iconRegistryM key). Unset keeps the CardOffer default ('stahnout'). */
+	/** Icon before the CTA label (an iconRegistryM key). Unset renders no icon. */
 	ctaIcon?: string | null
 	/** Icon after the CTA label (an iconRegistryM key). */
 	ctaIconAfter?: string | null
@@ -65,7 +65,7 @@ export function CardOfferBlock(
 	})
 
 	const label_ = ctaLabel?.trim()
-	// Unset icon stays undefined so CardOffer applies its own default; an unknown key falls back too.
+	// An unset or unknown key renders no icon — the editor's „(žádná)" pick must be honoured.
 	const ctaIconName = ctaIcon && ctaIcon in iconRegistryM ? (ctaIcon as IconName) : undefined
 	const ctaIconAfterName = ctaIconAfter && ctaIconAfter in iconRegistryM ? (ctaIconAfter as IconName) : undefined
 	const actions: CardOfferAction[] | undefined = label_

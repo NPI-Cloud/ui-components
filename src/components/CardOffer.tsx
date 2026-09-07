@@ -22,7 +22,7 @@ export interface CardOfferMetaItem {
 export interface CardOfferAction {
 	/** Visible label */
 	label: string
-	/** Icon rendered before the label (defaults to `'stahnout'`) */
+	/** Icon rendered before the label — none when unset */
 	iconBefore?: IconName
 	/** Icon rendered after the label */
 	iconAfter?: IconName
@@ -141,7 +141,7 @@ export const CardOffer = forwardRef<HTMLElement, CardOfferProps>(({
 					key={i}
 					variant={action.variant ?? 'tertiary-s'}
 					label={action.label}
-					iconBefore={action.iconBefore ?? 'stahnout'}
+					iconBefore={action.iconBefore}
 					iconAfter={action.iconAfter}
 					href={action.href}
 					target={action.newTab ? '_blank' : undefined}
