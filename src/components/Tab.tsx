@@ -16,6 +16,7 @@ import {
 import { twMerge } from 'tailwind-merge'
 import { Icon, type IconName } from '../icons'
 import { uic } from '../utils/uic'
+import { Scrollbar } from './Scrollbar'
 
 export const tabVariants = ['segmented', 'pill', 'icon'] as const
 export type TabVariant = (typeof tabVariants)[number]
@@ -167,32 +168,50 @@ export const Tabs = ({
 }
 Tabs.displayName = 'Tabs'
 
-const tabListLayoutByVariant: Record<TabVariant, Record<TabsOrientation, string>> = {
-	segmented: {
-		// Verze 1 — grey backdrop, 4px padding, 16px gap, single row that scrolls horizontally if it overflows
-		horizontal: 'inline-flex self-start max-w-full overflow-x-auto bg-npi-bg-light rounded-npi-xs p-npi-1 gap-npi-4',
-		vertical: 'inline-flex flex-col items-start bg-npi-bg-light rounded-npi-xs p-npi-1 gap-npi-1',
-	},
-	pill: {
-		// Verze 2 — free-floating chip cloud, wraps to multiple rows
-		horizontal: 'inline-flex flex-wrap gap-npi-1',
-		// Vertical pill — stacks as a sidebar nav (no backdrop)
-		vertical: 'inline-flex flex-col items-start gap-npi-1',
-	},
-	icon: {
-		// Verze 3 — grey backdrop with smaller gap
-		horizontal: 'inline-flex self-start bg-npi-bg-light rounded-npi-xs p-npi-1 gap-npi-1',
-		vertical: 'inline-flex flex-col items-start bg-npi-bg-light rounded-npi-xs p-npi-1 gap-npi-1',
-	},
+interface TabListLayout {
+	className: string
+	/** The row keeps a single line and scrolls horizontally inside the NPI `Scrollbar` when it overflows. */
+	scrolls: boolean
+}
+
+const tabListLayout = (variant: TabVariant, orientation: TabsOrientation, wrap: boolean): TabListLayout => {
+	if (orientation === 'vertical') {
+		return {
+			className: variant === 'pill'
+				// Vertical pill — stacks as a sidebar nav (no backdrop)
+				? 'inline-flex flex-col items-start gap-npi-1'
+				: 'inline-flex flex-col items-start bg-npi-bg-light rounded-npi-xs p-npi-1 gap-npi-1',
+			scrolls: false,
+		}
+	}
+	switch (variant) {
+		case 'segmented':
+			// Verze 1 — grey backdrop, 4px padding, 16px gap. One row that scrolls when it overflows;
+			// `wrap` lays the segments out in as many rows as they need instead.
+			return wrap
+				? { className: 'inline-flex flex-wrap self-start bg-npi-bg-light rounded-npi-xs p-npi-1 gap-x-npi-4 gap-y-npi-1', scrolls: false }
+				: { className: 'flex w-max mb-npi-1 bg-npi-bg-light rounded-npi-xs p-npi-1 gap-npi-4', scrolls: true }
+		case 'pill':
+			// Verze 2 — free-floating chip cloud, wraps to multiple rows
+			return { className: 'inline-flex flex-wrap gap-npi-1', scrolls: false }
+		case 'icon':
+			// Verze 3 — grey backdrop with smaller gap
+			return { className: 'inline-flex self-start bg-npi-bg-light rounded-npi-xs p-npi-1 gap-npi-1', scrolls: false }
+	}
 }
 
 export interface TabListProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'role' | 'aria-orientation'> {
 	'aria-label'?: string
+	/**
+	 * Lay the tabs out in as many rows as they need instead of one row that scrolls. Only the
+	 * `segmented` variant scrolls; `pill` always wraps and `icon` never overflows.
+	 */
+	wrap?: boolean
 	children: ReactNode
 }
 
 export const TabList = forwardRef<HTMLDivElement, TabListProps>(
-	({ children, className, onKeyDown, ...rest }, ref) => {
+	({ children, className, onKeyDown, wrap = false, ...rest }, ref) => {
 		const ctx = useContext(TabsContext)
 		const isVertical = ctx?.orientation === 'vertical'
 
@@ -230,21 +249,31 @@ export const TabList = forwardRef<HTMLDivElement, TabListProps>(
 			next?.click()
 		}
 
-		const layoutClass = ctx
-			? tabListLayoutByVariant[ctx.variant][ctx.orientation]
-			: 'inline-flex gap-npi-1'
+		const layout: TabListLayout = ctx
+			? tabListLayout(ctx.variant, ctx.orientation, wrap)
+			: { className: 'inline-flex gap-npi-1', scrolls: false }
 
-		return (
+		const list = (
 			<div
 				ref={ref}
 				role="tablist"
 				aria-orientation={isVertical ? 'vertical' : 'horizontal'}
 				onKeyDown={handleKeyDown}
-				className={twMerge(clsx(layoutClass, className))}
+				className={twMerge(clsx(layout.className, className))}
 				{...rest}
 			>
 				{children}
 			</div>
+		)
+
+		if (!layout.scrolls) return list
+
+		// The scroll container sits outside the tablist so the styled scrollbar runs under the
+		// grey backdrop instead of inside its rounded corners.
+		return (
+			<Scrollbar direction="horizontal" className="max-w-full self-start">
+				{list}
+			</Scrollbar>
 		)
 	},
 )
