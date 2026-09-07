@@ -19,7 +19,9 @@ export interface ScrollbarProps extends HTMLAttributes<HTMLDivElement> {
  * `Scrollbar` wraps its children in a scroll container with NPI-styled scrollbars.
  *
  * The styling targets WebKit's `::-webkit-scrollbar*` pseudo-elements (Chrome / Safari /
- * Edge) and Firefox's `scrollbar-color` / `scrollbar-width`. The track is `npi-gray-200`,
+ * Edge) and, only where those are unsupported (Firefox), the standard `scrollbar-color` /
+ * `scrollbar-width` — Chromium ignores every `::-webkit-scrollbar*` rule as soon as either
+ * standard property is set on the element, which would lose the rounded track. The track is `npi-gray-200`,
  * the thumb is `npi-blue` and turns `npi-blue-hover` on hover / active. When the
  * container itself receives keyboard focus the thumb gets a `npi-blue-light` ring,
  * matching the Figma "Focus" state.
@@ -42,9 +44,11 @@ export const Scrollbar = forwardRef<HTMLDivElement, ScrollbarProps>((props, ref)
 	// WebKit pseudo-elements can't be reached through Tailwind utilities, so we inline
 	// a scoped style block. All colors come from the `--npi-*` CSS custom properties.
 	const css = `
-.${scopeClass} {
-	scrollbar-color: var(--npi-blue) var(--npi-gray-200);
-	scrollbar-width: thin;
+@supports not selector(::-webkit-scrollbar) {
+	.${scopeClass} {
+		scrollbar-color: var(--npi-blue) var(--npi-gray-200);
+		scrollbar-width: thin;
+	}
 }
 .${scopeClass}::-webkit-scrollbar {
 	width: 8px;
@@ -78,9 +82,6 @@ export const Scrollbar = forwardRef<HTMLDivElement, ScrollbarProps>((props, ref)
 	border-radius: var(--npi-radius-xs);
 	border: 2px solid var(--npi-blue-light);
 	background-clip: padding-box;
-}
-.${scopeClass}:focus-visible {
-	scrollbar-color: var(--npi-blue) var(--npi-gray-200);
 }
 `
 
