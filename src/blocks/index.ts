@@ -65,6 +65,15 @@ export {
 	type TableCellLine,
 	tableCellPlainText,
 } from './table-block-data'
+export {
+	SideMenuBlock,
+	type SideMenuBlockBackground,
+	type SideMenuBlockChild,
+	type SideMenuBlockItem,
+	type SideMenuBlockItemKind,
+	type SideMenuBlockProps,
+	toSideMenuItems,
+} from './SideMenuBlock'
 export { TableBlock, type TableBlockProps, TableCellContent, TableCellVisual } from './TableBlock'
 export { TabsBlock, type TabsBlockProps, type TabsBlockTab, tabsBlockTabFallbackTitle, type TabsBlockVariant, tabsBlockVariants } from './TabsBlock'
 export { TabsEndBlock, TabsStartBlock } from './TabsMarkerBlocks'

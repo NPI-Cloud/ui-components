@@ -1,4 +1,6 @@
+import { clsx } from 'clsx'
 import type { ReactNode } from 'react'
+import { twMerge } from 'tailwind-merge'
 import { normalizeAnchor } from './anchor'
 import { BLOCK_SPACING_DEFAULT, BLOCK_SPACING_TOP_CLASS, type BlockSpacing } from './spacing'
 
@@ -12,10 +14,16 @@ import { BLOCK_SPACING_DEFAULT, BLOCK_SPACING_TOP_CLASS, type BlockSpacing } fro
  * only concerns shared between the two — everything else (data shape, dispatch, prop mapping) is
  * consumer-owned.
  */
-export function RenderBlock({ spacingBefore, anchor, children }: {
+export function RenderBlock({ spacingBefore, anchor, className, children }: {
 	spacingBefore?: BlockSpacing | null
 	anchor?: string | null
+	/** Extra classes on the wrapper — for placement a block cannot apply to itself (a sticky side menu). */
+	className?: string
 	children: ReactNode
 }) {
-	return <div id={normalizeAnchor(anchor) ?? undefined} className={BLOCK_SPACING_TOP_CLASS[spacingBefore ?? BLOCK_SPACING_DEFAULT]}>{children}</div>
+	return (
+		<div id={normalizeAnchor(anchor) ?? undefined} className={twMerge(clsx(BLOCK_SPACING_TOP_CLASS[spacingBefore ?? BLOCK_SPACING_DEFAULT], className))}>
+			{children}
+		</div>
+	)
 }

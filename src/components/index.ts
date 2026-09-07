@@ -182,6 +182,16 @@ export { Scrollbar, type ScrollbarDirection, scrollbarDirections, type Scrollbar
 export { SearchBar, type SearchBarProps } from './SearchBar'
 export { type HighlightSegment, SearchResultItem, type SearchResultItemProps } from './SearchResultItem'
 export { Select, type SelectOption, type SelectProps, type SelectSize, selectSizes, type SelectVariant, selectVariants } from './Select'
+export {
+	SideMenu,
+	type SideMenuBackground,
+	sideMenuBackgrounds,
+	type SideMenuChildLink,
+	type SideMenuItem,
+	type SideMenuLinkItem,
+	type SideMenuProps,
+} from './SideMenu'
+export { sideMenuFillHeightClass, sideMenuStickyClass } from './side-menu-placement'
 export { Slider, type SliderProps, type SliderSize, sliderSizes } from './Slider'
 export { StaticMap, type StaticMapMarker, type StaticMapProps } from './StaticMap'
 export { StatusIndicator, type StatusIndicatorProps, type StatusIndicatorTone, statusIndicatorTones } from './StatusIndicator'
