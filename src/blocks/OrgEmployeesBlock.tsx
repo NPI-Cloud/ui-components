@@ -6,6 +6,8 @@ export interface OrgEmployeeItem {
 	name: string
 	/** Job position shown under the name. */
 	position?: string | null
+	/** Organizational unit, shown under the position — set where the listing spans units (contact search). */
+	unit?: string | null
 	/** Work e-mail — rendered as a `mailto:` link. */
 	email?: string | null
 	/** Work phone — rendered as a `tel:` link. */
@@ -57,6 +59,7 @@ export function OrgEmployeesBlock({ items, columns }: OrgEmployeesBlockProps) {
 					size="S"
 					name={item.name}
 					role={item.position ?? undefined}
+					detail={item.unit ?? undefined}
 					email={item.email ?? undefined}
 					phone={item.phone ?? undefined}
 				/>

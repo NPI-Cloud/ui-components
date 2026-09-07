@@ -29,6 +29,8 @@ export interface ProfileCardProps extends Omit<React.HTMLAttributes<HTMLElement>
 	name: string
 	/** Position / role shown as the subtitle. */
 	role?: string
+	/** Second subtitle line under `role`, same typography — e.g. the organizational unit in a cross-unit listing. */
+	detail?: string
 	/** Avatar photo URL — when present takes priority over initials and icon fallback. */
 	avatarSrc?: string
 	/** Override accessible label for the avatar image (defaults to the person's name). */
@@ -188,6 +190,7 @@ const textGapClass: Record<ProfileCardSize, string> = {
 export const ProfileCard = forwardRef<HTMLElement, ProfileCardProps>(({
 	name,
 	role,
+	detail,
 	avatarSrc,
 	avatarAlt,
 	initials,
@@ -234,6 +237,7 @@ export const ProfileCard = forwardRef<HTMLElement, ProfileCardProps>(({
 			>
 				<p className={nameTextClass[size]}>{name}</p>
 				{role && <p className={roleTextClass}>{role}</p>}
+				{detail && <p className={roleTextClass}>{detail}</p>}
 				{email && (
 					<Link href={`mailto:${email}`} className={contactLinkClass}>
 						{email}
