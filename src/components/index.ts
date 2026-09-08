@@ -10,6 +10,7 @@ export {
 } from './Accordion'
 export { Badge, type BadgeProps } from './Badge'
 export { type BadgeTone, badgeTones } from './badge-tones'
+export { descriptionClampClass, descriptionClampLines, type DescriptionClampLines, toDescriptionClampLines } from './description-clamp'
 export { Banner, type BannerAction, type BannerIndicator, bannerIndicators, type BannerProps, type BannerTone, bannerTones } from './Banner'
 export { BigNumber, type BigNumberProps, type BigNumberSize, bigNumberSizes } from './BigNumber'
 export { Breadcrumbs, type BreadcrumbsItem, type BreadcrumbsProps } from './Breadcrumbs'

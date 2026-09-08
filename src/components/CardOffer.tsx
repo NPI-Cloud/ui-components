@@ -7,6 +7,7 @@ import { twMerge } from 'tailwind-merge'
 import { Icon, type IconName } from '../icons'
 import { Button } from './Button'
 import type { CtaTracking } from './cta-tracking'
+import { descriptionClampClass, type DescriptionClampLines } from './description-clamp'
 import { Heading } from './Heading'
 import { Text } from './Text'
 
@@ -45,9 +46,11 @@ export interface CardOfferProps extends Omit<React.HTMLAttributes<HTMLElement>, 
 	title: string
 	/**
 	 * Body text — rendered instead of (or, on wide layouts, alongside) the metadata rows.
-	 * Clamped to 4 lines (Figma: ~150 chars, then …).
+	 * Figma draws it at ~150 chars over 4 lines, then …; `clampDescription` decides the count.
 	 */
 	description?: string
+	/** Clamp the description to this many lines (1-6); unset lets it flow at full length. */
+	clampDescription?: DescriptionClampLines
 	/** Status tag (course availability / fullness). Non-interactive, gray outline per Figma "Tag - statusový". */
 	statusTag?: string
 	/** Icon + text metadata rows (date, place, price, person, … — Figma caps at ~4 stacked items) */
@@ -105,6 +108,7 @@ export const CardOffer = forwardRef<HTMLElement, CardOfferProps>(({
 	label,
 	title,
 	description,
+	clampDescription,
 	statusTag,
 	meta,
 	actions,
@@ -194,17 +198,24 @@ export const CardOffer = forwardRef<HTMLElement, CardOfferProps>(({
 							: title}
 					</Heading>
 					{/* From @md up the description always sits in the main column under the title; on narrow
-					    cards it instead joins the info stack below (matching the Figma S "Text" variant). */}
+					    cards it instead joins the info stack below (matching the Figma S "Text" variant). The
+					    responsive show/hide sits on a wrapper, never on the clamped element: `line-clamp-*`
+					    works by setting `display: -webkit-box`, which a `block` / `hidden` utility on the same
+					    node would override, silently dropping the ellipsis. */}
 					{description && (
-						<Text variant="m" className="line-clamp-4 hidden @md:block">
-							{description}
-						</Text>
+						<div className="hidden @md:block">
+							<Text variant="m" className={descriptionClampClass(clampDescription)}>{description}</Text>
+						</div>
 					)}
 					{/* Without metadata there is no right column — tag, description and CTAs flow under the title. */}
 					{!hasMeta && (
 						<div className={clsx('flex flex-col items-start gap-npi-3', fillHeight && 'mt-auto')}>
 							{statusTagNode && <span className="@md:hidden">{statusTagNode}</span>}
-							{description && <Text variant="m" className="line-clamp-4 @md:hidden">{description}</Text>}
+							{description && (
+								<div className="@md:hidden">
+									<Text variant="m" className={descriptionClampClass(clampDescription)}>{description}</Text>
+								</div>
+							)}
 							{actionButtons}
 						</div>
 					)}

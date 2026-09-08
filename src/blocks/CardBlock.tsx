@@ -3,6 +3,7 @@
 import { Image } from '../components/ui-primitives'
 import type { BadgeTone } from '../components/badge-tones'
 import { Card, type CardAspect, type CardIndicator } from '../components/Card'
+import { toDescriptionClampLines } from '../components/description-clamp'
 import type { CtaTracking } from '../components/cta-tracking'
 import type { DownloadVariant } from '../components/DownloadButton'
 
@@ -32,8 +33,9 @@ export interface CardBlockProps {
 	aspect?: CardBlockAspect | null
 	/** Stretch the standard card to fill the height of its grid cell. */
 	fillHeight?: boolean
-	/** Clamp the body description to a fixed number of lines. */
-	clampDescription?: 2 | 3 | 4
+	/** Clamp the body description to this many lines. Stored as a plain integer, so anything outside
+	 * the supported 1-6 renders unclamped. */
+	clampDescription?: number | null
 	indicator?: CardIndicator | null
 	tagLabel?: string | null
 	tagUrl?: string | null
@@ -97,7 +99,7 @@ export function CardBlock(
 				indicator={indicator ?? undefined}
 				href={href ?? undefined}
 				fillHeight={fillHeight}
-				clampDescription={clampDescription}
+				clampDescription={toDescriptionClampLines(clampDescription)}
 			/>
 		)
 	}
@@ -121,7 +123,7 @@ export function CardBlock(
 			hideVisual={!hasVisualIntent}
 			aspect={resolvedAspect}
 			fillHeight={fillHeight}
-			clampDescription={clampDescription}
+			clampDescription={toDescriptionClampLines(clampDescription)}
 			indicator={indicator ?? undefined}
 			tag={tag}
 			href={href ?? undefined}

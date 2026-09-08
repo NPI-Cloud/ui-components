@@ -9,6 +9,7 @@ import { Badge } from './Badge'
 import type { BadgeTone } from './badge-tones'
 import { Button } from './Button'
 import type { CtaTracking } from './cta-tracking'
+import { descriptionClampClass, type DescriptionClampLines } from './description-clamp'
 import { DownloadButton, type DownloadVariant } from './DownloadButton'
 import { Heading, type HeadingLevel } from './Heading'
 import { Tag } from './Tag'
@@ -72,8 +73,8 @@ export interface CardProps extends Omit<React.HTMLAttributes<HTMLElement>, 'titl
 	description?: string
 	/** Stretch the standard card wrapper and article to fill the height of its grid cell. */
 	fillHeight?: boolean
-	/** Clamp the body description to a fixed number of lines. */
-	clampDescription?: 2 | 3 | 4
+	/** Clamp the body description to this many lines (1-6); unset lets it flow at full length. */
+	clampDescription?: DescriptionClampLines
 	/** Content for the visual area (image, video, etc.) */
 	visual?: React.ReactNode
 	/** Aspect ratio of the visual area. Use `'line'` for a thin colored bar instead of an image. */
@@ -119,12 +120,6 @@ const rootShadowClass = 'shadow-npi-m hover:shadow-npi-m-hover'
 // Bumps the title to L-size typography (Bitter Regular 28px / level-4 spec) when the card is at @4xl width.
 const titleClass = 'text-npi-blue @4xl:text-[1.75rem] @4xl:font-normal transition-colors'
 const titleHoverClass = 'group-hover:text-npi-blue-hover'
-const descriptionClampClassMap: Record<NonNullable<CardProps['clampDescription']>, string> = {
-	2: 'line-clamp-2',
-	3: 'line-clamp-3',
-	4: 'line-clamp-4',
-}
-
 export const Card = forwardRef<HTMLElement, CardProps>(({
 	title,
 	titleLevel = 3,
@@ -259,7 +254,7 @@ export const Card = forwardRef<HTMLElement, CardProps>(({
 							))}
 						</div>
 					)}
-					{description && <Text variant="l" className={clampDescription ? descriptionClampClassMap[clampDescription] : undefined}>{description}</Text>}
+					{description && <Text variant="l" className={descriptionClampClass(clampDescription)}>{description}</Text>}
 					{tag && (
 						<div className="relative z-10">
 							{tag.tone ? <Badge tone={tag.tone}>{tag.label}</Badge> : <Tag size="S" label={tag.label} href={tag.href} />}

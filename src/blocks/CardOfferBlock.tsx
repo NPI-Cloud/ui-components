@@ -3,6 +3,7 @@
 import { Image } from '../components/ui-primitives'
 import { CardOffer, type CardOfferAction, type CardOfferDisplay, type CardOfferMetaItem } from '../components/CardOffer'
 import type { CtaTracking } from '../components/cta-tracking'
+import { toDescriptionClampLines } from '../components/description-clamp'
 import { iconRegistryM, type IconName } from '../icons'
 import type { ButtonBlockVariant } from './ButtonBlock'
 
@@ -19,6 +20,9 @@ export interface CardOfferBlockProps {
 	label?: string | null
 	title?: string | null
 	description?: string | null
+	/** Clamp the description to this many lines. Stored as a plain integer, so anything outside
+	 * the supported 1-6 renders unclamped. */
+	clampDescription?: number | null
 	statusTag?: string | null
 	display?: CardOfferBlockDisplay | null
 	/** Stretch the card to its grid cell's height so a row of cards ends on one baseline. */
@@ -55,7 +59,7 @@ const toIconName = (name: string | null | undefined): IconName =>
 	name && name in iconRegistryM ? (name as IconName) : DEFAULT_META_ICON
 
 export function CardOfferBlock(
-	{ label, title, description, statusTag, display, fillHeight, meta, imageUrl, imageAlt, href, ctaLabel, ctaUrl, ctaIcon, ctaIconAfter, ctaVariant, ctaNewTab, ctaTracking }:
+	{ label, title, description, clampDescription, statusTag, display, fillHeight, meta, imageUrl, imageAlt, href, ctaLabel, ctaUrl, ctaIcon, ctaIconAfter, ctaVariant, ctaNewTab, ctaTracking }:
 		CardOfferBlockProps,
 ) {
 	const metaItems: CardOfferMetaItem[] = (meta ?? []).flatMap(item => {
@@ -90,6 +94,7 @@ export function CardOfferBlock(
 			label={label ?? undefined}
 			title={title || 'Název nabídky'}
 			description={description ?? undefined}
+			clampDescription={toDescriptionClampLines(clampDescription)}
 			statusTag={statusTag ?? undefined}
 			meta={metaItems.length > 0 ? metaItems : undefined}
 			actions={actions}
