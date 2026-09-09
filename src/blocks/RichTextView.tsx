@@ -1,5 +1,7 @@
 'use client'
 
+import { tableSpan, tableCellHasContent } from './table-grid'
+
 import { Link } from '../components/ui-primitives'
 import { Fragment, type ReactNode } from 'react'
 import { Accordion, AccordionItem } from '../components/Accordion'
@@ -86,13 +88,14 @@ const TABLE_CELL_JUSTIFY: Record<string, string> = { center: 'text-center', end:
 // Cell blocks are ordinary paragraphs — the cell padding frames them, so their outer
 // article-rhythm margins are zeroed at the edges. `justify` aligns the cell's text.
 function renderTableCell(node: SlateElement, key: number, headerRow: boolean, references: RichTextReferences): ReactNode {
+	if (node.covered === true && !tableCellHasContent(node)) return null
 	const children = (Array.isArray(node.children) ? node.children : []).map((child, i) => renderNode(child, i, references))
 	const justify = typeof node.justify === 'string' ? TABLE_CELL_JUSTIFY[node.justify] : undefined
 	const cellClassName = `px-npi-4 py-npi-2 align-top [&>:first-child]:mt-0 [&>:last-child]:mb-0${justify ? ` ${justify}` : ''}`
 	const header = node.header === true || node.headerScope === 'row' || headerRow
 	return header
-		? <th key={key} scope={node.headerScope === 'row' ? 'row' : 'col'} className={`${cellClassName} font-bold`}>{children}</th>
-		: <td key={key} className={cellClassName}>{children}</td>
+		? <th rowSpan={tableSpan(node.rowSpan)} colSpan={tableSpan(node.colSpan)} key={key} scope={node.headerScope === 'row' ? 'row' : 'col'} className={`${cellClassName} font-bold`}>{children}</th>
+		: <td rowSpan={tableSpan(node.rowSpan)} colSpan={tableSpan(node.colSpan)} key={key} className={cellClassName}>{children}</td>
 }
 
 function renderNode(node: SlateNode, key: number, references: RichTextReferences): ReactNode {

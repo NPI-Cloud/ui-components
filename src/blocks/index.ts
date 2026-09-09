@@ -100,3 +100,4 @@ export { VideoTemplate, type VideoTemplateProps } from './VideoTemplate'
 
 export { parseBlueskyPostUrl } from './bluesky-url'
 export { BlueskyPost } from './BlueskyPost'
+export { expandTableGrid, tableSpan, tableCellHasContent, type TableCellSpan } from './table-grid'
