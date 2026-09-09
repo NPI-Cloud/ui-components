@@ -5,6 +5,8 @@ import { clsx } from 'clsx'
 import { useState } from 'react'
 import { Text } from '../components/Text'
 import { Lightbox } from '../components/Lightbox'
+import { BlueskyPost } from './BlueskyPost'
+import { parseBlueskyPostUrl } from './bluesky-url'
 import { toEmbedUrl } from '../components/Video'
 
 export const mediaBlockAspects = ['16:9', '4:3', '1:1', '3:2', 'auto'] as const
@@ -25,7 +27,7 @@ export interface MediaBlockProps {
 	 */
 	imageWidth?: number | null
 	imageHeight?: number | null
-	/** YouTube or Vimeo URL — when parseable, embeds an iframe instead of the image. */
+	/** YouTube, Vimeo or Bluesky post URL — when parseable, embeds an iframe instead of the image. */
 	videoUrl?: string | null
 	/** Caption rendered below the media as `<figcaption>`. */
 	caption?: string | null
@@ -81,6 +83,7 @@ export function MediaBlock(
 	const [zoomOpen, setZoomOpen] = useState(false)
 
 	const media = (() => {
+		if (videoUrl && parseBlueskyPostUrl(videoUrl)) return <BlueskyPost key={videoUrl} url={videoUrl} />
 		if (embedUrl) {
 			return (
 				<div className="relative aspect-[16/9] w-full overflow-hidden rounded-npi-xxs bg-npi-blue-lighter">

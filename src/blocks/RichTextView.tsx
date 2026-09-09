@@ -111,7 +111,7 @@ function renderNode(node: SlateNode, key: number, references: RichTextReferences
 		case 'unorderedList':
 			return <ul key={key} className="list-disc pl-5 my-npi-4 space-y-npi-1">{children}</ul>
 		case 'orderedList':
-			return <ol key={key} className="list-decimal pl-5 my-npi-4 space-y-npi-1">{children}</ol>
+			return <ol key={key} start={typeof node.start === 'number' ? node.start : undefined} className="list-decimal pl-5 my-npi-4 space-y-npi-1">{children}</ol>
 		case 'listItem':
 			return <li key={key}>{children}</li>
 		case 'anchor': {

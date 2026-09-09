@@ -97,3 +97,6 @@ export {
 } from './TextBlock'
 export { VideoBlock, type VideoBlockProps } from './VideoBlock'
 export { VideoTemplate, type VideoTemplateProps } from './VideoTemplate'
+
+export { parseBlueskyPostUrl } from './bluesky-url'
+export { BlueskyPost } from './BlueskyPost'
