@@ -12,6 +12,8 @@ export interface OrgEmployeeItem {
 	email?: string | null
 	/** Work phone — rendered as a `tel:` link. */
 	phone?: string | null
+	/** Staff portrait, uploaded in the admin. Without one the card falls back to the initials avatar. */
+	photoUrl?: string | null
 }
 
 export interface OrgEmployeesBlockProps {
@@ -42,8 +44,9 @@ const gridColsClass = (cols: number | null | undefined): string => {
 }
 
 /**
- * Grid of NPI staff contact cards (`ProfileCard` size S) — name, position, e-mail and phone per
- * person. The staff directory carries no photos, so every avatar renders the initials fallback.
+ * Grid of NPI staff contact cards (`ProfileCard` size S) — portrait, name, position, e-mail and
+ * phone per person. Helen serves no photo, so a person without one uploaded in the admin renders
+ * the initials avatar.
  *
  * `items-start`: a grid row stretches to its tallest card by default, which would push a short
  * card's vertically-centered text away from its avatar — keep every card at intrinsic height.
@@ -62,6 +65,7 @@ export function OrgEmployeesBlock({ items, columns }: OrgEmployeesBlockProps) {
 					detail={item.unit ?? undefined}
 					email={item.email ?? undefined}
 					phone={item.phone ?? undefined}
+					avatarSrc={item.photoUrl ?? undefined}
 				/>
 			))}
 		</div>
