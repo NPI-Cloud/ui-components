@@ -22,6 +22,8 @@ export {
 } from './ButtonBlock'
 export { CardBlock, type CardBlockAspect, cardBlockAspects, type CardBlockProps } from './CardBlock'
 export { CardOfferBlock, type CardOfferBlockDisplay, type CardOfferBlockMetaItem, type CardOfferBlockProps } from './CardOfferBlock'
+export { CarouselBlock, type CarouselBlockPerView, carouselBlockPerViewOptions, type CarouselBlockProps } from './CarouselBlock'
+export { CarouselEndBlock, CarouselStartBlock } from './CarouselMarkerBlocks'
 export { ColumnBlock } from './ColumnBlock'
 export { ContactCardBlock, type ContactCardBlockProps } from './ContactCardBlock'
 export { EmbedBlock, type EmbedBlockProps } from './EmbedBlock'

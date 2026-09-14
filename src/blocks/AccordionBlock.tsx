@@ -4,6 +4,7 @@ import { Image } from '../components/ui-primitives'
 import type { ReactNode } from 'react'
 import { Accordion, AccordionItem } from '../components/Accordion'
 import { clsx } from 'clsx'
+import { pluralizeItems } from './pluralize-items'
 import { normalizeRichContent, renderRichBlocks, renderRichInlines, textBlockAlignClass, type TextBlockRichContent } from './TextBlock'
 
 export type AccordionBlockSize = 's' | 'm'
@@ -91,10 +92,4 @@ export function AccordionStartBlock({ itemCount }: { itemCount?: number }) {
 			<span>{itemCount === undefined ? 'Akordeon' : `Akordeon · ${itemCount} ${pluralizeItems(itemCount)}`}</span>
 		</div>
 	)
-}
-
-function pluralizeItems(count: number): string {
-	if (count === 1) return 'položka'
-	if (count >= 2 && count <= 4) return 'položky'
-	return 'položek'
 }
