@@ -51,6 +51,14 @@ export interface TagProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonElem
 	newTab?: boolean
 }
 
+/**
+ * Icons are centred on the flex line, but a line of text is not: its glyphs sit below the line box's
+ * centre by the font's ascent/descent asymmetry — `(ascent − descent) / 2 − x-height / 2`, which is
+ * 0.125em in Noto Sans. Nudging every icon down by that much puts it on the label's optical centre at
+ * either size; a label-only tag is untouched, so no tag changes height or position.
+ */
+const ICON_OPTICAL_ALIGN = 'translate-y-[0.125em]'
+
 export const Tag = forwardRef<HTMLButtonElement | HTMLAnchorElement, TagProps>(
 	({ label, size = 'M', iconBefore, iconAfter, inverted = false, onRemove, removeLabel = 'Odebrat', href, newTab = false, className, ...props }, ref) => {
 		const showIconBefore = iconBefore != null && size === 'M'
@@ -59,15 +67,15 @@ export const Tag = forwardRef<HTMLButtonElement | HTMLAnchorElement, TagProps>(
 
 		const inner = (
 			<>
-				{showIconBefore && <Icon name={iconBefore} size="s" className="size-4 shrink-0" />}
+				{showIconBefore && <Icon name={iconBefore} size="s" className={`size-4 shrink-0 ${ICON_OPTICAL_ALIGN}`} />}
 				<span>{label}</span>
-				{showIconAfter && <Icon name={iconAfter} size="s" className="size-4 shrink-0" />}
+				{showIconAfter && <Icon name={iconAfter} size="s" className={`size-4 shrink-0 ${ICON_OPTICAL_ALIGN}`} />}
 				{showRemove && (
 					<span
 						role="button"
 						tabIndex={0}
 						aria-label={removeLabel}
-						className="inline-flex items-center justify-center rounded-npi-xxs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-npi-blue-light"
+						className={`inline-flex items-center justify-center rounded-npi-xxs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-npi-blue-light ${ICON_OPTICAL_ALIGN}`}
 						onClick={e => {
 							e.stopPropagation()
 							onRemove?.()
