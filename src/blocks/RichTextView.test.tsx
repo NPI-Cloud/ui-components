@@ -117,3 +117,32 @@ describe('RichTextView editor-authored table', () => {
 		expect(html).toContain('Obsah vody')
 	})
 })
+
+// A button or card whose destination was picked in the editor carries it on a reference row; the
+// node's own url/href is the authoring-time snapshot. The row wins when the renderer resolved it.
+const linkedBlocksDocument = {
+	children: [
+		{ type: 'button', children: [{ text: '' }], label: 'Přihlásit', url: 'https://snapshot.example/', referenceId: 'ref-button' },
+		{ type: 'button', children: [{ text: '' }], label: 'Bez řádku', url: 'https://legacy.example/' },
+		{ type: 'card', children: [{ text: '' }], title: 'Karta', href: 'https://card-snapshot.example/', referenceId: 'ref-card' },
+	],
+}
+
+describe('RichTextView block destinations', () => {
+	test('a resolved reference row wins over the node snapshot; a rowless block keeps its url', () => {
+		const html = renderToStaticMarkup(
+			<RichTextView value={linkedBlocksDocument} references={{ 'ref-button': { href: '/o-nas' }, 'ref-card': { href: '/kurzy', url: 'https://img.example/a.jpg', alt: 'A' } }} />,
+		)
+		expect(html).toContain('href="/o-nas"')
+		expect(html).not.toContain('https://snapshot.example/')
+		expect(html).toContain('href="https://legacy.example/"')
+		expect(html).toContain('href="/kurzy"')
+		expect(html).not.toContain('https://card-snapshot.example/')
+	})
+
+	test('a row that resolved to no href falls back to the snapshot', () => {
+		const html = renderToStaticMarkup(<RichTextView value={linkedBlocksDocument} references={{ 'ref-button': {}, 'ref-card': {} }} />)
+		expect(html).toContain('href="https://snapshot.example/"')
+		expect(html).toContain('href="https://card-snapshot.example/"')
+	})
+})

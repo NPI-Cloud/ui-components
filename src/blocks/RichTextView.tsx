@@ -239,7 +239,9 @@ function renderNode(node: SlateNode, key: number, references: RichTextReferences
 					imageUrl={img?.url ?? undefined}
 					imageAlt={img?.alt ?? undefined}
 					aspect={asCardAspect(node.aspect)}
-					href={asString(node.href) || undefined}
+					// The row also carries the whole-card destination, resolved for the rendering site;
+					// the node's `href` is the authoring-time snapshot.
+					href={img?.href || asString(node.href) || undefined}
 					ctaLabel={asString(node.ctaLabel) || undefined}
 					ctaUrl={asString(node.ctaUrl) || undefined}
 				/>
@@ -247,18 +249,22 @@ function renderNode(node: SlateNode, key: number, references: RichTextReferences
 		}
 		case 'bigNumber':
 			return <BigNumberBlock key={key} value={asString(node.value)} label={asString(node.label)} size={node.size === 'm' ? 'm' : 'l'} />
-		case 'button':
+		case 'button': {
+			// A button that had a destination picked carries it on a reference row (an internal page
+			// resolved for the rendering site); the node's `url` is the authoring-time snapshot.
+			const link = typeof node.referenceId === 'string' ? references[node.referenceId] : undefined
 			return (
 				<ButtonBlock
 					key={key}
 					label={asString(node.label)}
-					url={asString(node.url) || undefined}
+					url={link?.href || asString(node.url) || undefined}
 					variant={asButtonVariant(node.variant)}
 					inverted={Boolean(node.inverted)}
 					iconBefore={asString(node.iconBefore) || undefined}
 					iconAfter={asString(node.iconAfter) || undefined}
 				/>
 			)
+		}
 		case 'download': {
 			const variants = toDownloadVariants(node.variants)
 			if (variants.length === 0) return null
