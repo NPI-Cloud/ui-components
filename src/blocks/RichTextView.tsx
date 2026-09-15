@@ -62,7 +62,15 @@ function toDownloadVariants(raw: unknown): DownloadVariant[] {
  * resolved for the site doing the rendering. An anchor whose reference resolves to no href falls
  * back to the node's own `href` snapshot.
  */
-export type RichTextReferences = Record<string, { url?: string | null; alt?: string | null; href?: string | null }>
+export type RichTextReferences = Record<string, {
+	url?: string | null
+	alt?: string | null
+	href?: string | null
+	/** A card's button destination (`ContentReference.ctaLink`), resolved for the rendering site. */
+	ctaHref?: string | null
+	/** A download block's library file (`ContentReference.file`), one entry per format. */
+	downloadVariants?: DownloadVariant[] | null
+}>
 
 const isText = (node: SlateNode): node is SlateText => typeof (node as SlateText).text === 'string'
 
@@ -243,7 +251,7 @@ function renderNode(node: SlateNode, key: number, references: RichTextReferences
 					// the node's `href` is the authoring-time snapshot.
 					href={img?.href || asString(node.href) || undefined}
 					ctaLabel={asString(node.ctaLabel) || undefined}
-					ctaUrl={asString(node.ctaUrl) || undefined}
+					ctaUrl={img?.ctaHref || asString(node.ctaUrl) || undefined}
 				/>
 			)
 		}
@@ -266,7 +274,9 @@ function renderNode(node: SlateNode, key: number, references: RichTextReferences
 			)
 		}
 		case 'download': {
-			const variants = toDownloadVariants(node.variants)
+			// A library file on the reference row wins; the node's typed list is the fallback.
+			const file = typeof node.referenceId === 'string' ? references[node.referenceId]?.downloadVariants : undefined
+			const variants = file && file.length > 0 ? file : toDownloadVariants(node.variants)
 			if (variants.length === 0) return null
 			return <DownloadButton key={key} label={asString(node.label) || 'Stáhnout'} variants={variants} />
 		}

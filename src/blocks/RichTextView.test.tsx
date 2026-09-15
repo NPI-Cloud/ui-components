@@ -146,3 +146,30 @@ describe('RichTextView block destinations', () => {
 		expect(html).toContain('href="https://card-snapshot.example/"')
 	})
 })
+
+// A card's button and a download block resolve through the reference row too.
+const referencedExtrasDocument = {
+	children: [
+		{ type: 'card', children: [{ text: '' }], title: 'Karta', ctaLabel: 'Více', ctaUrl: 'https://cta-snapshot.example/', referenceId: 'ref-card' },
+		{ type: 'download', children: [{ text: '' }], label: 'Stáhnout', variants: [{ url: 'https://typed.example/a.pdf', format: 'PDF' }], referenceId: 'ref-download' },
+	],
+}
+
+describe('RichTextView card button and download references', () => {
+	test('ctaHref and library variants win over the node; without them the node stays', () => {
+		const resolved = renderToStaticMarkup(
+			<RichTextView
+				value={referencedExtrasDocument}
+				references={{ 'ref-card': { ctaHref: '/kurzy' }, 'ref-download': { downloadVariants: [{ url: 'https://files.example/m.pdf', fileName: 'm.pdf', fileType: 'application/pdf' }] } }}
+			/>,
+		)
+		expect(resolved).toContain('href="/kurzy"')
+		expect(resolved).not.toContain('https://cta-snapshot.example/')
+		expect(resolved).toContain('https://files.example/m.pdf')
+		expect(resolved).not.toContain('https://typed.example/a.pdf')
+
+		const fallback = renderToStaticMarkup(<RichTextView value={referencedExtrasDocument} references={{ 'ref-card': {}, 'ref-download': {} }} />)
+		expect(fallback).toContain('href="https://cta-snapshot.example/"')
+		expect(fallback).toContain('https://typed.example/a.pdf')
+	})
+})
