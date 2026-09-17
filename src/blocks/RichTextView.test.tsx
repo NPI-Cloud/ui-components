@@ -173,3 +173,46 @@ describe('RichTextView card button and download references', () => {
 		expect(fallback).toContain('https://typed.example/a.pdf')
 	})
 })
+
+// A link to a library file (`fileAnchor`) resolves through its row's file, not the node's snapshot.
+const fileAnchorDocument = {
+	children: [
+		{ type: 'paragraph', children: [{ text: 'Viz ' }, { type: 'fileAnchor', href: 'https://snapshot.example/old.pdf', referenceId: 'ref-file', children: [{ text: 'metodika' }] }] },
+	],
+}
+
+describe('RichTextView file links', () => {
+	test("link to the file's first format in a new tab", () => {
+		const html = renderToStaticMarkup(
+			<RichTextView
+				value={fileAnchorDocument}
+				references={{
+					'ref-file': {
+						downloadVariants: [
+							{ url: 'https://files.example/metodika.pdf', fileName: 'metodika.pdf', fileType: 'application/pdf' },
+							{ url: 'https://files.example/metodika.docx', fileName: 'metodika.docx', fileType: null },
+						],
+					},
+				}}
+			/>,
+		)
+		expect(html).toContain('href="https://files.example/metodika.pdf"')
+		expect(html).toContain('target="_blank"')
+		expect(html).toContain('rel="noopener noreferrer"')
+		expect(html).not.toContain('metodika.docx')
+		expect(html).not.toContain('snapshot.example')
+	})
+
+	test('a deleted file falls back to the snapshot href', () => {
+		const html = renderToStaticMarkup(<RichTextView value={fileAnchorDocument} references={{ 'ref-file': {} }} />)
+		expect(html).toContain('href="https://snapshot.example/old.pdf"')
+		expect(html).toContain('target="_blank"')
+	})
+
+	test('with neither a file nor a snapshot the text stays plain', () => {
+		const document = { children: [{ type: 'paragraph', children: [{ type: 'fileAnchor', href: '', referenceId: 'ref-file', children: [{ text: 'metodika' }] }] }] }
+		const html = renderToStaticMarkup(<RichTextView value={document} references={{}} />)
+		expect(html).toContain('metodika')
+		expect(html).not.toContain('<a')
+	})
+})

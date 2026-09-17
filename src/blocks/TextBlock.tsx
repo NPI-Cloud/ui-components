@@ -5,6 +5,7 @@ import { clsx } from 'clsx'
 import { Fragment, type ReactNode } from 'react'
 import { Text, type TextSize } from '../components/Text'
 import { TooltipInfo } from '../components/Tooltip'
+import type { RichTextReferences } from './RichTextView'
 
 type TextBlockVariant = TextSize
 
@@ -20,6 +21,16 @@ export interface TextBlockRichLeaf {
 export interface TextBlockRichAnchor {
 	type: 'anchor'
 	href: string
+	/** The `ContentReference` row saying where the link really goes; absent on a link authored before rows existed. */
+	referenceId?: string
+	children: TextBlockRichLeaf[]
+}
+
+/** A link to a document of the shared file library. Its row (`fileAnchor`) names the file. */
+export interface TextBlockRichFileAnchor {
+	type: 'fileAnchor'
+	href: string
+	referenceId?: string
 	children: TextBlockRichLeaf[]
 }
 
@@ -30,7 +41,7 @@ export interface TextBlockRichTooltip {
 	children: TextBlockRichInline[]
 }
 
-export type TextBlockRichInline = TextBlockRichLeaf | TextBlockRichAnchor | TextBlockRichTooltip
+export type TextBlockRichInline = TextBlockRichLeaf | TextBlockRichAnchor | TextBlockRichFileAnchor | TextBlockRichTooltip
 
 // Block text alignment, stored on the paragraph node (bindx-editor's `align` attribute). `start` is
 // the default (left) so an unset paragraph and an explicit `start` render identically.
@@ -63,6 +74,13 @@ export interface TextBlockRichContent {
 export interface TextBlockProps {
 	variant?: TextBlockVariant | null
 	content?: TextBlockRichContent | string | null
+	/**
+	 * The block content's resolved reference rows, keyed by the link node's `referenceId` — where a
+	 * link really goes now (`href`) and, for a link to a library file, that file's formats
+	 * (`downloadVariants`). Omitted (or a row that resolves to nothing) leaves every link on the
+	 * address stored on its node.
+	 */
+	references?: RichTextReferences
 	/** Wrap in a soft grey rounded box (matches `<Testimonial boxed>`). */
 	boxed?: boolean | null
 }
@@ -72,13 +90,13 @@ const FALLBACK_PARAGRAPH: TextBlockRichParagraph = {
 	children: [{ text: 'Textový blok' }],
 }
 
-export function TextBlock({ variant, content, boxed }: TextBlockProps) {
+export function TextBlock({ variant, content, references, boxed }: TextBlockProps) {
 	const blocks = normalizeRichContent(content) ?? [FALLBACK_PARAGRAPH]
 	return (
 		<div className={clsx('flex flex-col gap-npi-4', boxed && 'rounded-npi-m bg-npi-bg-light px-npi-12 py-npi-10')}>
 			{renderRichBlocks(blocks, (children, key, align) => (
 				<Text key={key} variant={variant ?? 'l'} className={textBlockAlignClass(align)}>
-					{renderRichInlines(children)}
+					{renderRichInlines(children, references)}
 				</Text>
 			))}
 		</div>
@@ -158,12 +176,12 @@ export function renderRichBlocks(
 	})
 }
 
-export function renderRichInlines(children: TextBlockRichInline[]): ReactNode {
+export function renderRichInlines(children: TextBlockRichInline[], references?: RichTextReferences): ReactNode {
 	return children.map((node, index) => {
 		if ('type' in node && node.type === 'tooltip') {
 			// The run itself stays plain — the info glyph placed after it is the only trigger.
 			// A tooltip with no body has nothing to reveal, so it renders as text alone.
-			const wrapped = renderRichInlines(Array.isArray(node.children) ? node.children : [])
+			const wrapped = renderRichInlines(Array.isArray(node.children) ? node.children : [], references)
 			return (
 				<Fragment key={index}>
 					{wrapped}
@@ -172,8 +190,24 @@ export function renderRichInlines(children: TextBlockRichInline[]): ReactNode {
 			)
 		}
 		if ('type' in node && node.type === 'anchor') {
+			// The row is the truth about where the link goes; `href` is the address stored when it was
+			// authored. A link with neither would be a dead `#`, so it falls back to plain text.
+			const href = referenceHref(node.referenceId, references) || node.href
+			if (!href) return <Fragment key={index}>{renderLeaves(Array.isArray(node.children) ? node.children : [])}</Fragment>
 			return (
-				<Link key={index} href={node.href} className="text-npi-blue underline">
+				<Link key={index} href={href} className="text-npi-blue underline">
+					{renderLeaves(Array.isArray(node.children) ? node.children : [])}
+				</Link>
+			)
+		}
+		if ('type' in node && node.type === 'fileAnchor') {
+			// A link to a library file goes to that file's first format as it is now, and opens in a new
+			// tab (files live cross-origin). Its node's `href` covers a file since deleted.
+			const file = node.referenceId ? references?.[node.referenceId]?.downloadVariants?.[0] : undefined
+			const href = file?.url || node.href
+			if (!href) return <Fragment key={index}>{renderLeaves(Array.isArray(node.children) ? node.children : [])}</Fragment>
+			return (
+				<Link key={index} href={href} target="_blank" rel="noopener noreferrer" className="text-npi-blue underline">
 					{renderLeaves(Array.isArray(node.children) ? node.children : [])}
 				</Link>
 			)
@@ -184,10 +218,17 @@ export function renderRichInlines(children: TextBlockRichInline[]): ReactNode {
 		// `leaf.text.split`. Proper list/heading formatting is a separate enhancement.
 		const candidate = node as { text?: unknown; children?: unknown }
 		if (typeof candidate.text !== 'string' && Array.isArray(candidate.children)) {
-			return <Fragment key={index}>{renderRichInlines(candidate.children as TextBlockRichInline[])}</Fragment>
+			return <Fragment key={index}>{renderRichInlines(candidate.children as TextBlockRichInline[], references)}</Fragment>
 		}
 		return <Fragment key={index}>{renderLeaf(node as TextBlockRichLeaf)}</Fragment>
 	})
+}
+
+// Where a link's row says it goes, `null` when there is no row, no reference map, or the row
+// resolved to nothing (a deleted target).
+function referenceHref(referenceId: string | undefined, references: RichTextReferences | undefined): string | null {
+	if (!referenceId) return null
+	return references?.[referenceId]?.href ?? null
 }
 
 function renderLeaves(leaves: TextBlockRichLeaf[]): ReactNode {

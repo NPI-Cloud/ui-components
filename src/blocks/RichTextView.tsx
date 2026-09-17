@@ -60,7 +60,8 @@ function toDownloadVariants(raw: unknown): DownloadVariant[] {
  * out of the JSON, so the renderer needs the resolved values handed in — `Content.references`
  * mapped to `{ url, alt }` for an image slot, and to `{ href }` for a link (`anchor`) reference,
  * resolved for the site doing the rendering. An anchor whose reference resolves to no href falls
- * back to the node's own `href` snapshot.
+ * back to the node's own `href` snapshot. A link to a library file (`fileAnchor`) reads the file's
+ * `downloadVariants` and falls back to its snapshot the same way.
  */
 export type RichTextReferences = Record<string, {
 	url?: string | null
@@ -68,7 +69,7 @@ export type RichTextReferences = Record<string, {
 	href?: string | null
 	/** A card's button destination (`ContentReference.ctaLink`), resolved for the rendering site. */
 	ctaHref?: string | null
-	/** A download block's library file (`ContentReference.file`), one entry per format. */
+	/** The library file of a download block or a file link (`ContentReference.file`), one entry per format. */
 	downloadVariants?: DownloadVariant[] | null
 }>
 
@@ -134,6 +135,20 @@ function renderNode(node: SlateNode, key: number, references: RichTextReferences
 			if (!href) return <Fragment key={key}>{children}</Fragment>
 			return (
 				<Link key={key} href={href} className="text-npi-blue underline">
+					{children}
+				</Link>
+			)
+		}
+		case 'fileAnchor': {
+			// A link to a library file goes to the file's first format as it is now; the node's `href`
+			// is the address at the time it was picked, kept for a file since deleted. It opens the way
+			// the download block's link does: in a new tab, since files live cross-origin where
+			// `download` is ignored.
+			const file = typeof node.referenceId === 'string' ? references[node.referenceId]?.downloadVariants?.[0] : undefined
+			const href = file?.url || asString(node.href)
+			if (!href) return <Fragment key={key}>{children}</Fragment>
+			return (
+				<Link key={key} href={href} target="_blank" rel="noopener noreferrer" className="text-npi-blue underline">
 					{children}
 				</Link>
 			)

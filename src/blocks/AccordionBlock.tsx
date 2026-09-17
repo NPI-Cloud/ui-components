@@ -5,6 +5,7 @@ import type { ReactNode } from 'react'
 import { Accordion, AccordionItem } from '../components/Accordion'
 import { clsx } from 'clsx'
 import { pluralizeItems } from './pluralize-items'
+import type { RichTextReferences } from './RichTextView'
 import { normalizeRichContent, renderRichBlocks, renderRichInlines, textBlockAlignClass, type TextBlockRichContent } from './TextBlock'
 
 export type AccordionBlockSize = 's' | 'm'
@@ -35,11 +36,13 @@ export interface AccordionItemBlockProps {
 	avatarAlt?: string | null
 	/** Rich-text answer — `content.data`, same Slate shape as the text block. */
 	content?: TextBlockRichContent | string | null
+	/** The answer's resolved reference rows, keyed by `referenceId` — see `TextBlockProps.references`. */
+	references?: RichTextReferences
 	/** Render expanded initially — the editor canvas opens items so their answers are visible. */
 	defaultOpen?: boolean
 }
 
-export function AccordionItemBlock({ question, description, avatarSrc, avatarAlt, content, defaultOpen }: AccordionItemBlockProps) {
+export function AccordionItemBlock({ question, description, avatarSrc, avatarAlt, content, references, defaultOpen }: AccordionItemBlockProps) {
 	const blocks = normalizeRichContent(content)
 	return (
 		<AccordionItem
@@ -61,7 +64,7 @@ export function AccordionItemBlock({ question, description, avatarSrc, avatarAlt
 			{blocks
 				? renderRichBlocks(blocks, (children, key, align) => (
 					<p key={key} className={clsx('[&:not(:last-child)]:mb-npi-4', textBlockAlignClass(align))}>
-						{renderRichInlines(children)}
+						{renderRichInlines(children, references)}
 					</p>
 				))
 				: <p className="text-npi-text-secondary">Obsah…</p>}

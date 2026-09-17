@@ -90,6 +90,7 @@ export {
 	type TextBlockRichAnchor,
 	type TextBlockRichBlock,
 	type TextBlockRichContent,
+	type TextBlockRichFileAnchor,
 	type TextBlockRichInline,
 	type TextBlockRichLeaf,
 	type TextBlockRichList,
