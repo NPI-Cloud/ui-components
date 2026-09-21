@@ -4,8 +4,10 @@ import { forwardRef } from 'react'
 import { useInverted } from '../utils/inverted-context'
 import { uic } from '../utils/uic'
 
+// `regular` = 400, `semibold` = Noto Sans 600, `bold` = 700. Every app that renders these loads
+// Noto Sans with 600 — the weight must stay in the font links or 600 falls back to a faux bold.
 export const textVariants = ['xl', 'l', 'm', 's', 'xs', 'label'] as const
-export const textWeights = ['regular', 'bold'] as const
+export const textWeights = ['regular', 'semibold', 'bold'] as const
 
 export type TextSize = (typeof textVariants)[number]
 export type TextWeight = (typeof textWeights)[number]
@@ -47,6 +49,7 @@ const TextRoot = uic('p', {
 		variant: variantClasses,
 		weight: {
 			regular: 'font-normal',
+			semibold: 'font-semibold',
 			bold: 'font-bold',
 		},
 		secondary: {
@@ -66,7 +69,9 @@ const TextRoot = uic('p', {
 	},
 	compoundVariants: [
 		{ variant: 's', weight: 'bold', className: 'font-semibold' },
+		// `label` is Bitter, which the apps load in 400/500/700 only — every weight resolves to its own bold.
 		{ variant: 'label', weight: 'regular', className: 'font-bold' },
+		{ variant: 'label', weight: 'semibold', className: 'font-bold' },
 		{ variant: 'label', weight: 'bold', className: 'font-bold' },
 		{ secondary: false, inverted: false, className: 'text-npi-text-primary' },
 	],
