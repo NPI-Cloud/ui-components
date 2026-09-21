@@ -112,7 +112,7 @@ export const uic = <El extends React.ElementType, Variants extends ConfigSchema 
 				dataAttrs[`data-${keyAsString}` as DataAttr<Variants>] = dataAttribute(variantValue)
 			}
 		}
-		const style = config?.style ? { ...config.style, ...(rest.style || {}) } : rest.style
+		const style = config?.style ? { ...config.style, ...rest.style } : rest.style
 		const finalClassName = useMemo(() => twMerge(clsx(cls(variantsMemoized), classNameProp)), [variantsMemoized, classNameProp])
 
 		let FinalComponent: React.ElementType = Component

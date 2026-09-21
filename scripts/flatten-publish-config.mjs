@@ -9,7 +9,7 @@ import { readFileSync, writeFileSync } from 'node:fs'
 
 const pkgPath = new URL('../package.json', import.meta.url)
 const pkg = JSON.parse(readFileSync(pkgPath, 'utf8'))
-const publishConfig = { ...(pkg.publishConfig ?? {}) }
+const publishConfig = { ...pkg.publishConfig }
 
 for (const field of ['main', 'module', 'types', 'exports', 'bin']) {
 	if (publishConfig[field] !== undefined) {
