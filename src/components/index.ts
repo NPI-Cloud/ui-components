@@ -241,6 +241,15 @@ export { Testimonial, type TestimonialProps, type TestimonialSize, testimonialSi
 export { Text, type TextProps, type TextSize, type TextSpec, textSpecs, textVariants, type TextWeight, textWeights } from './Text'
 export { Toast, type ToastProps, type ToastTone, toastTones } from './Toast'
 export { Image, Link, type UIImageComponent, type UIImageProps, type UILinkComponent, type UILinkProps, UIPrimitivesProvider } from './ui-primitives'
-export { Tooltip, TooltipInfo, type TooltipInfoProps, type TooltipPlacement, tooltipPlacements, type TooltipProps } from './Tooltip'
+export {
+	Tooltip,
+	TooltipInfo,
+	type TooltipInfoProps,
+	type TooltipPlacement,
+	tooltipPlacements,
+	type TooltipProps,
+	type TooltipVariant,
+	tooltipVariants,
+} from './Tooltip'
 export { UploadDropzone, type UploadDropzoneProps } from './UploadDropzone'
 export { toEmbedUrl, Video, type VideoProps } from './Video'

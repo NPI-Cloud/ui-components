@@ -21,6 +21,9 @@ import { Icon } from '../icons/Icon'
 export const tooltipPlacements = ['top', 'right', 'bottom', 'left'] as const
 export type TooltipPlacement = (typeof tooltipPlacements)[number]
 
+export const tooltipVariants = ['default', 'label'] as const
+export type TooltipVariant = (typeof tooltipVariants)[number]
+
 export interface TooltipProps extends Omit<HTMLAttributes<HTMLSpanElement>, 'content'> {
 	/** Trigger element — Tooltip wraps it. `aria-describedby` and listeners are attached to the focusable child element when possible. */
 	children: ReactNode
@@ -28,6 +31,11 @@ export interface TooltipProps extends Omit<HTMLAttributes<HTMLSpanElement>, 'con
 	content: ReactNode
 	/** Placement relative to the trigger. Defaults to `'top'`. */
 	placement?: TooltipPlacement
+	/**
+	 * Body shape. `default` is the 300px note with an arrow pointing at the trigger. `label` is the
+	 * compact arrowless pill that hugs its text — the posture used for a caption revealed over a photo.
+	 */
+	variant?: TooltipVariant
 	/** Delay before showing (ms). Defaults to `300`. */
 	delayShow?: number
 	/** Delay before hiding (ms). Defaults to `0`. */
@@ -36,9 +44,13 @@ export interface TooltipProps extends Omit<HTMLAttributes<HTMLSpanElement>, 'con
 	disabled?: boolean
 	/** Force the tooltip open (uncontrolled escape hatch — useful for stories and visual tests). */
 	forceOpen?: boolean
-	/** Width of the tooltip body. Defaults to `300` (matches Figma). Pass a number for px or a CSS string. */
+	/** Width of the tooltip body. Defaults to `300` for a bubble (matches Figma) and `fit-content` for a label. Pass a number for px or a CSS string. */
 	width?: number | string
+	/** Upper bound on the body width. Defaults to what the viewport allows. Pass a number for px or a CSS string. */
+	maxWidth?: number | string
 }
+
+const isLabel = (variant: TooltipVariant) => variant === 'label'
 
 // The arrow is a flex sibling of the body — flexbox keeps its flat base flush against
 // the body edge for every placement, so it always stays visually connected to the bubble.
@@ -55,12 +67,30 @@ const arrowGeometry: Record<TooltipPlacement, { width: number; height: number; v
 
 // Container holds [body, arrow] as a flex stack, positioned so the arrow apex sits a small
 // gap (npi-1 = 4px) away from the trigger. `mb/mt/mr/ml` is that gap; flexbox handles the
-// body→arrow seam. Cross-axis is centered on the trigger.
-const placementContainerClass: Record<TooltipPlacement, string> = {
-	top: 'bottom-full mb-npi-1 left-1/2 -translate-x-1/2 flex-col',
-	bottom: 'top-full mt-npi-1 left-1/2 -translate-x-1/2 flex-col',
-	left: 'right-full mr-npi-1 top-1/2 -translate-y-1/2 flex-row',
-	right: 'left-full ml-npi-1 top-1/2 -translate-y-1/2 flex-row',
+// body→arrow seam. Cross-axis is centered on the trigger. A `label` has no arrow to bridge the
+// distance, so it keeps the full 8px gap of its own.
+const placementContainerClass: Record<TooltipVariant, Record<TooltipPlacement, string>> = {
+	default: {
+		top: 'bottom-full mb-npi-1 left-1/2 -translate-x-1/2 flex-col',
+		bottom: 'top-full mt-npi-1 left-1/2 -translate-x-1/2 flex-col',
+		left: 'right-full mr-npi-1 top-1/2 -translate-y-1/2 flex-row',
+		right: 'left-full ml-npi-1 top-1/2 -translate-y-1/2 flex-row',
+	},
+	// Beside the trigger, a label hangs from the trigger's bottom edge rather than centring on it:
+	// the pill is taller than the glyph it belongs to, and flush bottoms are what reads as one unit.
+	label: {
+		top: 'bottom-full mb-npi-2 left-1/2 -translate-x-1/2 flex-col',
+		bottom: 'top-full mt-npi-2 left-1/2 -translate-x-1/2 flex-col',
+		left: 'right-full mr-npi-2 bottom-0 flex-row',
+		right: 'left-full ml-npi-2 bottom-0 flex-row',
+	},
+}
+
+// Padding is what separates the two shapes: a note is a 24px-padded box, a label is a 40px-tall
+// pill (16/8) whose text is one `Text L` line.
+const bodyVariantClass: Record<TooltipVariant, string> = {
+	default: 'p-npi-6',
+	label: 'px-npi-4 py-npi-2',
 }
 
 // The arrow precedes the body when the body sits after the trigger (bottom/right).
@@ -68,6 +98,42 @@ const arrowFirst = (placement: TooltipPlacement) => placement === 'bottom' || pl
 
 // Minimum gap the bubble keeps from the viewport edges when it has to be nudged back on screen.
 const VIEWPORT_MARGIN = 16
+
+// The gap a label keeps from its trigger (`mr-npi-2` / `ml-npi-2`).
+const LABEL_GAP = 8
+
+/**
+ * How wide a label may grow beside its trigger: the room between the trigger and the viewport edge
+ * it opens toward, less the margin it keeps from that edge. Without this bound a long caption runs
+ * straight off the screen on a phone, where the trigger sits centimetres from the edge and nothing
+ * else limits `max-content`. Sized rather than shifted, so the label wraps onto more lines instead
+ * of sliding out from under the glyph it belongs to.
+ */
+function useRoomBeside(rootRef: React.RefObject<HTMLSpanElement | null>, open: boolean, placement: TooltipPlacement, enabled: boolean): number | null {
+	const [room, setRoom] = useState<number | null>(null)
+	const beside = placement === 'left' || placement === 'right'
+
+	useLayoutEffect(() => {
+		if (!open || !enabled || !beside) {
+			setRoom(null)
+			return
+		}
+		const measure = () => {
+			const node = rootRef.current
+			if (!node) return
+			const rect = node.getBoundingClientRect()
+			const viewport = node.ownerDocument.defaultView?.innerWidth ?? 0
+			const space = placement === 'left' ? rect.left : viewport - rect.right
+			setRoom(Math.max(0, space - VIEWPORT_MARGIN - LABEL_GAP))
+		}
+		measure()
+		const view = rootRef.current?.ownerDocument.defaultView
+		view?.addEventListener('resize', measure)
+		return () => view?.removeEventListener('resize', measure)
+	}, [rootRef, open, enabled, beside, placement])
+
+	return room
+}
 
 /**
  * Keeps a top/bottom-placed bubble inside the viewport on narrow screens. The container centres the
@@ -129,14 +195,21 @@ export const Tooltip = forwardRef<HTMLSpanElement, TooltipProps>((props, ref) =>
 		children,
 		content,
 		placement = 'top',
+		variant = 'default',
 		delayShow = 300,
 		delayHide = 0,
 		disabled = false,
 		forceOpen = false,
-		width = 300,
+		width,
+		maxWidth,
 		className,
 		...rest
 	} = props
+
+	// A label hugs its text; a note keeps the fixed 300px of the design. `max-content` rather than
+	// `fit-content`: beside the trigger the popup's available width is zero, and a shrink-to-fit box
+	// would collapse to one word per line. `maxWidth` is what bounds a long label instead.
+	const resolvedWidth = width ?? (isLabel(variant) ? 'max-content' : 300)
 
 	const tooltipId = useId()
 	const canHover = useCanHover()
@@ -206,8 +279,15 @@ export const Tooltip = forwardRef<HTMLSpanElement, TooltipProps>((props, ref) =>
 	}, [open, canHover])
 
 	const isOpen = forceOpen || open
-	const widthStyle = typeof width === 'number' ? `${width}px` : width
-	const shiftX = useViewportShift(bodyRef, isOpen, placement, width)
+	const widthStyle = typeof resolvedWidth === 'number' ? `${resolvedWidth}px` : resolvedWidth
+	const shiftX = useViewportShift(bodyRef, isOpen, placement, resolvedWidth)
+	const roomBeside = useRoomBeside(rootRef, isOpen, placement, isLabel(variant))
+	// Every bound that applies, whichever is tightest.
+	const maxWidthStyle = `min(${[
+		`calc(100vw - ${2 * VIEWPORT_MARGIN}px)`,
+		typeof maxWidth === 'number' ? `${maxWidth}px` : maxWidth,
+		roomBeside === null ? undefined : `${roomBeside}px`,
+	].filter(Boolean).join(', ')})`
 
 	if (disabled) {
 		return (
@@ -308,25 +388,28 @@ export const Tooltip = forwardRef<HTMLSpanElement, TooltipProps>((props, ref) =>
 					id={tooltipId}
 					className={clsx(
 						'pointer-events-none absolute z-50 flex items-center',
-						placementContainerClass[placement],
+						placementContainerClass[variant][placement],
 					)}
 					style={{ filter: 'drop-shadow(0 20px 22.5px rgba(0, 0, 0, 0.06))' }}
 				>
-					{arrowFirst(placement) && arrow}
+					{!isLabel(variant) && arrowFirst(placement) && arrow}
 					<span
 						ref={bodyRef}
-						className="block rounded-npi-xs bg-npi-white p-npi-6 font-npi-sans text-[1rem] leading-[1.5] text-npi-text-primary"
+						className={clsx(
+							'block rounded-npi-xs bg-npi-white font-npi-sans text-[1rem] leading-[1.5] text-npi-text-primary',
+							bodyVariantClass[variant],
+						)}
 						style={{
 							width: widthStyle,
 							// Never wider than the viewport allows, and nudged back on screen when the
 							// trigger sits near an edge (the arrow stays put, pointing at the trigger).
-							maxWidth: `calc(100vw - ${2 * VIEWPORT_MARGIN}px)`,
+							maxWidth: maxWidthStyle,
 							transform: shiftX === 0 ? undefined : `translateX(${shiftX}px)`,
 						}}
 					>
 						{content}
 					</span>
-					{!arrowFirst(placement) && arrow}
+					{!isLabel(variant) && !arrowFirst(placement) && arrow}
 				</span>
 			)}
 		</span>

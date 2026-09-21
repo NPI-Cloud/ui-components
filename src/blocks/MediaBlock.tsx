@@ -5,6 +5,8 @@ import { clsx } from 'clsx'
 import { useState } from 'react'
 import { Text } from '../components/Text'
 import { Lightbox } from '../components/Lightbox'
+import { Tooltip } from '../components/Tooltip'
+import { Icon } from '../icons/Icon'
 import { BlueskyPost } from './BlueskyPost'
 import { parseBlueskyPostUrl } from './bluesky-url'
 import { toEmbedUrl } from '../components/Video'
@@ -14,6 +16,9 @@ export type MediaBlockAspect = (typeof mediaBlockAspects)[number]
 
 export const mediaBlockFits = ['cover', 'contain'] as const
 export type MediaBlockFit = (typeof mediaBlockFits)[number]
+
+export const mediaBlockCaptionDisplays = ['below', 'overlay'] as const
+export type MediaBlockCaptionDisplay = (typeof mediaBlockCaptionDisplays)[number]
 
 export interface MediaBlockProps {
 	/** Static image URL — shown when no parseable `videoUrl` is provided. */
@@ -35,6 +40,12 @@ export interface MediaBlockProps {
 	author?: string | null
 	/** Source attribution, appended to the caption line as `zdroj: …`. */
 	source?: string | null
+	/**
+	 * Where the caption line goes. `below` (default) renders it as a `<figcaption>` under the media.
+	 * `overlay` keeps the media clean: an info glyph sits in its bottom-right corner and reveals the
+	 * caption as a label on hover/focus (tap on touch) — the posture an article's cover photo uses.
+	 */
+	captionDisplay?: MediaBlockCaptionDisplay
 	/** Placeholder text shown when neither URL is provided. */
 	placeholderLabel?: string
 	/**
@@ -77,7 +88,23 @@ const aspectClasses: Record<Exclude<MediaBlockAspect, 'auto'>, string> = {
  * `<figcaption>`. Frame ratio and image fit are configurable via `aspect` / `fit`.
  */
 export function MediaBlock(
-	{ imageUrl, imageAlt, imageWidth, imageHeight, videoUrl, caption, author, source, placeholderLabel = 'Vizuál, foto, video', aspect = '16:9', fit = 'cover', href, zoomable, priority }: MediaBlockProps,
+	{
+		imageUrl,
+		imageAlt,
+		imageWidth,
+		imageHeight,
+		videoUrl,
+		caption,
+		author,
+		source,
+		captionDisplay = 'below',
+		placeholderLabel = 'Vizuál, foto, video',
+		aspect = '16:9',
+		fit = 'cover',
+		href,
+		zoomable,
+		priority,
+	}: MediaBlockProps,
 ) {
 	const embedUrl = videoUrl ? toEmbedUrl(videoUrl) : null
 	const [zoomOpen, setZoomOpen] = useState(false)
@@ -184,6 +211,41 @@ export function MediaBlock(
 
 	if (!figcaptionText) {
 		return <>{media}{lightbox}</>
+	}
+
+	if (captionDisplay === 'overlay') {
+		return (
+			<>
+				<figure className="relative">
+					{media}
+					{/* The caption also lives in the DOM as the figure's own caption, so it reaches assistive
+					  * tech whether or not the label is open. */}
+					<figcaption className="sr-only">{figcaptionText}</figcaption>
+					<span className="absolute bottom-npi-2 right-npi-2 leading-none">
+						<Tooltip content={figcaptionText} placement="left" variant="label" maxWidth="24rem">
+							<button
+								type="button"
+								aria-label="Popisek fotky"
+								className={clsx(
+									'relative block cursor-pointer rounded-full border-0 bg-transparent p-0 leading-none',
+									'text-npi-blue transition-colors hover:text-npi-blue-hover',
+									'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-npi-blue',
+									// Comfortable touch target without growing the glyph itself.
+									"before:absolute before:-inset-2 before:content-['']",
+								)}
+							>
+								{/* The glyph is a ring with a transparent middle — a white disc behind it keeps
+								  * it readable over any photo. */}
+								<span className="block size-npi-6 rounded-full bg-npi-white">
+									<Icon name="info" className="size-full" />
+								</span>
+							</button>
+						</Tooltip>
+					</span>
+				</figure>
+				{lightbox}
+			</>
+		)
 	}
 
 	return (

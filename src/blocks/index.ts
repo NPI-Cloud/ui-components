@@ -45,7 +45,16 @@ export { HeroBlock, type HeroBlockProps, type HeroSize, heroSizes } from './Hero
 export { JobPositionsBlock, type JobPositionsBlockItem, type JobPositionsBlockProps } from './JobPositionsBlock'
 export { MapAddressBlock, type MapAddressBlockProps } from './MapAddressBlock'
 export { MapBlock, type MapBlockMode, type MapBlockProps, type MapBlockRegion } from './MapBlock'
-export { MediaBlock, type MediaBlockAspect, mediaBlockAspects, type MediaBlockFit, mediaBlockFits, type MediaBlockProps } from './MediaBlock'
+export {
+	MediaBlock,
+	type MediaBlockAspect,
+	mediaBlockAspects,
+	type MediaBlockCaptionDisplay,
+	mediaBlockCaptionDisplays,
+	type MediaBlockFit,
+	mediaBlockFits,
+	type MediaBlockProps,
+} from './MediaBlock'
 export { type NavCardBlockBackground, NavCardBlock, type NavCardBlockProps, type NavCardBlockSize } from './NavCardBlock'
 export { NotFoundPage, type NotFoundPageProps, type NotFoundPageTheme, notFoundPageThemes } from './NotFoundPage'
 export { OrgContactSearchBlock, type OrgContactSearchBlockProps } from './OrgContactSearchBlock'
