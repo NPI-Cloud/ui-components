@@ -312,7 +312,9 @@ export const NavigationMenuBar = forwardRef<HTMLDivElement, NavigationMenuBarPro
 				)}
 				{...props}
 			>
-				<div className="mx-auto flex h-24 w-full max-w-npi-layout items-center justify-between gap-npi-6 px-npi-6">
+				{/* The desktop bar is wider than its content only when no CTA is configured; with one, the
+				    gap is all the separation the button gets, so it steps up from the mobile 24px. */}
+				<div className="mx-auto flex h-24 w-full max-w-npi-layout items-center justify-between gap-npi-6 px-npi-6 npi-desktop:gap-npi-8">
 					{children}
 				</div>
 			</div>
@@ -334,16 +336,18 @@ export const NavigationMenuBrand = forwardRef<HTMLAnchorElement, NavigationMenuB
 	({ logoSrc, title, logoAlt, className, ...props }, ref) => (
 		<Link
 			ref={ref}
-			// Below desktop the brand yields: a long site name wraps onto further lines (the longest one
-			// in use takes three, which still fit the bar's 96px) instead of pushing the mobile toggle
-			// past the right edge of the screen, where it can't be tapped — and, with the drawer open
-			// and page scroll locked, can't be reached at all. At desktop the name stays on one line
-			// and the brand keeps its width against the search field and the items row.
+			// The brand is what yields when the bar runs out of room: a long site name wraps onto
+			// further lines (the longest one in use takes three, which still fit the bar's 96px)
+			// rather than pushing the search field, the CTA or — below desktop — the mobile toggle
+			// past the right edge, where the toggle can't be tapped and, with the drawer open and
+			// page scroll locked, can't be reached at all. With room to spare the name stays on one
+			// line. The shrink factor outweighs the search field's, so the name gives up its width
+			// first and the field keeps its design size for as long as it can.
 			className={twMerge(
 				clsx(
-					'flex min-w-0 shrink items-center gap-npi-6 rounded-npi-xxs text-npi-text-primary',
+					'flex min-w-0 shrink-[3] items-center gap-npi-6 rounded-npi-xxs text-npi-text-primary',
 					'focus-visible:outline-3 focus-visible:outline-npi-blue-light',
-					'npi-desktop:shrink-0 npi-desktop:gap-npi-8',
+					'npi-desktop:gap-npi-8',
 					className,
 				),
 			)}
@@ -351,7 +355,7 @@ export const NavigationMenuBrand = forwardRef<HTMLAnchorElement, NavigationMenuB
 		>
 			<Image src={logoSrc} alt={title ? '' : logoAlt ?? ''} width={48} height={48} className="size-npi-12 shrink-0" />
 			{title && (
-				<Heading level={7} className="text-[1rem] font-semibold npi-desktop:whitespace-nowrap">
+				<Heading level={7} className="text-[1rem] font-semibold">
 					{title}
 				</Heading>
 			)}
