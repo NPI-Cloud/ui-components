@@ -1520,6 +1520,9 @@ export interface NavigationCta {
 	label: string
 	href?: string
 	onClick?: () => void
+	/** Icons flanking the label in the bar. The mobile drawer renders the CTA as a plain item, without them. */
+	iconBefore?: IconName
+	iconAfter?: IconName
 }
 
 export interface NavigationProps extends Omit<HTMLAttributes<HTMLElement>, 'children'> {
@@ -1578,7 +1581,15 @@ export const Navigation = forwardRef<HTMLElement, NavigationProps>((props, ref) 
 				)}
 				{!compact && cta && (
 					<NavigationMenuActions className="max-npi-desktop:hidden">
-						<Button variant="primary" label={cta.label} href={cta.href} onClick={cta.onClick} className="min-w-0!" />
+						<Button
+							variant="primary"
+							label={cta.label}
+							href={cta.href}
+							onClick={cta.onClick}
+							iconBefore={cta.iconBefore}
+							iconAfter={cta.iconAfter}
+							className="min-w-0!"
+						/>
 					</NavigationMenuActions>
 				)}
 				{compact && itemNodes.length > 0 && (
