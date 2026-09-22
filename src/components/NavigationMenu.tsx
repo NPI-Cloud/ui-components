@@ -9,6 +9,7 @@ import {
 	Children,
 	createContext,
 	forwardRef,
+	Fragment,
 	type HTMLAttributes,
 	isValidElement,
 	type ReactElement,
@@ -25,6 +26,7 @@ import { Icon, type IconName } from '../icons'
 import { Button } from './Button'
 import { Heading } from './Heading'
 import { Text } from './Text'
+import { hasNonBreakingSpace, splitNonBreakingRuns } from '../utils/non-breaking-runs'
 
 export const navigationMenuItemTrailings = ['chevron', 'badge', 'none'] as const
 export type NavigationMenuItemTrailing = (typeof navigationMenuItemTrailings)[number]
@@ -356,13 +358,32 @@ export const NavigationMenuBrand = forwardRef<HTMLAnchorElement, NavigationMenuB
 			<Image src={logoSrc} alt={title ? '' : logoAlt ?? ''} width={48} height={48} className="size-npi-12 shrink-0" />
 			{title && (
 				<Heading level={7} className="text-[1rem] font-semibold">
-					{title}
+					{renderBrandTitle(title)}
 				</Heading>
 			)}
 		</Link>
 	),
 )
 NavigationMenuBrand.displayName = 'NavigationMenuBrand'
+
+/**
+ * A non-breaking space in the site name says where the name must NOT wrap — the editor wants
+ * "Národní pedagogický institut" over "České republiky", not wherever the bar happens to run
+ * out. Each such run is an inline-block capped at the heading's width: the line breaks between
+ * runs, never inside one, for as long as the run fits on a line at all. On a narrow phone, where
+ * "Národní pedagogický institut" is wider than the room left beside the logo and the toggle, a
+ * literal non-breaking space would push the name under the toggle; the capped block wraps
+ * inside instead, the same as a name with no non-breaking space.
+ */
+function renderBrandTitle(title: string): ReactNode {
+	if (!hasNonBreakingSpace(title)) return title
+	return splitNonBreakingRuns(title).map((run, index) => (
+		<Fragment key={index}>
+			{index > 0 && ' '}
+			{run.includes(' ') ? <span className="inline-block max-w-full">{run}</span> : run}
+		</Fragment>
+	))
+}
 
 export interface NavigationMenuSearchProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size' | 'type' | 'onSubmit'> {
 	/** Accessible label — not visually shown (placeholder handles visible prompt). */
