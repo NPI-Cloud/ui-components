@@ -14,3 +14,13 @@ export function normalizeAnchor(value: string | null | undefined): string | null
 		.replace(/^-+|-+$/g, '')
 	return slug || null
 }
+
+/**
+ * Appends a link's stored anchor to a resolved address: `#` plus the normalized slug, so the link
+ * lands on the block whose `id` normalizes the same way. An address that already carries a fragment
+ * keeps it, and an empty anchor leaves the address alone.
+ */
+export function withAnchor(href: string, anchor: string | null | undefined): string {
+	const fragment = normalizeAnchor(anchor)
+	return fragment && !href.includes('#') ? `${href}#${fragment}` : href
+}
