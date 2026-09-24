@@ -20,7 +20,8 @@ export interface StickyBarProps extends HTMLAttributes<HTMLElement> {
 	/**
 	 * Contextual content — consumers compose `Heading`, `Text`, `StatusIndicator`, etc. (e.g. product
 	 * title and price). Shown inline on desktop; **hidden below `@npi-tablet`** so the bar collapses to
-	 * just the `action` on mobile and doesn't eat the viewport.
+	 * just the `action` on mobile and doesn't eat the viewport. A bar without an `action` is an
+	 * announcement whose content is all it has to say, so there the content shows at every width.
 	 */
 	children?: ReactNode
 	/**
@@ -64,8 +65,10 @@ const positionClass: Record<StickyBarPosition, string> = {
 // `children` are hidden), so the mobile bar is just a full-width button and stays compact.
 const innerClass = 'flex w-full max-w-npi-layout items-center gap-npi-4 @npi-tablet:gap-npi-6'
 
-// Context column (title, price, status, …): hidden on mobile, an inline row that grows on desktop.
-const contextClass = 'hidden min-w-0 flex-1 items-center gap-npi-6 @npi-tablet:flex'
+// Context column (title, price, status, …): an inline row that grows. Hidden on mobile next to an
+// action, which then is the whole bar; without one it is the only thing to show and stays.
+const contextClass = 'min-w-0 flex-1 items-center gap-npi-6'
+const contextDisplayClass = { besideAction: 'hidden @npi-tablet:flex', alone: 'flex' } as const
 
 // Action (CTA): full-width on mobile where it is the sole element, intrinsic width on desktop.
 // `flex flex-col` (default `items-stretch`) stretches the child button to the bar width on mobile.
@@ -97,7 +100,7 @@ export const StickyBar = forwardRef<HTMLElement, StickyBarProps>(({
 			    it to render on a dark background, so callers don't thread `inverted` onto every child. */}
 			<InvertedContext.Provider value={tone === 'inverted'}>
 				<div className={innerClass}>
-					{children != null && <div className={contextClass}>{children}</div>}
+					{children != null && <div className={clsx(contextClass, contextDisplayClass[action != null ? 'besideAction' : 'alone'])}>{children}</div>}
 					{action != null && <div className={actionClass}>{action}</div>}
 					{onDismiss != null && (
 						<button type="button" onClick={onDismiss} aria-label={dismissLabel} className={dismissButtonClass}>
