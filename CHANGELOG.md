@@ -1,5 +1,15 @@
 # @npicz/ui-components
 
+## 0.3.0
+
+### Minor Changes
+
+- 8373384: Carousel can show several slides side by side: narrow the slides with `slideClassName` (and set the gap with `gapClassName`), and the carousel measures how many fit and pages by that many: the controls, indicators and snap points move a whole page, the last page aligns to the end, and every slide in view stays reachable. Add `CarouselBlock`, which lays out 1–4 items per view on desktop (at most 2 on tablet, 1 on mobile).
+
+### Patch Changes
+
+- d1e6aad: StickyBar shows its content on mobile when it has no `action` — an announcement bar without a button used to collapse to just the close icon below `@npi-tablet`.
+
 ## 0.2.0
 
 ### Minor Changes
