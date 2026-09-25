@@ -33,6 +33,12 @@ type SlateElement = { type: string; children: SlateNode[]; [attr: string]: unkno
 type SlateNode = SlateText | SlateElement
 
 const asString = (v: unknown): string => (typeof v === 'string' ? v : '')
+// Block alignment (`align` on a paragraph / heading node — the editor's „Zarovnání" toggles); unset
+// is the writing direction's start, so it needs no style at all.
+const BLOCK_ALIGNS = ['start', 'center', 'end', 'justify'] as const
+type BlockAlign = (typeof BLOCK_ALIGNS)[number]
+const alignStyle = (v: unknown): { textAlign: BlockAlign } | undefined =>
+	typeof v === 'string' && (BLOCK_ALIGNS as readonly string[]).includes(v) ? { textAlign: v as BlockAlign } : undefined
 const BUTTON_VARIANTS = new Set<string>(['primary', 'secondary', 'tertiary', 'tertiarySmall', 'icon'])
 const asButtonVariant = (v: unknown): ButtonBlockVariant => (typeof v === 'string' && BUTTON_VARIANTS.has(v) ? (v as ButtonBlockVariant) : 'primary')
 const asMediaAspect = (v: unknown): MediaBlockAspect =>
@@ -113,12 +119,12 @@ function renderNode(node: SlateNode, key: number, references: RichTextReferences
 	const children = (Array.isArray(node.children) ? node.children : []).map((child, i) => renderNode(child, i, references))
 	switch (node.type) {
 		case 'paragraph':
-			return <p key={key} className="my-npi-4 leading-relaxed">{children}</p>
+			return <p key={key} className="my-npi-4 leading-relaxed" style={alignStyle(node.align)}>{children}</p>
 		case 'heading': {
 			// Body headings are H2–H4; render with the design-system `Heading` (matches the editor and ui-components).
 			// Spacing per Figma article rhythm: a heading starts a section — 48px above, 16px down to its body.
 			const level = Math.min(Math.max((node.level as number | undefined) ?? 3, 2), 4) as HeadingLevel
-			return <Heading key={key} level={level} className="mt-npi-12 mb-npi-4">{children}</Heading>
+			return <Heading key={key} level={level} className="mt-npi-12 mb-npi-4" style={alignStyle(node.align)}>{children}</Heading>
 		}
 		case 'unorderedList':
 			return <ul key={key} className="list-disc pl-5 my-npi-4 space-y-npi-1">{children}</ul>
