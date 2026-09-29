@@ -211,7 +211,8 @@ export const Card = forwardRef<HTMLElement, CardProps>(({
 									'w-full',
 									aspectClassMap[resolvedAspect],
 									// @md (M): 200px-wide visual on the left, 4px inner radius (designer note 12:246 — "volitelný poměr" = aspect kept configurable)
-									'@md:w-npi-50 @md:shrink-0 @md:rounded-npi-xxs',
+									// `self-start` keeps the flex row from stretching the visual to the text height, which would override the aspect.
+									'@md:w-npi-50 @md:shrink-0 @md:self-start @md:rounded-npi-xxs',
 									// @4xl (L): wider 400px visual with bigger indicator inset (designer note 12:247 — also "volitelný poměr")
 									'@4xl:w-[400px] @4xl:p-npi-4',
 								)}
