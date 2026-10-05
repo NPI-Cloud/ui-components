@@ -1,5 +1,11 @@
 # @npicz/ui-components
 
+## 0.4.0
+
+### Minor Changes
+
+- f3ff04d: Add `status` to `SelectOption` — a short state shown after the label in the dropdown and the trigger. A long label still truncates, but the status never does, so a disabled option keeps saying why.
+
 ## 0.3.0
 
 ### Minor Changes
