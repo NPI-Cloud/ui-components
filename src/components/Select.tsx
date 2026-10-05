@@ -12,6 +12,8 @@ export interface SelectOption {
 	label: ReactNode
 	/** Disables the option in the dropdown — it stays visible but can't be picked. */
 	disabled?: boolean
+	/** Short state shown after the label, such as why the option is disabled. A long label truncates; the status never does. */
+	status?: ReactNode
 }
 
 export const selectVariants = ['outlined', 'borderless'] as const
@@ -237,9 +239,11 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>((props, ref) =>
 		const selectedOptions = options.filter(o => selectedValues.includes(o.value))
 		if (multiple) {
 			// Spell out every selected label ("Praha, Brno") rather than a count; the trigger truncates on overflow.
-			return selectedOptions.map((o, i) => <span key={o.value}>{i > 0 && ', '}{o.label}</span>)
+			return selectedOptions.map((o, i) => <span key={o.value}>{i > 0 && ', '}{o.label}{o.status && <> {o.status}</>}</span>)
 		}
-		return selectedOptions[0]?.label ?? null
+		const selected = selectedOptions[0]
+		if (selected?.status) return <>{selected.label} {selected.status}</>
+		return selected?.label ?? null
 	})()
 
 	const showPlaceholder = triggerLabel === null || triggerLabel === undefined || triggerLabel === ''
@@ -411,7 +415,14 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>((props, ref) =>
 										)}
 									</span>
 								)}
-								<span className="min-w-0 flex-1 truncate">{option.label}</span>
+								{option.status
+									? (
+										<span className="flex min-w-0 flex-1">
+											<span className="truncate">{option.label}</span>
+											<span className="shrink-0 whitespace-pre">{' '}{option.status}</span>
+										</span>
+									)
+									: <span className="min-w-0 flex-1 truncate">{option.label}</span>}
 							</div>
 						)
 					})}
