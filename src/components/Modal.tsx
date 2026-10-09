@@ -54,7 +54,8 @@ const actionsClass = 'flex w-full flex-col items-stretch gap-npi-3 @npi-tablet:w
 
 const closeButtonClass = 'absolute right-npi-6 top-npi-6 inline-flex size-6 cursor-pointer items-center justify-center text-npi-blue '
 	+ '@npi-tablet:right-npi-10 @npi-tablet:top-npi-10 '
-	+ 'outline-none transition-colors hover:text-npi-blue-hover '
+	+ 'transition-colors hover:text-npi-blue-hover '
+	// No `outline-none` beside it: in Tailwind 4 that sets the outline style the width utility reads, and the ring would not draw.
 	+ 'focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-npi-blue-light'
 
 export const Modal = forwardRef<HTMLDialogElement, ModalProps>((props, ref) => {
