@@ -2,6 +2,7 @@
 
 import { tableSpan, tableCellHasContent } from './table-grid'
 
+import { normalizeAnchor } from '../anchor'
 import { Link } from '../components/ui-primitives'
 import { Fragment, type ReactNode } from 'react'
 import { Accordion, AccordionItem } from '../components/Accordion'
@@ -144,6 +145,12 @@ function renderNode(node: SlateNode, key: number, references: RichTextReferences
 					{children}
 				</Link>
 			)
+		}
+		case 'scrollTarget': {
+			// A kotva: the marked words a `#fragment` link lands on. The site's `scroll-padding-top`
+			// keeps them clear of the sticky navigation.
+			const id = normalizeAnchor(asString(node.identifier))
+			return id ? <span key={key} id={id}>{children}</span> : <Fragment key={key}>{children}</Fragment>
 		}
 		case 'fileAnchor': {
 			// A link to a library file goes to the file's first format as it is now; the node's `href`
