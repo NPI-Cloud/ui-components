@@ -216,3 +216,19 @@ describe('RichTextView file links', () => {
 		expect(html).not.toContain('<a')
 	})
 })
+
+describe('RichTextView kotvy', () => {
+	const body = (identifier: unknown) => ({
+		children: [{ type: 'paragraph', children: [{ text: 'Viz ' }, { type: 'scrollTarget', identifier, children: [{ text: 'ceník' }] }, { text: '.' }] }],
+	})
+
+	test('a kotva wraps its words in a span whose id is the normalized name, with no look of its own', () => {
+		const html = renderToStaticMarkup(<RichTextView value={body('Ceny a slevy')} />)
+		expect(html).toContain('<p class="my-npi-4 leading-relaxed">Viz <span id="ceny-a-slevy">ceník</span>.</p>')
+	})
+
+	test('a kotva with no usable name leaves its words as plain text', () => {
+		expect(renderToStaticMarkup(<RichTextView value={body(' # ')} />)).toContain('Viz ceník.</p>')
+		expect(renderToStaticMarkup(<RichTextView value={body(null)} />)).toContain('Viz ceník.</p>')
+	})
+})
