@@ -20,6 +20,10 @@ export interface EmbedBlockProps {
 // opaque origin: scripts still run, forms still POST cross-origin, and the resize beacon's
 // postMessage still reaches the parent. A widget that genuinely needs same-origin storage won't work
 // under this default; that's the deliberate safe posture.
+//
+// `allow-top-navigation-by-user-activation` is there for forms that post to `target="_top"` — the
+// SmartEmailing newsletter form does, and without the flag the browser drops the submit silently.
+// It lets the snippet navigate the page only in response to a click, never on its own.
 function buildSrcDoc(html: string, nonce: string): string {
 	const beacon = `(function(){function r(){parent.postMessage({__npiEmbed:${JSON.stringify(nonce)},height:document.documentElement.scrollHeight},'*')}`
 		+ `if(window.ResizeObserver){new ResizeObserver(r).observe(document.documentElement)}`
@@ -53,7 +57,7 @@ export function EmbedBlock({ html, title }: EmbedBlockProps) {
 			ref={ref}
 			title={title || 'Vložený obsah'}
 			srcDoc={buildSrcDoc(html, nonce)}
-			sandbox="allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox allow-presentation"
+			sandbox="allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox allow-presentation allow-top-navigation-by-user-activation"
 			loading="lazy"
 			className="block w-full border-0"
 			style={{ height: height ?? undefined, minHeight: height ? undefined : 200 }}
