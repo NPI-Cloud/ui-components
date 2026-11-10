@@ -198,6 +198,10 @@ export interface FooterLogosProps extends HTMLAttributes<HTMLDivElement> {}
  * Row of partner / funder logos. On mobile the logos sit in a two-column grid so the wide funder
  * lock-ups don't each take a full row; from `npi-tablet` up they flow as a horizontal wrapping row
  * (32px spacing, 48px on desktop).
+ *
+ * The logos are an editor's pictures and may be a funder's, so every gap here stays at least half
+ * the logo height (`h-npi-14`, 56px → 28px): the clear space the EU publicity rules ask for around
+ * a logo. Raise the logo height and the gaps go up with it.
  */
 export const FooterLogos = forwardRef<HTMLDivElement, FooterLogosProps>(
 	({ className, children, ...props }, ref) => (
