@@ -49,6 +49,8 @@ export {
 	MediaBlock,
 	type MediaBlockAspect,
 	mediaBlockAspects,
+	type MediaBlockCaptionAlign,
+	mediaBlockCaptionAligns,
 	type MediaBlockCaptionDisplay,
 	mediaBlockCaptionDisplays,
 	type MediaBlockFit,

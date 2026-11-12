@@ -20,6 +20,9 @@ export type MediaBlockFit = (typeof mediaBlockFits)[number]
 export const mediaBlockCaptionDisplays = ['below', 'overlay'] as const
 export type MediaBlockCaptionDisplay = (typeof mediaBlockCaptionDisplays)[number]
 
+export const mediaBlockCaptionAligns = ['start', 'center'] as const
+export type MediaBlockCaptionAlign = (typeof mediaBlockCaptionAligns)[number]
+
 export interface MediaBlockProps {
 	/** Static image URL — shown when no parseable `videoUrl` is provided. */
 	imageUrl?: string | null
@@ -46,6 +49,8 @@ export interface MediaBlockProps {
 	 * caption as a label on hover/focus (tap on touch) — the posture an article's cover photo uses.
 	 */
 	captionDisplay?: MediaBlockCaptionDisplay
+	/** Horizontal alignment of the `below` caption line; the media itself keeps its own placement. Defaults to `start`. */
+	captionAlign?: MediaBlockCaptionAlign
 	/** Placeholder text shown when neither URL is provided. */
 	placeholderLabel?: string
 	/**
@@ -98,6 +103,7 @@ export function MediaBlock(
 		author,
 		source,
 		captionDisplay = 'below',
+		captionAlign = 'start',
 		placeholderLabel = 'Vizuál, foto, video',
 		aspect = '16:9',
 		fit = 'cover',
@@ -252,7 +258,7 @@ export function MediaBlock(
 		<>
 			<figure className="flex flex-col items-start gap-npi-2">
 				{media}
-				<figcaption>
+				<figcaption className={clsx(captionAlign === 'center' && 'self-stretch text-center')}>
 					<Text variant="l">{figcaptionText}</Text>
 				</figcaption>
 			</figure>

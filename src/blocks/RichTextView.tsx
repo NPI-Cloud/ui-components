@@ -241,6 +241,7 @@ function renderNode(node: SlateNode, key: number, references: RichTextReferences
 					imageAlt={img?.alt ?? undefined}
 					videoUrl={asString(node.videoUrl) || undefined}
 					caption={asString(node.caption) || undefined}
+					captionAlign={node.captionAlign === 'center' ? 'center' : 'start'}
 					aspect={asMediaAspect(node.aspect)}
 					fit={node.fit === 'contain' ? 'contain' : 'cover'}
 				/>

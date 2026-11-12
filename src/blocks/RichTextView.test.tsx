@@ -232,3 +232,23 @@ describe('RichTextView kotvy', () => {
 		expect(renderToStaticMarkup(<RichTextView value={body(null)} />)).toContain('Viz ceník.</p>')
 	})
 })
+
+describe('RichTextView media caption alignment', () => {
+	const mediaDocument = (captionAlign?: string) => ({
+		children: [{ type: 'media', videoUrl: '', caption: 'Autor díla: Jana Nováková', aspect: '16:9', fit: 'cover', captionAlign, children: [{ text: '' }] }],
+	})
+	const figcaptionClass = (html: string) => html.match(/<figcaption([^>]*)>/)?.[1] ?? null
+
+	test('centres only the caption when the block asks for it', () => {
+		const html = renderToStaticMarkup(<RichTextView value={mediaDocument('center')} />)
+		expect(figcaptionClass(html)).toContain('text-center')
+		expect(html).toContain('items-start')
+	})
+
+	test('keeps the caption left-aligned by default and for an unknown value', () => {
+		for (const align of [undefined, 'start', 'right']) {
+			const html = renderToStaticMarkup(<RichTextView value={mediaDocument(align)} />)
+			expect(figcaptionClass(html)).not.toContain('text-center')
+		}
+	})
+})
