@@ -242,7 +242,8 @@ describe('RichTextView media caption alignment', () => {
 	test('centres only the caption when the block asks for it', () => {
 		const html = renderToStaticMarkup(<RichTextView value={mediaDocument('center')} />)
 		expect(figcaptionClass(html)).toContain('text-center')
-		expect(html).toContain('items-start')
+		// The figure keeps its start alignment: the media does not move with the caption.
+		expect(html).toContain('<figure class="flex flex-col items-start')
 	})
 
 	test('keeps the caption left-aligned by default and for an unknown value', () => {
