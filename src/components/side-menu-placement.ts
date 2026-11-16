@@ -4,6 +4,7 @@
 //
 // The top offset mirrors the site's `scroll-padding-top`: 1.5 rem below the (non-sticky) tablet
 // nav, 6 rem under the sticky desktop nav, plus a pinned top bar's height while one is on screen.
+// A site whose nav also stays on screen on tablet sets `--npi-side-menu-tablet-top` to clear it.
 // Literal class strings — Tailwind's scanner reads them from source.
 
 /**
@@ -13,8 +14,8 @@
  * the menu would never let it move.
  */
 export const sideMenuStickyClass =
-	'npi-tablet:sticky npi-tablet:top-[calc(1.5rem+var(--npi-top-bar-height,0px))] npi-desktop:top-[calc(6rem+var(--npi-top-bar-height,0px))]'
+	'npi-tablet:sticky npi-tablet:top-[calc(var(--npi-side-menu-tablet-top,1.5rem)+var(--npi-top-bar-height,0px))] npi-desktop:top-[calc(6rem+var(--npi-top-bar-height,0px))]'
 
 /** Viewport height minus the top offset and the same 1.5 rem of breathing room at the bottom. */
 export const sideMenuFillHeightClass =
-	'npi-tablet:min-h-[calc(100dvh-3rem-var(--npi-top-bar-height,0px))] npi-desktop:min-h-[calc(100dvh-7.5rem-var(--npi-top-bar-height,0px))]'
+	'npi-tablet:min-h-[calc(100dvh-var(--npi-side-menu-tablet-top,1.5rem)-1.5rem-var(--npi-top-bar-height,0px))] npi-desktop:min-h-[calc(100dvh-7.5rem-var(--npi-top-bar-height,0px))]'
