@@ -330,16 +330,19 @@ export interface NavigationMenuBrandProps extends AnchorHTMLAttributes<HTMLAncho
 	logoSrc: string
 	/** Site name rendered next to the logo. Omit to show only the logo. */
 	title?: string
+	/** A short line above the site name, such as the institution the site belongs to. Only with `title`. */
+	kicker?: string
 	/** Accessible label for the logo link when `title` is omitted. */
 	logoAlt?: string
 }
 
 export const NavigationMenuBrand = forwardRef<HTMLAnchorElement, NavigationMenuBrandProps>(
-	({ logoSrc, title, logoAlt, className, ...props }, ref) => (
+	({ logoSrc, title, kicker, logoAlt, className, ...props }, ref) => (
 		<Link
 			ref={ref}
 			// The brand is what yields when the bar runs out of room: a long site name wraps onto
-			// further lines (the longest one in use takes three, which still fit the bar's 96px)
+			// further lines (the longest one in use takes three, which still fit the bar's 96px; with a
+			// kicker, two lines of it and two of the name fit, so a site with one keeps its name short)
 			// rather than pushing the search field, the CTA or — below desktop — the mobile toggle
 			// past the right edge, where the toggle can't be tapped and, with the drawer open and
 			// page scroll locked, can't be reached at all. With room to spare the name stays on one
@@ -347,16 +350,25 @@ export const NavigationMenuBrand = forwardRef<HTMLAnchorElement, NavigationMenuB
 			// first and the field keeps its design size for as long as it can.
 			className={twMerge(
 				clsx(
-					'flex min-w-0 shrink-[3] items-center gap-npi-6 rounded-npi-xxs text-npi-text-primary',
+					'flex min-w-0 shrink-[3] items-center rounded-npi-xxs text-npi-text-primary',
 					'focus-visible:outline-3 focus-visible:outline-npi-blue-light',
-					'npi-desktop:gap-npi-8',
+					// Two lines read as one block with the logo, so they sit closer to it than a lone name.
+					title && kicker ? 'gap-npi-4' : 'gap-npi-6 npi-desktop:gap-npi-8',
 					className,
 				),
 			)}
 			{...props}
 		>
 			<Image src={logoSrc} alt={title ? '' : logoAlt ?? ''} width={48} height={48} className="size-npi-12 shrink-0" />
-			{title && (
+			{title && kicker && (
+				<div className="flex min-w-0 flex-col gap-npi-1">
+					<Text variant="s" secondary>{kicker}</Text>
+					<Heading level={7} className="text-[1rem] leading-[1.3] font-semibold">
+						{renderBrandTitle(title)}
+					</Heading>
+				</div>
+			)}
+			{title && !kicker && (
 				<Heading level={7} className="text-[1rem] font-semibold">
 					{renderBrandTitle(title)}
 				</Heading>
@@ -1523,6 +1535,8 @@ export interface NavigationBrand {
 	logoSrc: string
 	/** Site title rendered next to the logo. Omit to show only the logo. */
 	title?: string
+	/** A short line above the title, such as the institution the site belongs to. Only with `title`. */
+	kicker?: string
 	href?: string
 	logoAlt?: string
 }
@@ -1587,6 +1601,7 @@ export const Navigation = forwardRef<HTMLElement, NavigationProps>((props, ref) 
 				<NavigationMenuBrand
 					logoSrc={brand.logoSrc}
 					title={brand.title}
+					kicker={brand.kicker}
 					href={brand.href}
 					logoAlt={brand.logoAlt}
 				/>

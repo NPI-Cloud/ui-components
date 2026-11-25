@@ -27,3 +27,24 @@ describe('NavigationMenuBrand site name', () => {
 		expect(markup).toContain('<span class="inline-block max-w-full">We Lead</span> Schools</h')
 	})
 })
+
+describe('NavigationMenuBrand kicker', () => {
+	const withKicker = renderToStaticMarkup(<NavigationMenuBrand logoSrc="/logo.svg" title="Rámcové vzdělávací programy" kicker="Národní pedagogický institut ČR" href="/" />)
+
+	test('puts the kicker above the site name, next to the logo', () => {
+		expect(withKicker.indexOf('Národní pedagogický institut ČR')).toBeLessThan(withKicker.indexOf('Rámcové vzdělávací programy'))
+		expect(withKicker).toContain('gap-npi-4')
+		expect(withKicker).not.toContain('npi-desktop:gap-npi-8')
+	})
+
+	test('a site without one keeps the single name at the usual distance', () => {
+		const plain = brand('prohlednout')
+		expect(plain).toContain('gap-npi-6')
+		expect(plain).toContain('npi-desktop:gap-npi-8')
+	})
+
+	test('needs a title: a logo alone shows no kicker', () => {
+		expect(renderToStaticMarkup(<NavigationMenuBrand logoSrc="/logo.svg" kicker="Národní pedagogický institut ČR" logoAlt="NPI" href="/" />))
+			.not.toContain('Národní pedagogický institut ČR')
+	})
+})
