@@ -1,5 +1,11 @@
 # @npicz/ui-components
 
+## 0.5.0
+
+### Minor Changes
+
+- d5dde3c: NavigationMenu: the brand takes an optional `kicker`, a short line above the site name (such as the institution the site belongs to). With one, the two lines sit closer to the logo than a lone name.
+
 ## 0.4.0
 
 ### Minor Changes
